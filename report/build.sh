@@ -12,7 +12,6 @@ else
     echo 'latexmk and pdfLaTeX are required (TeX Live / MacTeX).' >&2
     exit 1
 fi
-python3 generate.py
 mkdir -p build
 "$LATEXMK" -pdf -interaction=nonstopmode -halt-on-error -outdir=build project_report.tex
 cp build/project_report.pdf project_report.pdf

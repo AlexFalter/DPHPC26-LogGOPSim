@@ -115,10 +115,25 @@ unit tests and `ctest -L integration` the end-to-end conversion and simulation
 checks. The optional ATLAHS integration is built and tested with
 `-DBUILD_ATLAHS=ON`; see `src/LogGOPSim/simulators/atlahs/README.md`.
 
+Project report
+==============
+
+Read the [report PDF](report/project_report.pdf). Edit
+[`report/project_report.tex`](report/project_report.tex) directly;
+figures live in `report/diagrams/` and shared styling in `report/plan-style.sty`.
+From the repository root, rebuild with:
+
+```sh
+./report/build.sh
+```
+
+Requires TeX Live or MacTeX with `latexmk`, pdfLaTeX, TikZ, Latin Modern,
+`geometry`, `microtype`, `longtable`, `booktabs`, `enumitem`, `listings`,
+`graphicx` and `hyperref`. Build auxiliaries stay in `report/build/`;
+the script copies the finished PDF to `report/project_report.pdf`.
+
 Further documentation
 =====================
-
-* [Project report](report/project_report.pdf), with [Markdown source](project_report.md).
 
 * `doc/binary_header.md`: the self-describing binary format.
 * `src/LogGOPSim/simulators/README.md`: connecting a simulator to the binary reader.

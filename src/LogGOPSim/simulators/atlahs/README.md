@@ -10,14 +10,41 @@ GOAL → txt2bin → packed trace ┤
 
 Each simulation uses its own private mmap, so counter updates do not change the file or affect another consumer. A trace must also use a matching convention supported by its consumer: explicit ATLAHS identities currently require the adapted ATLAHS backend. LogGOPSim rejects these messages because its matcher only understands numeric tags.
 
+## Upstream source
+
+The integration is maintained in [mgman03/atlahs](https://github.com/mgman03/atlahs/tree/packed-trace-integration),
+on branch `packed-trace-integration`, based on
+[spcl/atlahs](https://github.com/spcl/atlahs) commit
+`fb51a99f908e550318056ebb3e084f3d2fff55bd`.
+The parent repository pins the integration commit as a submodule;
+[`UPSTREAM_REVISION`](UPSTREAM_REVISION) records the original base used by the
+independent reference tests. Original licenses and documentation are retained.
+
+From the LogGOPSim repository root, initialize only this submodule:
+
+```sh
+git submodule update --init src/LogGOPSim/simulators/atlahs/upstream
+```
+
+The NCCL generator edits live under `upstream/goal_gen/ai/nccl_goal_generator/`;
+the loader and scheduler edits are under `upstream/sim/htsim-backend/sim/lgs/`
+and `datacenter/`. Review the changes against the original base with:
+
+```sh
+git -C src/LogGOPSim/simulators/atlahs/upstream diff fb51a99f908e550318056ebb3e084f3d2fff55bd
+```
+
+The reference tests use `git archive` at the original revision, keeping their
+baseline independent of the edited generator. Unrelated application submodules
+are not needed for the NCCL and NDP integration.
+
 ## Build
 
-The readable ATLAHS source lives in [`upstream/`](upstream/), beside the adapter. It is a submodule of [our ATLAHS fork](https://github.com/mgman03/atlahs), based on revision `fb51a99f908e550318056ebb3e084f3d2fff55bd`. See [UPSTREAM.md](UPSTREAM.md) for source navigation, the pin and Git review commands.
+The readable ATLAHS source lives in [`upstream/`](upstream/), beside the adapter. The fork and original revision are described above.
 
 Enable the optional backend in the existing build:
 
 ```sh
-git submodule update --init src/LogGOPSim/simulators/atlahs/upstream
 cmake -S src -B build -DBUILD_ATLAHS=ON
 cmake --build build --target txt2bin atlahs_htsim -j4
 ```
@@ -178,7 +205,6 @@ docker run --rm --entrypoint sh \
 Build the reference and enable the optional recorded test (the topology here matches this sixteen-GPU dataset):
 
 ```sh
-git submodule update --init src/LogGOPSim/simulators/atlahs/upstream
 cmake -S src -B build -DBUILD_ATLAHS=ON \
   -DATLAHS_GENERATOR_PYTHON=/path/to/venv/bin/python \
   -DATLAHS_RECORDED_TRACE_DIR="$PWD/build/atlahs-recorded/sqlite"
