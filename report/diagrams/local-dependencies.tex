@@ -1,0 +1,26 @@
+\begin{tikzpicture}[
+  op/.style={inputbox,text width=26mm,minimum height=12mm,inner sep=5pt,font=\small},
+  root/.style={line width=1.3pt}]
+\node[font=\small\bfseries] (rank0title) at (0,1.05) {Rank 0};
+\node[font=\small\bfseries] (rank1title) at (6,1.05) {Rank 1};
+\node[op,root] (a) at (0,0) {\texttt{l1: calc 1000}\\counter 0};
+\node[op,fill=orange!20] (b) at (1.9,-2.2) {\texttt{l2: send}\\tag 42; counter 1};
+\node[op,fill=orange!20] (c) at (-1.9,-2.2) {\texttt{l3: recv}\\tag 43; counter 1};
+\node[op,fill=green!12] (d) at (0,-4.4) {\texttt{l4: calc 100}\\\textbf{counter 2}};
+\node[op,root,fill=orange!20] (e) at (6,-2.2) {\texttt{l1: recv}\\tag 42; counter 0};
+\node[op,fill=orange!20] (f) at (6,-4.4) {\texttt{l2: send}\\tag 43; counter 1};
+\begin{scope}[on background layer]
+\node[draw=black!45,fill=black!2,rounded corners=5pt,inner sep=3mm,
+  fit=(rank0title)(a)(b)(c)(d)] {};
+\node[draw=black!45,fill=black!2,rounded corners=5pt,inner sep=3mm,
+  fit=(rank1title)(e)(f)] {};
+\end{scope}
+\draw[arrow] (a.south west) -- (c.north);
+\draw[arrow] (a.south east) -- (b.north);
+\draw[arrow] (c.south) -- (d.north west);
+\draw[arrow] (b.south) -- (d.north east);
+\draw[arrow] (e.south) -- (f.north);
+\draw[message] (b.east) -- node[above,font=\scriptsize] {request} (e.west);
+\draw[message,rounded corners=5pt] (f.south) -- (6,-5.65)
+  -- node[below,font=\scriptsize] {reply} (-1.9,-5.65) -- (c.south);
+\end{tikzpicture}

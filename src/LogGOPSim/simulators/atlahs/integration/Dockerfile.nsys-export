@@ -1,0 +1,8 @@
+# Export previously recorded traces; collecting GPU traces is not required.
+FROM ubuntu:24.04
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+    && curl -fSL https://developer.download.nvidia.com/devtools/repos/ubuntu2404/arm64/nsight-systems-cli-2026.3.1_2026.3.1.157-1_arm64.deb -o /tmp/nsys.deb \
+    && echo '58d561685db4e7d2693e64550639ef8fd16d2ca344160b135b7538ff20cc5669  /tmp/nsys.deb' | sha256sum -c - \
+    && apt-get install -y --no-install-recommends /tmp/nsys.deb \
+    && rm -rf /tmp/nsys.deb /var/lib/apt/lists/*
+ENTRYPOINT ["nsys"]

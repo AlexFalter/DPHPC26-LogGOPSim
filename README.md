@@ -23,6 +23,8 @@ Parts of the toolchain
 Building the toolchain
 ======================
 
+Requires CMake 3.20 or newer and a C++23 compiler/standard library.
+
 On a recent Debian-based distro such as Ubuntu you can install the build dependencies with something like
 ```
 sudo apt-get install cmake gengetopt re2c libgraphviz-dev python3 libclang-15-dev llvm-15-dev python3-clang-15 openmpi-bin openmpi-common libopenmpi-dev libunwind-dev
@@ -39,6 +41,104 @@ This project uses cmake as its build tool:
  cmake ../src/CMakeLists.txt
  make
 ```
+
+Source organization
+===================
+
+The trace pipeline lives under `src/LogGOPSim/`:
+
+| Directory | Responsibility |
+|---|---|
+| `goal_parsing/` | Parse GOAL rank graphs and TOML field declarations; collect trace statistics. |
+| `binary_writing/` | Pack individual records and rank graphs, and write the binary trace. |
+| `binary_reading/` | Access mapped binary traces and decode fields for consumers. |
+| `trace_format/` | Shared types, layouts, encodings, binary metadata, and bit/byte helpers. |
+| `simulators/` | Simulator adapters and simulator-specific execution code. |
+
+`txt2bin.cpp` coordinates GOAL parsing, layout construction, and binary writing.
+The two parsing passes use the same `GoalReader`; simulator adapters use the
+binary reader. Both sides use the definitions in `trace_format/`.
+
+Each simulator runs as its own program. `simulators/loggopsim/LogGOPSim.cpp`
+contains LogGOPSim's `main`, command-line setup and event loop; its adapter
+declares how binary fields map to `LogGOPSimNode`. ATLAHS keeps its own htsim
+executable and calls the same binary reader through `AtlahsAdapter`. Generate
+and convert the GOAL workload first, then invoke the desired simulator on the
+binary file. Node decoding takes place inside that simulator process.
+
+Inspecting a proposed schema
+============================
+
+```sh
+./txt2bin -i example.goal -o example.bin --report-schema
+```
+
+This still writes the legacy binary. After conversion, it prints observed field
+ranges, wildcard presence, value bases, suggested widths/bit offsets, and the
+proposed padded node record size. Numeric values are proposed as unsigned offsets
+from each field’s minimum; constants still use one bit. Statistics are gathered in the normal pass, keeping one rank's graph
+in memory. The proposed size excludes headers and dependency-index arrays.
+Values exceeding legacy storage widths produce errors instead of truncating.
+A failed conversion may leave a partial output file; do not use it.
+
+Writing the self-describing format
+=================================
+
+```sh
+./txt2bin -i example.goal -o example.sd.bin --format self-describing --report-schema
+```
+
+This reads the input twice: first to infer field ranges and widths, then to write
+the header, rank table, packed records, dependencies and roots. Each pass keeps
+one rank's graph at a time. Custom fields are loaded automatically from
+`config/custom_fields.toml`; declare their names/types there and supply their
+values on each GOAL operation. Their ranges are inferred from those values.
+Use `--custom-fields <file>` to read the declarations from another file. If the
+default file does not exist, no custom fields are declared.
+
+The simulator detects both formats automatically:
+
+```sh
+./LogGOPSim -f example.sd.bin
+```
+
+Omit `--format` or use `--format legacy` to retain the original output format. Legacy output omits custom
+values and prints a warning when they are declared. Keep the input unchanged
+between passes, and use a different output file. A failure while writing may
+leave partial output.
+
+Tests
+=====
+
+From the build directory, `ctest` runs all tests, `ctest -L unit` only the fast
+unit tests and `ctest -L integration` the end-to-end conversion and simulation
+checks. The optional ATLAHS integration is built and tested with
+`-DBUILD_ATLAHS=ON`; see `src/LogGOPSim/simulators/atlahs/README.md`.
+
+Further documentation
+=====================
+
+* [Project report](report/project_report.pdf), with [Markdown source](project_report.md).
+
+* `doc/binary_header.md`: the self-describing binary format.
+* `src/LogGOPSim/simulators/README.md`: connecting a simulator to the binary reader.
+* `src/LogGOPSim/simulators/atlahs/README.md`: the ATLAHS integration.
+* `tests/reference/README.md`: the saved reference results.
+
+Behaviour changes compared with upstream LogGOPSim
+==================================================
+
+Results are unchanged for valid schedules, with one bug fix:
+
+* **Eager messages matched by a larger receive.** If a message of at most `S`
+  bytes arrived before a receive with a larger buffer was posted, the receive
+  side treated it as rendezvous and completed the sender twice, which produced
+  wrong finish times. The receive side now uses the message's size, as the
+  sender does.
+* **Ranks without operations** are now supported; upstream crashed on them.
+* **Invalid schedules are rejected during conversion**, for example peers
+  outside `num_ranks` or values exceeding the legacy field widths. Upstream
+  converted them and the simulator could crash or truncate values.
 
 Simple usage example
 ====================

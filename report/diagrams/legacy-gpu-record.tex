@@ -1,0 +1,24 @@
+\begin{tikzpicture}[
+  cell/.style={draw=black!65,fill=blue!8,minimum height=11mm,inner sep=1pt,align=center,font=\small},
+  over/.style={cell,fill=red!18,line width=1pt},
+  sub/.style={draw=black!65,fill=red!8,minimum height=10mm,inner sep=1pt,align=center,font=\scriptsize}]
+\node[cell,minimum width=17mm] (dep) {\texttt{depcnt}\\4\,B};
+\node[cell,minimum width=12mm,right=0mm of dep] (type) {\texttt{type}\\1\,B};
+\node[cell,minimum width=17mm,right=0mm of type] (peer) {\texttt{peer}\\4\,B};
+\node[cell,minimum width=24mm,right=0mm of peer] (size) {\texttt{size}\\8\,B};
+\node[over,minimum width=17mm,right=0mm of size] (tag) {\texttt{tag}\\4\,B};
+\node[over,minimum width=12mm,right=0mm of tag] (cpu) {stream\\1\,B};
+\node[over,minimum width=12mm,right=0mm of cpu] (nic) {GPU\\1\,B};
+\node[cell,minimum width=17mm,right=0mm of nic] (ndep) {\texttt{nDep}\\4\,B};
+\node[cell,minimum width=17mm,right=0mm of ndep] (dix) {\texttt{depIx}\\4\,B};
+\node[cell,minimum width=17mm,right=0mm of dix] (nsdep) {\texttt{nSDep}\\4\,B};
+\node[cell,minimum width=17mm,right=0mm of nsdep] (sdix) {\texttt{sDepIx}\\4\,B};
+% Decimal digits of the example NCCL tag 3050012001.
+\node[sub,minimum width=13mm,anchor=south west] (t1) at ([xshift=-32mm,yshift=12mm]tag.north) {index\\\texttt{3}};
+\node[sub,minimum width=14mm,right=0mm of t1] (t2) {channel\\\texttt{05}};
+\node[sub,minimum width=15mm,right=0mm of t2] (t3) {sequence\\\texttt{0012}};
+\node[sub,minimum width=15mm,right=0mm of t3] (t4) {collective\\\texttt{0}};
+\node[sub,minimum width=14mm,right=0mm of t4] (t5) {comm.\\\texttt{01}};
+\draw[dashed,black!55] (t1.south west) -- (tag.north west);
+\draw[dashed,black!55] (t5.south east) -- (tag.north east);
+\end{tikzpicture}

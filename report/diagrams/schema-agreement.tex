@@ -1,0 +1,24 @@
+\begin{tikzpicture}[
+  common/.style={box,fill=blue!8,text width=74mm,align=left,inner sep=3mm},
+  adapter/.style={box,fill=green!12,text width=48mm,minimum height=18mm},
+  inherits/.style={-{Triangle[open,length=3mm,width=3mm]},thick}]
+\node[inputbox,text width=31mm] (file) at (0,0) {One self-describing\\binary};
+\node[common] (base) at (7,0) {
+  \textbf{SimulatorAdapter<Node>}\\
+  Shared \texttt{TraceReader}: validation + decoding\\[3pt]
+  \texttt{read\_node(rank, index)} $\rightarrow$ \texttt{Node}\\
+  \texttt{read\_root\_nodes(rank)}\\
+  \texttt{decrement\_dependency\_count(rank, index)}};
+\draw[arrow] (file) -- node[above,font=\small] {file data} (base);
+\node[adapter] (log) at (3.6,-3.5) {\textbf{LogGOPSimAdapter}\\\texttt{Node = LogGOPSimNode}\\LogGOPSim field bindings};
+\node[adapter] (atlas) at (10.4,-3.5) {\textbf{AtlahsAdapter}\\\texttt{Node = AtlahsNode}\\ATLAHS field bindings};
+\draw[inherits] (log.north) -- (log.north |- base.south);
+\draw[inherits] (atlas.north) -- (atlas.north |- base.south);
+\node[font=\small,fill=white] at (7,-2.1) {inherit the shared interface};
+\node[outputbox,text width=39mm] (ls) at (3.6,-5.7) {LogGOPSim scheduler};
+\node[outputbox,text width=39mm] (as) at (10.4,-5.7) {ATLAHS / htsim scheduler};
+\draw[arrow] ([xshift=-9mm]ls.north) -- node[left,font=\small] {request} ([xshift=-9mm]log.south);
+\draw[arrow] ([xshift=9mm]log.south) -- node[right,font=\small] {node} ([xshift=9mm]ls.north);
+\draw[arrow] ([xshift=-9mm]as.north) -- node[left,font=\small] {request} ([xshift=-9mm]atlas.south);
+\draw[arrow] ([xshift=9mm]atlas.south) -- node[right,font=\small] {node} ([xshift=9mm]as.north);
+\end{tikzpicture}

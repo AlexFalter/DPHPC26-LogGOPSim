@@ -1,0 +1,43 @@
+num_ranks 8
+
+rank 0 {
+l1: send 1b to 1 tag 0
+l2: send 1b to 2 tag 0
+l3: send 1b to 4 tag 0
+}
+
+rank 1 {
+l1: recv 1b from 0 tag 0
+l2: send 1b to 3 tag 0
+l2 requires l1
+l3: send 1b to 5 tag 0
+l3 requires l1
+}
+
+rank 2 {
+l1: recv 1b from 0 tag 0
+l2: send 1b to 6 tag 0
+l2 requires l1
+}
+
+rank 3 {
+l1: recv 1b from 1 tag 0
+l2: send 1b to 7 tag 0
+l2 requires l1
+}
+
+rank 4 {
+l1: recv 1b from 0 tag 0
+}
+
+rank 5 {
+l1: recv 1b from 1 tag 0
+}
+
+rank 6 {
+l1: recv 1b from 2 tag 0
+}
+
+rank 7 {
+l1: recv 1b from 3 tag 0
+}

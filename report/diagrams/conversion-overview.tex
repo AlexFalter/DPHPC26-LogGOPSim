@@ -1,0 +1,11 @@
+\begin{tikzpicture}[node distance=8mm]
+\node[inputbox,text width=35mm,minimum height=16mm] (c)
+  {\textbf{Pass 1}\\Collect ranges\\and counts};
+\node[processbox,text width=32mm,minimum height=16mm,right=of c] (l)
+  {Resolve\\file-wide layout};
+\node[processbox,text width=35mm,minimum height=16mm,right=of l] (w)
+  {\textbf{Pass 2}\\Reread and\\pack ranks};
+\node[outputbox,text width=27mm,minimum height=16mm,right=of w] (b)
+  {Binary output};
+\foreach \x/\y in {c/l,l/w,w/b} \draw[arrow] (\x)--(\y);
+\end{tikzpicture}

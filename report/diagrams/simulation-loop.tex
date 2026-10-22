@@ -1,0 +1,10 @@
+\begin{tikzpicture}[
+  loopstage/.style={text width=30mm,minimum height=12mm,inner sep=5pt}]
+\node[inputbox,loopstage] (q) at (0,0) {Take the next event};
+\node[processbox,loopstage] (p) at (4.6,0) {Process the event};
+\node[outputbox,loopstage] (s) at (9.2,0) {Schedule new events};
+\draw[arrow] (q.east) -- (p.west);
+\draw[arrow] (p.east) -- (s.west);
+\draw[arrow,rounded corners=5pt] (s.south) -- (9.2,-1.5)
+  -- node[below,font=\small] {repeat while events remain} (0,-1.5) -- (q.south);
+\end{tikzpicture}

@@ -1,0 +1,3 @@
+[submodule "src/LogGOPSim/simulators/atlahs/upstream"]
+	path = src/LogGOPSim/simulators/atlahs/upstream
+	url = https://github.com/mgman03/atlahs.git

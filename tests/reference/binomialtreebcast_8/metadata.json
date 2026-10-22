@@ -1,0 +1,47 @@
+{
+  "source_commit": "76451de16546c7ea39651c183cbc532f4a3457c0",
+  "generator_args": [
+    "--commsize",
+    "8",
+    "--datasize",
+    "1",
+    "--ptrn",
+    "binomialtreebcast"
+  ],
+  "simulator_args": [
+    "-L",
+    "2500",
+    "-o",
+    "1500",
+    "-g",
+    "1000",
+    "-G",
+    "6",
+    "-O",
+    "0",
+    "-S",
+    "65535",
+    "--network-type",
+    "LogGP"
+  ],
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "legacy_byte_order": "little",
+  "binary_sha256": "e684b0c57fc0cffa516690723da8ca69dec60431c9ab918cbf64f4d1de846aab",
+  "capture_date": "2026-10-19",
+  "build_settings": {
+    "CMAKE_BUILD_TYPE": "",
+    "CMAKE_C_COMPILER": "/Library/Developer/CommandLineTools/usr/bin/clang",
+    "CMAKE_CXX_COMPILER": "/Library/Developer/CommandLineTools/usr/bin/clang++",
+    "CMAKE_C_FLAGS": "",
+    "CMAKE_CXX_FLAGS": "",
+    "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG",
+    "CMAKE_OSX_SYSROOT": "/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk"
+  },
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "executable_sha256": {
+    "LogGOPSim": "8f07c9a65b110a9544d8cc17a525fc415deb677969dbe8381b8f7fdd8aa62ca8",
+    "txt2bin": "a2568ba6f724334b495121a32b696e1f57c8a5a22a3ef5837c8624ac133dddfe",
+    "schedgen": "6e59b160657fbdd4af538c7fe18f4c7b682563b617832f5b9d04199b1d8e8436"
+  }
+}

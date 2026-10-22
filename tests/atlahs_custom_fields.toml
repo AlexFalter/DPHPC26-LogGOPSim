@@ -1,0 +1,31 @@
+[[fields]]
+name = "gpu_id"
+type = "unsigned"
+
+[[fields]]
+name = "communicator_id"
+type = "unsigned"
+
+[[fields]]
+name = "channel_id"
+type = "unsigned"
+
+[[fields]]
+name = "sequence_id"
+type = "unsigned"
+
+[[fields]]
+name = "message_kind"
+type = "unsigned"
+
+[[fields]]
+name = "chunk_id"
+type = "unsigned"
+
+[[fields]]
+name = "stream_id"
+type = "unsigned"
+
+[[fields]]
+name = "peer_gpu_id"
+type = "unsigned"

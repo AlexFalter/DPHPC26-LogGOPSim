@@ -1,45 +1,17 @@
-CXX=g++
-CXXFLAGS= -std=c++11 -O0 -g -pedantic -Wno-deprecated -Wall -Wno-long-long -I/opt/homebrew/include/
-CCFLAGS= -O0 -g 
-LDFLAGS= -L/opt/homebrew/lib/ -lcgraph -g
+# Compatibility entry point; CMake owns compiler settings and generated sources.
+CMAKE ?= cmake
+BUILD_DIR ?= ../../build
 
-AUTOGEN_SRC= loggopsim_cmdline.c loggopsim_cmdline.h txt2bin_cmdline.h txt2bin_cmdline.c  
-LOGGOPSIM_OBJECTS= LogGOPSim.o 
-HLPR_OBJECTS= loggopsim_cmdline.o 
-ALL_OBJECTS= $(LOGGOPSIM_OBJECTS) $(HLPR_OBJECTS)
-BINARY= LogGOPSim
+.PHONY: all configure LogGOPSim txt2bin clean
 
-all: $(ALL_OBJECTS) $(AUTOGEN_SRC) txt2bin
-	$(CXX) $(CXXFLAGS) $(ALL_OBJECTS) -o $(BINARY) $(LDFLAGS)
+all: configure
+	$(CMAKE) --build "$(BUILD_DIR)" --target LogGOPSim txt2bin
 
-txt2bin:
-	re2c -o txt2bin.cpp txt2bin.re
-	gengetopt -F txt2bin_cmdline -i txt2bin_cmdline.ggo
-	$(CXX) -g -O3 txt2bin.cpp txt2bin_cmdline.c -o txt2bin
+configure:
+	@test -f "$(BUILD_DIR)/CMakeCache.txt" || $(CMAKE) -S .. -B "$(BUILD_DIR)"
 
-loggopsim_cmdline.c: loggopsim_cmdline.ggo 
-	gengetopt -F loggopsim_cmdline -i loggopsim_cmdline.ggo
-
-loggopsim_cmdline.h: loggopsim_cmdline.ggo
-	gengetopt -F loggopsim_cmdline -i loggopsim_cmdline.ggo
-
-txt2bin_cmdline.c: txt2bin_cmdline.ggo 
-	gengetopt -F txt2bin_cmdline -i txt2bin_cmdline.ggo
-
-txt2bin_cmdline.h: txt2bin_cmdline.ggo
-	gengetopt -F txt2bin_cmdline -i txt2bin_cmdline.ggo
-
-
-
-%.o: %.cpp $(AUTOGEN_SRC) *.hpp 
-	$(CXX) $(CXXFLAGS) -c $<
-
-%.o: %.c $(AUTOGEN_SRC) *.h
-	$(CXX) $(CCFLAGS) -c $<
+LogGOPSim txt2bin: configure
+	$(CMAKE) --build "$(BUILD_DIR)" --target $@
 
 clean:
-	rm -f $(AUTOGEN_SRC)
-	rm -f $(ALL_OBJECTS)
-	rm -f $(BINARY)
-	rm -f txt2bin.cpp txt2bin bin2txt bin2dot simtest
-	rm -f cmdline_txt2bin.*
+	@if test -f "$(BUILD_DIR)/CMakeCache.txt"; then $(CMAKE) --build "$(BUILD_DIR)" --target clean; fi

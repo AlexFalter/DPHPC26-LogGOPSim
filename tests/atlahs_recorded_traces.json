@@ -1,0 +1,26 @@
+{
+  "dataset": "Llama7B_N4_GPU16_TP1_PP1_DP16_BS32",
+  "base_url": "http://storage2.spcl.ethz.ch/traces/ai/llama/Llama7B_N4_GPU16_TP1_PP1_DP16_BS32/nsys_reports/",
+  "files": [
+    {
+      "name": "nsys_report_nid005785_107285.nsys-rep",
+      "bytes": 63641717,
+      "sha256": "7f8eff46854e297a7c1e002b0a7c1ad665777c0193a9b8d5fce22256e780ba2f"
+    },
+    {
+      "name": "nsys_report_nid005786_109975.nsys-rep",
+      "bytes": 63359380,
+      "sha256": "0c3f3364f4771c54471ce30ffff36654dff7a44c4405227c5f62acf8d2cad9ea"
+    },
+    {
+      "name": "nsys_report_nid005789_106910.nsys-rep",
+      "bytes": 63904097,
+      "sha256": "39174ffe354268b48e844da23670e394a2ae3d5b142216476c3db7793f8de413"
+    },
+    {
+      "name": "nsys_report_nid005800_104761.nsys-rep",
+      "bytes": 63664391,
+      "sha256": "46f31879dfd9fbae58d525bd563e156088bcf22bf97dfb7be0b0d3a491ab5ccf"
+    }
+  ]
+}

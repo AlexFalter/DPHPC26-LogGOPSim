@@ -1,0 +1,13 @@
+num_ranks 2
+rank 0 {
+l1: send 1000000b to 1 tag 0 cpu 0 stream_id 0 gpu_id 0 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 0 peer_gpu_id 0
+l2: send 1000000b to 1 tag 0 cpu 0 stream_id 1 gpu_id 1 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 1 peer_gpu_id 1
+l3: send 1000000b to 1 tag 0 cpu 0 stream_id 2 gpu_id 2 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 2 peer_gpu_id 2
+l4: send 1000000b to 1 tag 0 cpu 0 stream_id 3 gpu_id 3 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 3 peer_gpu_id 3
+}
+rank 1 {
+l1: recv 1000000b from 0 tag 0 cpu 0 stream_id 0 gpu_id 0 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 0 peer_gpu_id 0
+l2: recv 1000000b from 0 tag 0 cpu 0 stream_id 1 gpu_id 1 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 1 peer_gpu_id 1
+l3: recv 1000000b from 0 tag 0 cpu 0 stream_id 2 gpu_id 2 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 2 peer_gpu_id 2
+l4: recv 1000000b from 0 tag 0 cpu 0 stream_id 3 gpu_id 3 communicator_id 0 channel_id 0 sequence_id 0 message_kind 5 chunk_id 3 peer_gpu_id 3
+}

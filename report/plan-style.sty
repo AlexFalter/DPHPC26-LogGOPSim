@@ -1,0 +1,35 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{plan-style}[2026/10/21 Shared LogGOPSim plan layout]
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage[a4paper,margin=22mm]{geometry}
+\RequirePackage{microtype}
+\RequirePackage{array,longtable,booktabs}
+\RequirePackage{enumitem}
+\RequirePackage{listings}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}
+\RequirePackage[colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+\AtBeginDocument{\raggedright}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=*}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{8pt}
+\renewcommand{\arraystretch}{1.18}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\lstset{basicstyle=\ttfamily\footnotesize,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,rulecolor=\color{black!18},backgroundcolor=\color{black!2},
+ xleftmargin=4pt,xrightmargin=4pt,aboveskip=7pt,belowskip=7pt,
+ literate={→}{{$\rightarrow$}}1 {−}{{$-$}}1 {×}{{$\times$}}1 {…}{{...}}3 {–}{{-}}1 {’}{{'}}1 {“}{{``}}2 {”}{{''}}2}
+\tikzset{box/.style={draw=black!65,rounded corners=3pt,minimum height=9mm,
+ align=center,font=\small,inner sep=5pt},
+ inputbox/.style={box,fill=blue!10},processbox/.style={box,fill=green!12},
+ outputbox/.style={box,fill=orange!20},arrow/.style={-{Stealth[length=2mm]},thick},
+ message/.style={arrow,dashed,draw=orange!85!black}}
+\newcommand{\plandiagram}[2]{\begin{center}\input{diagrams/#1.tex}\par
+ {\small\itshape #2}\end{center}}

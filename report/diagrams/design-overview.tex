@@ -1,0 +1,25 @@
+\begin{tikzpicture}
+\node[inputbox,text width=24mm] (t) at (0,0.9) {GOAL text};
+\node[inputbox,text width=24mm] (d) at (0,-0.9) {Custom fields\\(3.1)};
+\node[processbox,text width=25mm] (p) at (4.1,0) {Parser};
+\node[processbox,text width=26mm] (a) at (6.7,2.4) {Layout inference\\(3.2)};
+\node[processbox,text width=26mm] (w) at (9.3,0) {Writer\\(3.2)};
+\node[font=\small] (joint) at (6.7,-1.1) {Pass 2: parse and write one rank at a time};
+\begin{scope}[on background layer]
+\node[draw=black!35,fill=black!2,rounded corners=5pt,inner sep=4mm,
+  fit=(p)(w)(joint)] {};
+\end{scope}
+\node[outputbox,text width=22mm] (f) at (13,0) {Binary file\\(3.3)};
+\node[processbox,text width=24mm] (r) at (16.2,0) {Reader +\\adapters (3.4)};
+\node[outputbox,text width=24mm] (s) at (19.6,0) {Simulator};
+\node[inputbox,text width=26mm,dashed] (j) at (16.2,-2.1) {Specialized\\decoder (3.5)};
+\draw[arrow] (t.east) -- (p.west);
+\draw[arrow] (d.east) -- (p.west);
+\draw[arrow] (p.north) |- node[pos=.7,above,font=\small] {pass 1} (a.west);
+\draw[arrow] (a.east) -| node[pos=.3,above,font=\small] {schema} (w.north);
+\draw[arrow] (p.east) -- (w.west);
+\draw[arrow] (w)--(f);
+\draw[arrow] (f)--(r);
+\draw[arrow] (r)--(s);
+\draw[arrow,dashed] (j)--node[right,font=\small]{planned}(r);
+\end{tikzpicture}
