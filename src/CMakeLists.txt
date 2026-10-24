@@ -43,13 +43,17 @@ target_link_libraries(trace_schema PRIVATE tomlplusplus::tomlplusplus)
 
 # Optional integration with ATLAHS's existing packet simulator and GOAL scheduler.
 option(BUILD_ATLAHS "Build and test the optional ATLAHS integration" OFF)
-set(ATLAHS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/LogGOPSim/simulators/atlahs/upstream"
-  CACHE PATH "ATLAHS fork containing the shared-reader and explicit-GPU source edits")
+# The ATLAHS fork is a separate checkout, by default next to this repository.
+get_filename_component(ATLAHS_DEFAULT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/../../atlahs" ABSOLUTE)
+set(ATLAHS_SOURCE_DIR "${ATLAHS_DEFAULT_SOURCE_DIR}"
+  CACHE PATH "Checkout of the ATLAHS fork (branch packed-trace-integration)")
 if(BUILD_ATLAHS)
   find_package(Python3 REQUIRED COMPONENTS Interpreter)
   set(ATLAHS_GENERATOR_DIR "${ATLAHS_SOURCE_DIR}/goal_gen/ai/nccl_goal_generator")
   if(NOT EXISTS "${ATLAHS_GENERATOR_DIR}/get_traced_events.py")
-    message(FATAL_ERROR "ATLAHS source is missing: initialize simulators/atlahs/upstream or set ATLAHS_SOURCE_DIR")
+    message(FATAL_ERROR "ATLAHS not found at ${ATLAHS_SOURCE_DIR}. Clone it with\n"
+      "  git clone --branch packed-trace-integration https://github.com/mgman03/atlahs.git ${ATLAHS_DEFAULT_SOURCE_DIR}\n"
+      "or set ATLAHS_SOURCE_DIR to an existing checkout.")
   endif()
   file(STRINGS "${PROJECT_SOURCE_DIR}/LogGOPSim/simulators/atlahs/UPSTREAM_REVISION"
     ATLAHS_UPSTREAM_REVISION LIMIT_COUNT 1)

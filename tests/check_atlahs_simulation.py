@@ -1,4 +1,4 @@
-"""Run the actual ATLAHS NDP scheduler on legacy and self-describing traces."""
+"""Run the ATLAHS NDP scheduler on legacy and self-describing traces."""
 
 import argparse
 import os
@@ -48,8 +48,8 @@ def identity_schedule(component, delay, explicit):
     def operation(label, text, tag, identity):
         return (f"l{label}: {text} tag {0 if explicit else tag}"
                 + (explicit_attributes(**identity) if explicit else ""))
-    # The first receive deliberately requests B. If A wrongly matches it, the
-    # acknowledgement needed to send B is never released and the test fails.
+    # The first receive asks for B. If A matches it instead, the acknowledgement
+    # needed to send B is never released and the run does not finish.
     return "\n".join([
         "num_ranks 2", "rank 0 {",
         operation(1, "send 4096b to 1", 42, first),
@@ -134,8 +134,8 @@ l4 requires l3
                         raise RuntimeError("ATLAHS private mapping modified its input trace")
             finally:
                 trace.chmod(0o644)
-        # Two ranks, each with four GPUs. Standard NIC is deliberately different
-        # from GPU in the packed input, so copying/ignoring NIC cannot pass.
+        # Two ranks with four GPUs each. The packed input uses NIC 7 for every
+        # operation, so a reader that takes the GPU from the NIC fails.
         def gpu_schedule(custom_fields, collapse=False, rotate=False):
             lines = ["num_ranks 2"]
             for rank in range(2):
@@ -174,8 +174,8 @@ l4 requires l3
             finishing_times(output, ranks=2) for output in outputs]
         if explicit != expected:
             raise RuntimeError(f"Explicit GPU selection changed legacy GPU behavior: {explicit} != {expected}")
-        # Cross-GPU routing intentionally fixes upstream's same-index assumption;
-        # completion is required, but upstream timing is not its routing oracle.
+        # Upstream routes to the same GPU index on both hosts, so its times are no
+        # reference for cross-GPU traffic; only completion is required here.
         if explicit == shared:
             raise RuntimeError("Changing gpu_id did not affect multi-GPU simulation")
         print(f"Multi-GPU finish times: legacy={expected}, explicit={explicit}, shared={shared}")
@@ -195,7 +195,7 @@ l4 requires l3
                     times.append(finishing_times(run([*simulator_args, "-goal", str(trace)], directory), ranks=2))
                 if times[0] != times[1]:
                     raise RuntimeError(f"Matching changed for {component}, delay={delay}: {times}")
-        # Independent endpoint oracle: four GPUs/host imply A0=0 and B2=6.
+        # Expected endpoints with four GPUs per host: A0=0, B0=4, B2=6.
         # Exercise both receive-first and message-first paths with different streams.
         for source_gpu, receive_gpu in ((0, 0), (0, 2), (2, 0)):
             for delay in (0, 1000000):
@@ -250,8 +250,7 @@ l4 requires l3
             stream_times.append(finishing_times(run([*simulator_args, "-goal", str(trace)], directory), ranks=2))
         if stream_times[0] != stream_times[1] or stream_times[1] == stream_times[2]:
             raise RuntimeError(f"Explicit stream scheduling or wide stream IDs failed: {stream_times}")
-        # A missing partner must fail the process, rather than report success
-        # after consuming the event queue with pending unmatched receives.
+        # A send without a matching receive must fail the run, not end it normally.
         source = directory / "unmatched.goal"
         schedule = identity_schedule("communicator", 0, True)
         schedule = schedule.replace("communicator_id 281474976710656", "communicator_id 281474976710658", 1)
@@ -263,7 +262,7 @@ l4 requires l3
                                 text=True, capture_output=True, timeout=30)
         if result.returncode == 0 or "unmatched messages or receives" not in result.stdout + result.stderr:
             raise RuntimeError("An unmatched explicit identity did not fail the simulation")
-    print("PASS: ATLAHS matching, GPU/stream selection, explicit peer-GPU routing, legacy equivalence and private mappings")
+    print("PASS: matching, GPU and stream selection, peer-GPU routing, legacy equivalence, private mappings")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-"""Exercise ATLAHS's actual micro-event emitter, converter and NDP scheduler."""
+"""Run the ATLAHS NCCL event emitter, convert its output and simulate it with NDP."""
 
 import argparse
 import io
@@ -21,7 +21,7 @@ def emit(generator, output, mode, scenario="p2p", pairing="aligned"):
     counters = {0: {}, 1: {}}
     intervals = {}
     # Rotating communicator peers changes host-local GPU pairs without changing
-    # each host's four global trace IDs. It catches local-index routing guesses.
+    # each host's four global trace IDs, so guessing the peer's local index fails.
     receivers = ["40", "42", "45", "50"]
     if pairing == "crossed":
         receivers = receivers[2:] + receivers[:2]
@@ -108,8 +108,7 @@ def main():
         raise RuntimeError("The emitter accepted an unknown message kind")
     with tempfile.TemporaryDirectory(prefix="atlahs-generator-") as temporary:
         directory = Path(temporary)
-        # Read the pristine generator from the pinned commit, not the edited
-        # working tree. This keeps the legacy comparison independent of our fork.
+        # Compare against the generator at the fork point, not the edited checkout.
         baseline = directory / "upstream-generator"
         baseline.mkdir()
         archive = subprocess.run(
@@ -159,8 +158,7 @@ def main():
                     gpu_ids.add(int(re.search(r"gpu_id (\d+)", line)[1]))
             if gpu_ids != {0, 1, 2, 3}:
                 raise RuntimeError(f"Generator lost local GPU IDs for {kind}: {gpu_ids}")
-        # Check the real emitters' peer endpoints independently of historical
-        # simulation times, which cannot validate cross-GPU routing.
+        # Check peer GPUs directly: legacy finish times cannot show cross-GPU routing errors.
         for scenario in ("p2p", "ring", "tree"):
             source = directory / f"crossed-{scenario}.goal"
             run([sys.executable, "-c",
@@ -208,8 +206,8 @@ def main():
                 raise RuntimeError("Incorrect GPU endpoint mapping or modified binary input")
         if times["explicit"] != times["legacy"] or times["wide"] != times["legacy"]:
             raise RuntimeError(f"Generated explicit GPU workload changed behavior: {times}")
-        # Collective emitters have separate paths from Send/Recv. Exercise a
-        # multi-channel ring (Simple) and tree (LL), not only synthetic messages.
+        # Collectives use separate emitter code from Send/Recv: test a
+        # multi-channel ring (Simple) and a tree (LL).
         for scenario in ("ring", "tree"):
             collective_times = {}
             legacy_text = None
@@ -236,7 +234,7 @@ def main():
                 collective_times[name] = finishing_times(output, ranks=2)
             if any(result != collective_times["legacy"] for result in collective_times.values()):
                 raise RuntimeError(f"Explicit {scenario} identities changed behavior: {collective_times}")
-        print(f"PASS: upstream emitter → explicit message fields → packed binary → htsim: {times['explicit']}")
+        print(f"PASS: generated explicit-field traces simulate like legacy ones: {times['explicit']}")
 
 
 if __name__ == "__main__":

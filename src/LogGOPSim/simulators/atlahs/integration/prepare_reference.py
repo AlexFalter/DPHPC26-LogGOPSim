@@ -28,7 +28,7 @@ def observe_matches(source):
 def prepare(upstream, output, compiler, sysroot=""):
     if sysroot:
         os.environ["SDKROOT"] = sysroot
-    revision = (upstream.parent / "UPSTREAM_REVISION").read_text().strip()
+    revision = (Path(__file__).resolve().parent.parent / "UPSTREAM_REVISION").read_text().strip()
     source = output / "source"
     if source.exists():
         shutil.rmtree(source)
@@ -43,10 +43,10 @@ def prepare(upstream, output, compiler, sysroot=""):
     for pattern in ("*.o", "*.a"):
         for artifact in backend.rglob(pattern):
             artifact.unlink()
-    # Force rebuilding even if the pin happens to track an executable.
+    # Rebuild even if the pinned commit contains a prebuilt executable.
     (backend / "datacenter/htsim_ndp").unlink(missing_ok=True)
     # The upstream compiler already accepts this diagnostic; Clang needs the
-    # compatibility flag. No reader, matcher or scheduling logic is patched.
+    # compatibility flag.
     flags = "-O2 -g -std=c++17 -Wno-register -Wno-non-pod-varargs"
     common = ["make", "-j4", f"CC={compiler}", f"CFLAGS={flags}"]
     subprocess.run([*common, "libhtsim.a"], cwd=backend, check=True)

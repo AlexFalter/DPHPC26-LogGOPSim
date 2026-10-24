@@ -574,7 +574,7 @@ Legacy messages retain numeric-tag matching. Explicit-field messages require \te
 
 \textbf{Compatibility boundary.} The ordinary LogGOPSim matcher still supports numeric tags only, so its adapter rejects explicit ATLAHS messages. Running this particular trace in LogGOPSim would also require tuple-based matching there; accepting the file schema alone does not supply that behavior.
 
-The modified ATLAHS source is kept as a fork pinned to a fixed upstream revision. Build instructions are in \href{\detokenize{../src/LogGOPSim/simulators/atlahs/README.md}}{the adapter README}.
+The modified ATLAHS source is a separate fork of a fixed upstream revision, cloned beside LogGOPSim; only the adapter lives in LogGOPSim. Build instructions are in \href{\detokenize{../src/LogGOPSim/simulators/atlahs/README.md}}{the adapter README}.
 
 Integration results, including the complete recorded-workload comparison, are reported in Section 5.1.
 

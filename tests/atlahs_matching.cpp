@@ -16,8 +16,8 @@ int main() try {
     receive.src = 3;
     receive.message_id = message.message_id;
     receive.offset = 7;
-    // Each component independently distinguishes messages, including values
-    // beyond every width used by the original decimal concatenation.
+    // Each field alone distinguishes messages, also with values wider than
+    // upstream's decimal tag encoding allows.
     for (int component = 0; component < 5; ++component) {
         auto wrong = receive;
         switch (component) {

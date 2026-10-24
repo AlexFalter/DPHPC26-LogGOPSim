@@ -37,7 +37,7 @@ def main():
             setattr(args, name, value.resolve())
     args.output.mkdir(parents=True, exist_ok=True)
     args.output = Path(tempfile.mkdtemp(prefix="run-", dir=args.output))
-    print(f"Evidence directory: {args.output}", flush=True)
+    print(f"Run directory: {args.output}", flush=True)
     inputs = sorted(args.traces.glob("*.sqlite"))
     if not inputs:
         parser.error("--traces must contain actual Nsight SQLite exports")
@@ -112,12 +112,12 @@ def main():
                             "pairs_sha256": hashlib.sha256(
                                 repr(sorted(pairs.items())).encode()).hexdigest()}
         if outputs["legacy"][1] != outputs["explicit"][1]:
-            raise RuntimeError("Explicit-field matching differs from the independent upstream reference")
+            raise RuntimeError("Explicit-field matching differs from the upstream reference")
         if outputs["legacy"][0] != outputs["explicit"][0]:
-            raise RuntimeError("Explicit-field finish times differ from the independent upstream reference")
+            raise RuntimeError("Explicit-field finish times differ from the upstream reference")
         result["status"] = "passed"
-        print(f"PASS: recorded traces → generator CLI → converter → separate backends; "
-              f"{result['explicit']['messages']} message pairs and all finish times agree")
+        print(f"PASS: upstream and explicit-field pipelines agree on "
+              f"{result['explicit']['messages']} message pairs and all finish times")
     except Exception as error:
         result.update(status="failed", error=str(error))
         raise
