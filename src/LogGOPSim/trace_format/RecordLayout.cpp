@@ -30,8 +30,8 @@ FieldValueInfo FieldValueInfo::create_custom(
 
 static void validate_field(const FieldStorageInfo& field) {
     validate_field_identity(field.field);
-    if (field.bit_width == 0 || field.bit_width > 64)
-        throw std::invalid_argument("Field '" + get_field_label(field.field) + "' must have a width of 1..64 bits");
+    if (field.bit_width > 64)
+        throw std::invalid_argument("Field '" + get_field_label(field.field) + "' must have a width of 0..64 bits");
     const auto& encoding = field.offset_encoding;
     if (get_value_type(encoding.value_base) != field.type)
         throw std::invalid_argument("Offset base type does not match field type");
@@ -73,7 +73,7 @@ void RecordLayout::validate_layout() const {
         if (field.bit_offset > record_size_bits ||
             field.bit_width > record_size_bits - field.bit_offset)
             throw std::invalid_argument("Field '" + get_field_label(field.field) + "' exceeds the record size");
-        by_offset.push_back(&field);
+        if (field.bit_width != 0) by_offset.push_back(&field); // 0-bit fields occupy nothing
     }
     std::ranges::sort(by_offset, {}, &FieldStorageInfo::bit_offset);
     std::uint64_t end = 0;
@@ -121,9 +121,10 @@ RecordLayout create_packed_schema(std::vector<FieldStorageInfo> fields) {
         end += field.bit_width;
     }
     // Whole-byte records allow direct addressing: base + node_index * record_bytes.
+    // Records keep at least one byte, even if every field is constant.
     RecordLayout schema{
         .fields = std::move(fields),
-        .record_size_bits = round_up_to_byte(end)
+        .record_size_bits = std::max<std::uint64_t>(bits_per_byte, round_up_to_byte(end))
     };
     schema.validate_layout();
 
@@ -167,7 +168,8 @@ static FieldValueRange resolve_value_range(
 static std::uint32_t resolve_field_width(
     const FieldValueInfo& input, const OffsetEncoding& encoding) {
     const auto maximum_code = encoding.get_wildcard_code().value_or(encoding.maximum_offset);
-    const auto required_bits = calculate_required_bits(maximum_code);
+    // A constant field needs no bits: every node decodes to the value base.
+    const auto required_bits = static_cast<std::uint32_t>(std::bit_width(maximum_code));
     if (input.width && *input.width < required_bits)
         throw std::invalid_argument("Explicit width is too small for '" + get_field_label(input.field) + "'");
     return input.width.value_or(required_bits);

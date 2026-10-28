@@ -216,6 +216,11 @@ The main source folders, relative to \texttt{src/\allowbreak{}LogGOPSim/\allowbr
 \end{longtable}
 }
 
+\hypertarget{required-fields}{}
+\subsection{Standard and custom fields}
+
+Not every simulator needs every standard field, so we considered keeping only what is needed to traverse the graph (dependency counts, dependency lists and roots) and making all other fields custom. We kept \texttt{type}, \texttt{peer}, \texttt{size} and \texttt{tag} as standard fields because they are part of GOAL itself: every operation is a send, receive or calculation with a peer, size and tag, so every GOAL simulator needs them. \texttt{cpu} and \texttt{nic} are also part of GOAL, where an operation may omit them and they default to zero, so they stay standard fields as well. They describe LogGOPSim's resource model; ATLAHS, for example, selects GPUs and streams through custom fields instead and simply does not read them. A file may contain fields that a given simulator does not need, since each simulator reads only the fields it binds, and a field with the same value on every node takes no bits per node. Custom fields are therefore reserved for information that GOAL does not define.
+
 \hypertarget{custom-fields}{}
 \subsection{Custom fields}
 
@@ -295,7 +300,7 @@ Each field is stored as an offset from the smallest observed value. A field with
 \bottomrule
 \endfoot
 1000, 1001 & 1000 & 0, 1: one bit instead of eleven \\
-only 1024 & 1024 & 0: one bit \\
+only 1024 & 1024 & none: zero bits, decoded from the base \\
 0--7 plus ANY & 0 & 0--7 and 8 for ANY: four bits \\
 \end{longtable}
 }

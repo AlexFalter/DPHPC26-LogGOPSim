@@ -76,7 +76,7 @@ Inspecting a proposed schema
 This still writes the legacy binary. After conversion, it prints observed field
 ranges, wildcard presence, value bases, suggested widths/bit offsets, and the
 proposed padded node record size. Numeric values are proposed as unsigned offsets
-from each field’s minimum; constants still use one bit. Statistics are gathered in the normal pass, keeping one rank's graph
+from each field’s minimum; a field with the same value on every node uses no bits. Statistics are gathered in the normal pass, keeping one rank's graph
 in memory. The proposed size excludes headers and dependency-index arrays.
 Values exceeding legacy storage widths produce errors instead of truncating.
 A failed conversion may leave a partial output file; do not use it.

@@ -217,6 +217,11 @@ l2: calc 18446744073709551615 priority 9223372036854775807 gpu_id 18446744073709
         require(all(field[1] == 64 for field in fields if field[0] in ["gpu_id", "priority", "size"]),
                 "Full-range fields need 64 bits")
 
+        # Every declared custom field must appear on every operation.
+        result = convert("num_ranks 1\nrank 0 {\nl1: calc 5 gpu_id 2\n}\n", "--format", "self-describing",
+                         fields=args.custom_fields, success=False)
+        require("Missing custom field 'priority'" in result.stderr, result.stderr)
+
         convert("num_ranks 1\nrank 0 {\n}\n", "--format", "self-describing")
         require(decode_new(target.read_bytes())[0] == [([], [], [])], "Empty rank changed")
         larger = "num_ranks 1\nrank 0 {\n" + "".join(f"l{i}: calc 1\n" for i in range(9)) + "}\n"

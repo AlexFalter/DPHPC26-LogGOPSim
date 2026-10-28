@@ -108,9 +108,14 @@ int main() {
         rejects([&] { RecordLayout{{}, 8}.validate_layout(); }, "at least one");
         rejects([&] { RecordLayout{{layout(std::string("x"), u, 1, 0)}, 7}.validate_layout(); }, "multiple of 8");
         rejects([&] { (void)traceschema::create_packed_schema({layout(std::string(""), u, 8, 0)}); }, "name");
-        rejects([&] { (void)traceschema::create_packed_schema({layout(std::string("x"), u, 0, 0)}); }, "positive multiple of 8");
-        rejects([&] { (void)traceschema::create_packed_schema({layout(FieldId::Type, u, 2, 0), layout(std::string("x"), u, 0, 0)}); }, "1..64");
-        rejects([&] { (void)traceschema::create_packed_schema({layout(std::string("x"), u, 65, 0)}); }, "1..64");
+        // Constant fields take no bits; a record still occupies at least one byte.
+        check(traceschema::create_packed_schema({layout(std::string("x"), u, 0, 0)}).record_size_bits == 8,
+              "All-constant record was not padded to one byte");
+        const auto with_constant = traceschema::create_packed_schema(
+            {layout(FieldId::Type, u, 2, 0), layout(std::string("x"), u, 0, 0), layout(std::string("y"), u, 3, 0)});
+        check(with_constant.find_field("x")->bit_offset == 2 && with_constant.find_field("y")->bit_offset == 2 &&
+              with_constant.record_size_bits == 8, "0-bit field took space or was reported as overlapping");
+        rejects([&] { (void)traceschema::create_packed_schema({layout(std::string("x"), u, 65, 0)}); }, "0..64");
         rejects([&] { (void)traceschema::create_packed_schema({layout(std::string("x"), static_cast<FieldType>(99), 8, 0)}); }, "type");
         rejects([&] { (void)traceschema::create_packed_schema({layout(std::string("x"), u, 8, 0), layout(std::string("x"), u, 8, 0)}); }, "Duplicate");
         rejects([&] { RecordLayout{{layout(std::string("x"), u, 8, 0), layout(std::string("y"), u, 8, 4)}, 16}.validate_layout(); }, "Overlapping");
@@ -231,7 +236,7 @@ int main() {
             require_field<std::int8_t>(std::string("delta"))}); }, "delta");
         auto constant = build_record_layout({FieldValueInfo::create_standard(FieldId::Size,
             std::nullopt, UnsignedRange{1024, 1024})});
-        check(constant.fields[0].bit_width == 1, "Constant width failed");
+        check(constant.fields[0].bit_width == 0, "Constant field was not stored in 0 bits");
         auto high_unsigned = build_record_layout({FieldValueInfo::create_standard(FieldId::Size,
             std::nullopt, UnsignedRange{std::numeric_limits<std::uint64_t>::max() - 1,
                                      std::numeric_limits<std::uint64_t>::max()})});
@@ -338,7 +343,8 @@ int main() {
               statistics_schema.find_field(FieldId::Peer)->offset_encoding.maximum_offset == 1,
               "Statistics did not apply standard field bounds");
         const auto empty_schema = traceschema::TraceAnalysis{}.create_schema(2);
-        check(empty_schema.fields.size() == 11 && empty_schema.find_field(FieldId::Size)->bit_width == 1,
+        check(empty_schema.fields.size() == 11 && empty_schema.find_field(FieldId::Size)->bit_width == 0 &&
+              empty_schema.record_size_bits == 8,
               "Empty statistics did not produce a usable schema");
         std::ostringstream report;
         observed.print_report(report, statistics_schema);

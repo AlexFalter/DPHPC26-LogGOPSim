@@ -63,7 +63,8 @@ int main() try {
         "[[fields]]\nname = 'x'\ntype = 'unsigned'\nrange = {min = 0, max = 7}",
         "[[fields]]\nname = 'x'\ntype = 'unsigned'\nbits = 3",
         "[[fields]]\nname = 'x'\ntype = 'unsigned'\n[[fields]]\nname = 'x'\ntype = 'signed'",
-        "[[fields]]\nname = 'x'\nname = 'y'\ntype = 'unsigned'"
+        "[[fields]]\nname = 'x'\nname = 'y'\ntype = 'unsigned'",
+        "[[fields]]\nname = 'x'\ntype = 'unsigned'\ndefault = 0"
     }) {
         bool rejected = false;
         try { (void)parse(invalid); }

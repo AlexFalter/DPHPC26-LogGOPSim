@@ -116,7 +116,7 @@ void TraceAnalysis::print_report(std::ostream& output, const RecordLayout& schem
            << get_node_index_bits()
            << " bits each, shared file-wide; base 0 (legacy: 32 bits).\n"
            << "Header and root/dependency array sizes are not included in the node record size.\n"
-           << "Numeric storage: value - value base (unsigned); constants still use 1 bit.\n"
+           << "Numeric storage: value - value base (unsigned); constant fields use 0 bits.\n"
            << "Type uses codes 1..3; Peer uses the declared rank count. "
            << (layout_used ? "Two input passes: statistics, then writing.\n" : "No extra input pass.\n");
 }

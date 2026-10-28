@@ -27,7 +27,7 @@ Descriptors retain the layout's field order. Their bit offsets may specify gaps 
 |---|---:|---|
 | 0 | 1 | Identity kind: 0 standard ID, 1 custom name |
 | 1 | 1 | Logical type: 1 unsigned integer, 2 signed integer |
-| 2 | 1 | Field bit width: 1–64 |
+| 2 | 1 | Field bit width: 0–64. A width of 0 means the field has the same value on every node, which decodes to the value base. |
 | 3 | 1 | Wildcard flag: 0 or 1 |
 | 4 | 8 | Bit offset within the node record |
 | 12 | 8 | Numeric base; signed bases use two's-complement bits |
