@@ -94,6 +94,8 @@ add_executable(LogGOPSim
   LogGOPSim/simulators/loggopsim/loggopsim_cmdline.c
   LogGOPSim/simulators/loggopsim/LogGOPSim.cpp)
 target_link_libraries(LogGOPSim ${GRAPHVIZ_CGRAPH_LIBRARY} trace_schema)
+add_executable(decode_bench LogGOPSim/simulators/loggopsim/decode_bench.cpp)
+target_link_libraries(decode_bench trace_schema)
 
 # build txt2bin
 add_gengetopt_files(LogGOPSim/txt2bin_cmdline)
