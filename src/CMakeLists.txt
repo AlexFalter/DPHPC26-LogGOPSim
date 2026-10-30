@@ -36,6 +36,7 @@ add_library(trace_schema STATIC
   LogGOPSim/binary_reading/TraceFileView.cpp
   LogGOPSim/binary_reading/TraceReader.cpp
   LogGOPSim/binary_reading/NodeDecoder.cpp
+  LogGOPSim/binary_reading/DecodePlan.cpp
   LogGOPSim/simulators/loggopsim/LogGOPSimAdapter.cpp
   LogGOPSim/simulators/atlahs/AtlahsAdapter.cpp)
 target_include_directories(trace_schema PUBLIC ${PROJECT_SOURCE_DIR}/LogGOPSim)

@@ -2,6 +2,7 @@
 #define LOGGOPSIM_TRACEREADER_HPP
 
 #include "binary_reading/TraceFileView.hpp"
+#include "binary_reading/DecodePlan.hpp"
 #include "binary_reading/NodeDecoder.hpp"
 #include "simulators/BaseDeserializedGraphNode.hpp"
 #include "binary_reading/FieldBindings.hpp"
@@ -37,6 +38,7 @@ public:
             validate_field_bindings<DecodedDependencyFields>(dependencies, get_selected_fields().subspan(bindings.size()));
             set_dependency_counter(FieldId::DependencyCount);
         }
+        create_plan<Output>(bindings);
         bindings_ = NodeOutputBindings<Output>{std::move(bindings), std::move(validate_node)};
     }
 
@@ -70,7 +72,10 @@ public:
     void read_node_into(std::uint32_t rank, std::uint32_t index, Output& output) const {
         const auto& bindings = get_node_output_bindings<Output>();
         const auto record = file_.get_node_record_bytes(rank, index);
-        const auto graph = decode_selected_fields(record, bindings, output);
+        DecodedDependencyFields graph{};
+        std::byte* const targets[] = {reinterpret_cast<std::byte*>(&output), reinterpret_cast<std::byte*>(&graph)};
+        if (!plan_ || static_cast<std::size_t>(file_end_ - record.data()) < plan_->get_load_extent() || !plan_->decode(record.data(), targets))
+            graph = decode_selected_fields(record, bindings, output);
         if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>)
             populate_graph_node(output, graph, rank, index);
         if (bindings.validate_output) bindings.validate_output(output);
@@ -149,6 +154,22 @@ private:
         return graph;
     }
 
+    template<class Output>
+    void create_plan(std::span<const FieldBinding<Output>> bindings) {
+        if (!specialized_decoding_enabled()) return;
+        std::vector<FieldDestination> destinations;
+        const auto add = [&]<class Target>(std::uint8_t target, std::span<const FieldBinding<Target>> targets) {
+            for (const auto& binding : targets)
+                destinations.push_back({target, binding.destination_offset, binding.destination_size,
+                    binding.wildcard_destination ? integer_to_bits(*binding.wildcard_destination) : 0});
+        };
+        add(std::uint8_t{0}, bindings);
+        if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>)
+            add(std::uint8_t{1}, std::span<const FieldBinding<DecodedDependencyFields>>(get_dependency_bindings()));
+        plan_ = DecodePlan::create(get_selected_fields(), destinations);
+    }
+
+    [[nodiscard]] static bool specialized_decoding_enabled();
     [[nodiscard]] static const std::vector<FieldBinding<DecodedDependencyFields>>& get_dependency_bindings();
     void populate_graph_node(BaseDeserializedGraphNode& node, const DecodedDependencyFields& fields,
                              std::uint32_t rank, std::uint32_t index) const;
@@ -158,6 +179,9 @@ private:
     TraceFileView file_;
     NodeDecoder decoder_;
     std::optional<FieldStorageInfo> dependency_counter_;
+    std::optional<DecodePlan> plan_;
+    std::optional<DecodePlan::Step> counter_step_;
+    const std::byte* file_end_;
 
     [[nodiscard]] const FieldStorageInfo& require_unsigned_field(const FieldIdentity& field) const;
 };

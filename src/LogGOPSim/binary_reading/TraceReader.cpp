@@ -1,6 +1,8 @@
 #include "binary_reading/TraceReader.hpp"
 #include "trace_format/BinaryIO.hpp"
 
+#include <cstdlib>
+#include <cstring>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -8,7 +10,7 @@
 namespace traceschema {
 
 TraceReader::TraceReader(std::span<std::byte> file, const FieldRequirements& requirements)
-    : file_(file), decoder_(file_.get_layout(), requirements) {
+    : file_(file), decoder_(file_.get_layout(), requirements), file_end_(file.data() + file.size()) {
     for (const auto& field : get_selected_fields()) {
         if (field.field != FieldIdentity{FieldId::Peer}) continue;
         const auto& encoding = field.offset_encoding;
@@ -40,12 +42,23 @@ void TraceReader::set_dependency_counter(FieldIdentity identity) {
     if (std::get<std::uint64_t>(field.offset_encoding.value_base) != 0 || field.offset_encoding.has_wildcard)
         throw std::invalid_argument("Dependency counter must include zero and have no wildcard");
     dependency_counter_ = field;
+    if (specialized_decoding_enabled()) counter_step_ = DecodePlan::make_step(field);
+}
+
+bool TraceReader::specialized_decoding_enabled() {
+    static const bool enabled = [] {
+        const char* decoder = std::getenv("LOGGOPSIM_DECODER");
+        return decoder && std::strcmp(decoder, "plan") == 0;
+    }();
+    return enabled;
 }
 
 std::uint64_t TraceReader::decrement_dependency_count(std::uint32_t rank, std::uint32_t index) {
     if (!dependency_counter_) throw std::invalid_argument("No dependency counter configured");
     const auto& field = *dependency_counter_;
     const auto bytes = file_.get_node_record_bytes(rank, index);
+    if (counter_step_ && static_cast<std::size_t>(file_end_ - bytes.data()) >= counter_step_->byte + 8u)
+        if (const auto count = DecodePlan::decrement(bytes.data(), *counter_step_)) return *count;
     const auto count = std::get<std::uint64_t>(NodeDecoder::decode_field(bytes, field));
     if (count == 0) throw std::invalid_argument("Dependency counter is already zero");
     const auto code = field.offset_encoding.encode(FieldValue{count - 1});
