@@ -42,15 +42,17 @@ void TraceReader::set_dependency_counter(FieldIdentity identity) {
     if (std::get<std::uint64_t>(field.offset_encoding.value_base) != 0 || field.offset_encoding.has_wildcard)
         throw std::invalid_argument("Dependency counter must include zero and have no wildcard");
     dependency_counter_ = field;
-    if (specialized_decoding_enabled()) counter_step_ = DecodePlan::make_step(field);
+    if (get_decoder_kind() != DecoderKind::Generic) counter_step_ = DecodePlan::make_step(field);
 }
 
-bool TraceReader::specialized_decoding_enabled() {
-    static const bool enabled = [] {
+TraceReader::DecoderKind TraceReader::get_decoder_kind() {
+    static const DecoderKind kind = [] {
         const char* decoder = std::getenv("LOGGOPSIM_DECODER");
-        return decoder && std::strcmp(decoder, "plan") == 0;
+        if (decoder && std::strcmp(decoder, "plan") == 0) return DecoderKind::Plan;
+        if (decoder && std::strcmp(decoder, "jit") == 0) return DecoderKind::Jit;
+        return DecoderKind::Generic;
     }();
-    return enabled;
+    return kind;
 }
 
 std::uint64_t TraceReader::decrement_dependency_count(std::uint32_t rank, std::uint32_t index) {

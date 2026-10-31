@@ -44,6 +44,9 @@ public:
     [[nodiscard]] static std::optional<DecodePlan> create(std::span<const FieldStorageInfo> fields,
                                                           std::span<const FieldDestination> destinations);
 
+    [[nodiscard]] std::span<const Step> get_steps() const { return steps_; }
+    [[nodiscard]] int get_type_step() const { return type_step_; }
+    [[nodiscard]] int get_peer_step() const { return peer_step_; }
     // Bytes read from the record start; the caller guarantees they are mapped.
     [[nodiscard]] std::size_t get_load_extent() const { return load_extent_; }
 

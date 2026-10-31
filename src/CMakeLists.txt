@@ -37,10 +37,11 @@ add_library(trace_schema STATIC
   LogGOPSim/binary_reading/TraceReader.cpp
   LogGOPSim/binary_reading/NodeDecoder.cpp
   LogGOPSim/binary_reading/DecodePlan.cpp
+  LogGOPSim/binary_reading/JitDecoder.cpp
   LogGOPSim/simulators/loggopsim/LogGOPSimAdapter.cpp
   LogGOPSim/simulators/atlahs/AtlahsAdapter.cpp)
 target_include_directories(trace_schema PUBLIC ${PROJECT_SOURCE_DIR}/LogGOPSim)
-target_link_libraries(trace_schema PRIVATE tomlplusplus::tomlplusplus)
+target_link_libraries(trace_schema PRIVATE tomlplusplus::tomlplusplus ${CMAKE_DL_LIBS})
 
 # Optional integration with ATLAHS's existing packet simulator and GOAL scheduler.
 option(BUILD_ATLAHS "Build and test the optional ATLAHS integration" OFF)

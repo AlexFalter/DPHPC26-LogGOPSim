@@ -3,6 +3,7 @@
 
 #include "binary_reading/TraceFileView.hpp"
 #include "binary_reading/DecodePlan.hpp"
+#include "binary_reading/JitDecoder.hpp"
 #include "binary_reading/NodeDecoder.hpp"
 #include "simulators/BaseDeserializedGraphNode.hpp"
 #include "binary_reading/FieldBindings.hpp"
@@ -74,7 +75,8 @@ public:
         const auto record = file_.get_node_record_bytes(rank, index);
         DecodedDependencyFields graph{};
         std::byte* const targets[] = {reinterpret_cast<std::byte*>(&output), reinterpret_cast<std::byte*>(&graph)};
-        if (!plan_ || static_cast<std::size_t>(file_end_ - record.data()) < plan_->get_load_extent() || !plan_->decode(record.data(), targets))
+        if (!plan_ || static_cast<std::size_t>(file_end_ - record.data()) < plan_->get_load_extent() ||
+            !(jit_ ? jit_(record.data(), targets) : plan_->decode(record.data(), targets)))
             graph = decode_selected_fields(record, bindings, output);
         if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>)
             populate_graph_node(output, graph, rank, index);
@@ -156,7 +158,7 @@ private:
 
     template<class Output>
     void create_plan(std::span<const FieldBinding<Output>> bindings) {
-        if (!specialized_decoding_enabled()) return;
+        if (get_decoder_kind() == DecoderKind::Generic) return;
         std::vector<FieldDestination> destinations;
         const auto add = [&]<class Target>(std::uint8_t target, std::span<const FieldBinding<Target>> targets) {
             for (const auto& binding : targets)
@@ -167,9 +169,12 @@ private:
         if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>)
             add(std::uint8_t{1}, std::span<const FieldBinding<DecodedDependencyFields>>(get_dependency_bindings()));
         plan_ = DecodePlan::create(get_selected_fields(), destinations);
+        if (plan_ && get_decoder_kind() == DecoderKind::Jit) jit_ = load_jit_decoder(*plan_);
     }
 
-    [[nodiscard]] static bool specialized_decoding_enabled();
+    enum class DecoderKind { Generic, Plan, Jit };
+    // LOGGOPSIM_DECODER=generic|plan|jit, default generic.
+    [[nodiscard]] static DecoderKind get_decoder_kind();
     [[nodiscard]] static const std::vector<FieldBinding<DecodedDependencyFields>>& get_dependency_bindings();
     void populate_graph_node(BaseDeserializedGraphNode& node, const DecodedDependencyFields& fields,
                              std::uint32_t rank, std::uint32_t index) const;
@@ -180,6 +185,7 @@ private:
     NodeDecoder decoder_;
     std::optional<FieldStorageInfo> dependency_counter_;
     std::optional<DecodePlan> plan_;
+    JitDecodeFunction jit_ = nullptr;
     std::optional<DecodePlan::Step> counter_step_;
     const std::byte* file_end_;
 
