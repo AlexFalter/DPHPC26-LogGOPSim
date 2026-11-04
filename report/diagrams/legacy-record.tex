@@ -1,0 +1,23 @@
+\begin{tikzpicture}[
+  cell/.style={draw=black!65,fill=blue!8,minimum height=11mm,inner sep=1pt,align=center,font=\small}]
+\node[cell,fill=green!15,minimum width=17mm] (dep) {\texttt{depcnt}\\4\,B};
+\node[cell,minimum width=12mm,right=0mm of dep] (type) {\texttt{type}\\1\,B};
+\node[cell,minimum width=17mm,right=0mm of type] (peer) {\texttt{peer}\\4\,B};
+\node[cell,minimum width=24mm,right=0mm of peer] (size) {\texttt{size}\\8\,B};
+\node[cell,minimum width=17mm,right=0mm of size] (tag) {\texttt{tag}\\4\,B};
+\node[cell,minimum width=12mm,right=0mm of tag] (cpu) {\texttt{cpu}\\1\,B};
+\node[cell,minimum width=12mm,right=0mm of cpu] (nic) {\texttt{nic}\\1\,B};
+\node[cell,minimum width=17mm,right=0mm of nic,fill=orange!20] (ndep) {\texttt{nDep}\\4\,B};
+\node[cell,minimum width=17mm,right=0mm of ndep,fill=orange!20] (dix) {\texttt{depIx}\\4\,B};
+\node[cell,minimum width=17mm,right=0mm of dix,fill=orange!20] (nsdep) {\texttt{nSDep}\\4\,B};
+\node[cell,minimum width=17mm,right=0mm of nsdep,fill=orange!20] (sdix) {\texttt{sDepIx}\\4\,B};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65]
+  ([yshift=-2mm]dep.south west) -- ([yshift=-2mm]dep.south east)
+  node[midway,below=6pt,font=\scriptsize] {Readiness};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65]
+  ([yshift=-2mm]type.south west) -- ([yshift=-2mm]nic.south east)
+  node[midway,below=6pt,font=\small] {Operation};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65]
+  ([yshift=-2mm]ndep.south west) -- ([yshift=-2mm]sdix.south east)
+  node[midway,below=6pt,font=\small] {Completion / start dependents};
+\end{tikzpicture}

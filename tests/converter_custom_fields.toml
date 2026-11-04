@@ -1,0 +1,7 @@
+[[fields]]
+name = "gpu_id"
+type = "unsigned"
+
+[[fields]]
+name = "priority"
+type = "signed"

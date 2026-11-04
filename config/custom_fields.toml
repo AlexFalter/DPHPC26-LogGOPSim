@@ -1,0 +1,18 @@
+# Each [[fields]] declares one custom field; declaration order defines storage order.
+
+# name: unique GOAL identifier, excluding standard field names and keywords.
+# type: "unsigned" (uint64) or "signed" (int64).
+
+# Every operation must supply every declared field, in any order, for example:
+# l1: calc 1000 gpu_id 3 priority -2
+
+# To disable custom fields, leave this file empty or keep only comments.
+
+# An example is provided below:
+# [[fields]]
+# name = "gpu_id"
+# type = "unsigned"
+
+
+# ATLAHS --explicit-fields requires eight unsigned declarations. See
+# src/LogGOPSim/simulators/atlahs/README.md for the complete set and example.

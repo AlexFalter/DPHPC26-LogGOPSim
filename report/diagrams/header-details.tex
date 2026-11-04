@@ -1,0 +1,29 @@
+\begin{tikzpicture}[cell/.style={draw=black!65,minimum height=11mm,inner sep=1pt,align=center,font=\small}]
+\node[anchor=west,font=\small\bfseries] at (0,9mm) {Fixed prefix};
+\node[cell,fill=green!15,minimum width=22mm,anchor=west] (r0c0) at (0,0mm) {Magic\\8 B};
+\node[cell,fill=green!15,minimum width=18mm,right=0mm of r0c0] (r0c1) {Version\\2 B};
+\node[cell,fill=blue!8,minimum width=25mm,right=0mm of r0c1] (r0c2) {Header size\\8 B};
+\node[cell,fill=blue!8,minimum width=25mm,right=0mm of r0c2] (r0c3) {Record bits\\8 B};
+\node[cell,fill=blue!8,minimum width=19mm,right=0mm of r0c3] (r0c4) {Fields\\4 B};
+\node[cell,fill=blue!8,minimum width=19mm,right=0mm of r0c4] (r0c5) {Ranks\\4 B};
+\node[cell,fill=blue!8,minimum width=23mm,right=0mm of r0c5] (r0c6) {Index bits\\1 B};
+\node[cell,fill=orange!20,minimum width=27mm,right=0mm of r0c6] (r0c7) {Table offset\\8 B};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65] ([yshift=-2mm]r0c0.south west) -- ([yshift=-2mm]r0c7.south east) node[midway,below=6pt,font=\small] {43 bytes; once per file};
+\node[anchor=west,font=\small\bfseries] at (0,-22mm) {Field descriptor};
+\node[cell,fill=green!15,minimum width=16mm,anchor=west] (r1c0) at (0,-31mm) {Kind\\1 B};
+\node[cell,fill=green!15,minimum width=16mm,right=0mm of r1c0] (r1c1) {Type\\1 B};
+\node[cell,fill=blue!8,minimum width=17mm,right=0mm of r1c1] (r1c2) {Width\\1 B};
+\node[cell,fill=blue!8,minimum width=22mm,right=0mm of r1c2] (r1c3) {Wildcard\\1 B};
+\node[cell,fill=blue!8,minimum width=22mm,right=0mm of r1c3] (r1c4) {Bit offset\\8 B};
+\node[cell,fill=blue!8,minimum width=19mm,right=0mm of r1c4] (r1c5) {Base\\8 B};
+\node[cell,fill=blue!8,minimum width=25mm,right=0mm of r1c5] (r1c6) {Max. offset\\8 B};
+\node[cell,fill=orange!20,minimum width=31mm,right=0mm of r1c6] (r1c7) {ID / name length\\4 B};
+\node[cell,fill=orange!20,minimum width=22mm,right=0mm of r1c7] (r1c8) {Name\\variable};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65] ([yshift=-2mm]r1c0.south west) -- ([yshift=-2mm]r1c8.south east) node[midway,below=6pt,font=\small] {32 bytes + name; repeated for each field};
+\node[anchor=west,font=\small\bfseries] at (0,-53mm) {Rank-table entry};
+\node[cell,fill=orange!20,minimum width=66mm,anchor=west] (r2c0) at (0,-62mm) {Record offset\\8 B};
+\node[cell,fill=black!6,minimum width=44mm,right=0mm of r2c0] (r2c1) {Node count\\4 B};
+\node[cell,fill=black!6,minimum width=46mm,right=0mm of r2c1] (r2c2) {Dependency count\\4 B};
+\node[cell,fill=black!6,minimum width=44mm,right=0mm of r2c2] (r2c3) {Root count\\4 B};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65] ([yshift=-2mm]r2c0.south west) -- ([yshift=-2mm]r2c3.south east) node[midway,below=6pt,font=\small] {20 bytes; repeated for each rank};
+\end{tikzpicture}

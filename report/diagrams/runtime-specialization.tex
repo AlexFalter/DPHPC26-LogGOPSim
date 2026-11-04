@@ -1,0 +1,13 @@
+\begin{tikzpicture}[node distance=7mm]
+\node[outputbox,text width=24mm] (s) at (0,0) {Simulator};
+\node[processbox,text width=36mm] (a) at (4.5,0) {Simulator adapter\\\texttt{read\_node(rank, index)}};
+\node[processbox,text width=39mm] (r) at (10,0) {Shared reader\\locate + validate record};
+\draw[arrow] (s) -- (a);
+\draw[arrow] (a) -- (r);
+\node[inputbox,text width=38mm] (g) at (7,-2.1) {Generic decoder\\current / fallback};
+\node[inputbox,dashed,text width=40mm] (j) at (13,-2.1) {Generated decoder\\layout + bindings\\\textbf{TODO}};
+\draw[arrow] (r.south) -- ++(0,-.5) -| (g.north);
+\draw[arrow,dashed] (r.south) -- ++(0,-.5) -| (j.north);
+\node[box,fill=black!5,text width=91mm] (p) at (10,-4.1) {\textbf{Setup: schema + bindings}\\Load cached decoder, or generate C++, compile and load};
+\draw[arrow,dashed] (p.east) -| ([xshift=6mm]j.east) -- (j.east);
+\end{tikzpicture}

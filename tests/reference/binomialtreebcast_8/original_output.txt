@@ -1,0 +1,11 @@
+LogGP network backend; size: 8 (1 CPUs, 1 NICs); L=2500, o=1500 g=1000, G=6, O=0, P=8, S=65535
+PERFORMANCE: Processes: 8 	 Events: 21 	 Time: 0 s 	 Speed: inf ev/s
+Times: 
+Host 0: 4500
+Host 1: 8500
+Host 2: 8500
+Host 3: 12500
+Host 4: 8500
+Host 5: 12500
+Host 6: 12500
+Host 7: 16500

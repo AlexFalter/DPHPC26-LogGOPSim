@@ -1,0 +1,12 @@
+\begin{tikzpicture}[node distance=5mm,
+  contextbox/.style={box,fill=black!6,draw=black!45}]
+\node[inputbox,draw=blue!60!black,thick,text width=31mm] (h) {\textbf{Schema header}\\field descriptions\\+ settings};
+\node[contextbox,text width=28mm,right=of h] (t) {Updated rank table\\offset + counts};
+\node[contextbox,text width=27mm,right=of t] (n) {Packed\\node records};
+\node[contextbox,text width=29mm,right=of n] (a) {Packed\\dependency indices};
+\node[contextbox,text width=25mm,right=of a] (r) {Packed\\root indices};
+\foreach \x/\y in {h/t,t/n,n/a,a/r} \draw[arrow] (\x)--(\y);
+\begin{scope}[on background layer]
+\node[draw=black!45,dashed,rounded corners,fit=(n)(a)(r),inner sep=4mm,label={[font=\small]below:One rank payload; repeated for each rank}] {};
+\end{scope}
+\end{tikzpicture}

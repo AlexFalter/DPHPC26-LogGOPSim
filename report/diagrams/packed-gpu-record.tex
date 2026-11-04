@@ -1,0 +1,26 @@
+\begin{tikzpicture}[
+  cell/.style={draw=black!65,fill=blue!8,minimum height=12mm,inner sep=1pt,align=center,font=\scriptsize},
+  custom/.style={cell,fill=green!18}]
+% 12 mm per bit; measured by txt2bin --report-schema for the shipped example.
+\node[cell,minimum width=12mm] (dep) {\texttt{depcnt}\\1 bit};
+\node[cell,minimum width=24mm,right=0mm of dep] (type) {\texttt{type}\\2 bits};
+\node[cell,minimum width=12mm,right=0mm of type] (peer) {\texttt{peer}\\1};
+\node[cell,minimum width=12mm,right=0mm of peer] (size) {\texttt{size}\\1};
+\node[cell,minimum width=12mm,right=0mm of size] (tag) {\texttt{tag}\\1};
+\node[cell,minimum width=12mm,right=0mm of tag] (cpu) {\texttt{cpu}\\1};
+\node[cell,minimum width=12mm,right=0mm of cpu] (nic) {\texttt{nic}\\1};
+\node[cell,minimum width=12mm,right=0mm of nic] (ndep) {\texttt{nDep}\\1};
+\node[cell,minimum width=12mm,right=0mm of ndep] (dix) {\texttt{depIx}\\1};
+\node[cell,minimum width=12mm,right=0mm of dix] (nsdep) {\texttt{nSDep}\\1};
+\node[cell,minimum width=12mm,right=0mm of nsdep] (sdix) {\texttt{sDepIx}\\1};
+\node[anchor=south west,font=\footnotesize] at ([yshift=2mm]dep.north west) {Bits 0--11: standard fields};
+\node[custom,minimum width=24mm,anchor=north west] (gpu) at ([yshift=-13mm]dep.south west) {\texttt{gpu\_id}\\2 bits};
+\node[custom,minimum width=12mm,right=0mm of gpu] (comm) {comm\\1};
+\node[custom,minimum width=12mm,right=0mm of comm] (channel) {channel\\1};
+\node[custom,minimum width=12mm,right=0mm of channel] (seq) {sequence\\1};
+\node[custom,minimum width=12mm,right=0mm of seq] (kind) {kind\\1};
+\node[custom,minimum width=24mm,right=0mm of kind] (chunk) {chunk\\2};
+\node[custom,minimum width=24mm,right=0mm of chunk] (stream) {stream\\2};
+\node[custom,minimum width=24mm,right=0mm of stream] (peergpu) {peer GPU\\2 bits};
+\node[anchor=south west,font=\footnotesize] at ([yshift=2mm]gpu.north west) {Bits 12--23: custom fields};
+\end{tikzpicture}

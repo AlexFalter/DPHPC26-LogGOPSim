@@ -1,0 +1,15 @@
+\begin{tikzpicture}
+\node[inputbox,text width=30mm] (s) at (0,0) {Simulator};
+\node[processbox,text width=44mm] (r) at (6.5,0) {Adapter +\\shared reader};
+\node[inputbox,text width=30mm] (f) at (13,0) {Mapped binary};
+\foreach \p in {s,r,f} \draw[dashed,black!45] (\p.south)--++(0,-7.5);
+\node[font=\small\bfseries,fill=white,inner sep=2pt] at (6.5,-0.9) {Initial handshake (once)};
+\draw[arrow] (0,-1.7)--node[above,font=\small]{construct once over the mapped file}(6.5,-1.7);
+\draw[arrow] (6.5,-2.5)--node[above,font=\small]{read schema; check bindings}(13,-2.5);
+\draw[arrow,dashed] (6.5,-3.3)--node[above,font=\small]{ready, or reject incompatible file}(0,-3.3);
+\node[font=\small\bfseries,fill=white,inner sep=2pt] at (6.5,-4.1) {Node requests (repeated)};
+\draw[arrow] (0,-4.8)--node[above,font=\small]{\texttt{read\_node(rank, index)}}(6.5,-4.8);
+\draw[arrow] (6.5,-5.6)--node[above,font=\small]{decode selected fields}(13,-5.6);
+\draw[arrow,dashed] (6.5,-6.4)--node[above,font=\small]{node struct}(0,-6.4);
+\node[font=\Large,fill=white] at (3.25,-7.1) {$\vdots$};
+\end{tikzpicture}

@@ -1,0 +1,11 @@
+\begin{tikzpicture}[node distance=5mm]
+\node[inputbox,text width=27mm] (h) {Small header\\rank / CPU / NIC\\settings};
+\node[processbox,text width=27mm,right=of h] (t) {Rank table\\start + end\\offsets};
+\node[outputbox,text width=33mm,right=of t] (r) {Node / root counts\\Root indices\\32 bits each};
+\node[outputbox,text width=27mm,right=of r] (n) {Node records\\39 bytes each};
+\node[outputbox,text width=31mm,right=of n] (a) {Dependency appendix\\32-bit indices};
+\foreach \x/\y in {h/t,t/r,r/n,n/a} \draw[arrow] (\x)--(\y);
+\begin{scope}[on background layer]
+\node[draw=orange!75!black,dashed,rounded corners,fit=(r)(n)(a),inner sep=4mm,label={[font=\small]below:One rank payload; repeated for each rank}] {};
+\end{scope}
+\end{tikzpicture}

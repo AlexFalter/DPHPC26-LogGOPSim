@@ -1,4 +1,13 @@
 __pycache__
 *_cmdline.c
 *_cmdline.h
-src/LogGOPSim/txt2bin.cpp
+# Written into the source tree by the schedgen2_bcast test
+src/Schedgen2/schedule.goal
+# Personal build and editor settings
+.clangd
+build/build-local.sh
+
+# Local build products and editor state
+/build/
+/.vscode/
+.DS_Store

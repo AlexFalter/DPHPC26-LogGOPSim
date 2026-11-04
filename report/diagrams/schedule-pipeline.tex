@@ -1,0 +1,16 @@
+\begin{tikzpicture}[node distance=5mm]
+\node[inputbox,text width=31mm] (w) {Application trace\\or workload pattern};
+\node[processbox,text width=24mm,right=of w] (g) {GOAL generator\\Schedgen, ATLAHS, \ldots};
+\node[outputbox,text width=18mm,right=of g] (t) {GOAL text\\\texttt{.goal}};
+\node[processbox,text width=15mm,right=12mm of t] (c) {\texttt{txt2bin}};
+\node[outputbox,text width=19mm,right=of c] (b) {GOAL binary\\\texttt{.bin}};
+\node[processbox,text width=19mm,right=12mm of b] (s) {LogGOPSim};
+\node[outputbox,text width=20mm,right=of s] (r) {Finish time\\of each rank};
+\node[inputbox,text width=32mm,above=7mm of s] (p) {Network parameters\\$L, o, g, G, O, S$};
+\foreach \a/\b in {w/g,g/t,t/c,c/b,b/s,s/r,p/s} \draw[arrow] (\a)--(\b);
+\begin{scope}[on background layer]
+\node[draw=black!55,dashed,rounded corners,fit=(w)(g)(t),inner sep=3mm,label={[font=\small\bfseries]below:1. Generation}] {};
+\node[draw=black!55,dashed,rounded corners,fit=(c)(b),inner sep=3mm,label={[font=\small\bfseries,align=center]below:2. Conversion:\\once per schedule}] {};
+\node[draw=black!55,dashed,rounded corners,fit=(s)(r),inner sep=3mm,label={[font=\small\bfseries,align=center]below:3. Simulation:\\once per run}] {};
+\end{scope}
+\end{tikzpicture}
