@@ -50,6 +50,7 @@ TraceReader::DecoderKind TraceReader::get_decoder_kind() {
         const char* decoder = std::getenv("LOGGOPSIM_DECODER");
         if (decoder && std::strcmp(decoder, "plan") == 0) return DecoderKind::Plan;
         if (decoder && std::strcmp(decoder, "jit") == 0) return DecoderKind::Jit;
+        if (decoder && std::strcmp(decoder, "orc") == 0) return DecoderKind::Orc;
         return DecoderKind::Generic;
     }();
     return kind;

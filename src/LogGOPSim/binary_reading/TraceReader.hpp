@@ -5,6 +5,7 @@
 #include "binary_reading/DecodePlan.hpp"
 #include "binary_reading/JitDecoder.hpp"
 #include "binary_reading/NodeDecoder.hpp"
+#include "binary_reading/OrcDecoder.hpp"
 #include "simulators/BaseDeserializedGraphNode.hpp"
 #include "binary_reading/FieldBindings.hpp"
 
@@ -170,10 +171,11 @@ private:
             add(std::uint8_t{1}, std::span<const FieldBinding<DecodedDependencyFields>>(get_dependency_bindings()));
         plan_ = DecodePlan::create(get_selected_fields(), destinations);
         if (plan_ && get_decoder_kind() == DecoderKind::Jit) jit_ = load_jit_decoder(*plan_);
+        if (plan_ && get_decoder_kind() == DecoderKind::Orc) jit_ = load_orc_decoder(*plan_);
     }
 
-    enum class DecoderKind { Generic, Plan, Jit };
-    // LOGGOPSIM_DECODER=generic|plan|jit, default generic.
+    enum class DecoderKind { Generic, Plan, Jit, Orc };
+    // LOGGOPSIM_DECODER=generic|plan|jit|orc, default generic.
     [[nodiscard]] static DecoderKind get_decoder_kind();
     [[nodiscard]] static const std::vector<FieldBinding<DecodedDependencyFields>>& get_dependency_bindings();
     void populate_graph_node(BaseDeserializedGraphNode& node, const DecodedDependencyFields& fields,

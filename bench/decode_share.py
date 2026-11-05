@@ -3,7 +3,7 @@
 
 usage: decode_share.py BUILD_DIR RUNS TRACE...
 Expects BUILD_DIR/TRACE.legacy.bin and BUILD_DIR/TRACE.sd.bin; the self-describing file is
-run with the generic decoder, the decode plan and the JIT (LOGGOPSIM_DECODER). The warm-up run
+run with the generic decoder, the decode plan, the C JIT and the ORC JIT (LOGGOPSIM_DECODER). The warm-up run
 fills the JIT cache, so measured runs see a cache hit; setup_ms is the schedule load time.
 Medians with 95% nonparametric CIs (Le Boudec), raw samples in BUILD_DIR/decode_share.csv.
 """
@@ -27,7 +27,7 @@ def median_ci(samples):
 
 
 CONFIGS = (("legacy", "legacy", "generic"), ("generic", "sd", "generic"), ("plan", "sd", "plan"),
-           ("jit", "sd", "jit"))
+           ("jit", "sd", "jit"), ("orc", "sd", "orc"))
 
 
 def simulate(build, schedule, env):

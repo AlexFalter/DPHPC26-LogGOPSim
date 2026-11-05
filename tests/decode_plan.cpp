@@ -3,6 +3,7 @@
 #include "binary_reading/DecodePlan.hpp"
 #include "binary_reading/JitDecoder.hpp"
 #include "binary_reading/NodeDecoder.hpp"
+#include "binary_reading/OrcDecoder.hpp"
 #include "trace_format/BinaryIO.hpp"
 
 #include <cstdlib>
@@ -80,7 +81,7 @@ static std::uint64_t random_code(const FieldStorageInfo& field) {
 int main() try {
     const auto cache = std::filesystem::temp_directory_path() / ("decode_plan_test_" + std::to_string(rng()));
     setenv("LOGGOPSIM_JIT_CACHE", cache.c_str(), 1);
-    std::size_t accepted = 0, rejected = 0, compiled = 0;
+    std::size_t accepted = 0, rejected = 0, compiled = 0, orc_compiled = 0;
     for (int schema = 0; schema < 300; ++schema) {
         const auto layout = random_layout();
         FieldRequirements requirements;
@@ -97,6 +98,11 @@ int main() try {
         const auto jit = schema < 12 ? load_jit_decoder(*plan) : nullptr;
         check(schema >= 12 || jit, "JIT compilation failed");
         compiled += jit != nullptr;
+        const auto orc = load_orc_decoder(*plan);
+#ifdef LOGGOPSIM_HAVE_LLVM
+        check(orc != nullptr, "ORC compilation failed");
+#endif
+        orc_compiled += orc != nullptr;
 
         const auto size = layout.get_record_size_bytes();
         std::vector<std::byte> record(size + 16);
@@ -127,6 +133,11 @@ int main() try {
                 check((jit(record.data(), targets) != 0) == generic_ok, "JIT acceptance differs");
                 check(!generic_ok || output == expected, "JIT values differ");
             }
+            if (orc) {
+                std::fill(output.begin(), output.end(), 0);
+                check((orc(record.data(), targets) != 0) == generic_ok, "ORC acceptance differs");
+                check(!generic_ok || output == expected, "ORC values differ");
+            }
         }
 
         const auto width = static_cast<std::uint32_t>(pick(64));
@@ -154,7 +165,7 @@ int main() try {
     std::filesystem::remove_all(cache);
     check(accepted > 0 && rejected > 0, "test did not cover both accepted and rejected records");
     std::cout << "decode plan: " << accepted << " accepted, " << rejected << " rejected, "
-              << compiled << " JIT schemas\n";
+              << compiled << " JIT schemas, " << orc_compiled << " ORC schemas\n";
     return 0;
 } catch (const std::exception& error) {
     std::cerr << error.what() << '\n';

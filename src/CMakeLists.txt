@@ -38,10 +38,37 @@ add_library(trace_schema STATIC
   LogGOPSim/binary_reading/NodeDecoder.cpp
   LogGOPSim/binary_reading/DecodePlan.cpp
   LogGOPSim/binary_reading/JitDecoder.cpp
+  LogGOPSim/binary_reading/OrcLoader.cpp
   LogGOPSim/simulators/loggopsim/LogGOPSimAdapter.cpp
   LogGOPSim/simulators/atlahs/AtlahsAdapter.cpp)
 target_include_directories(trace_schema PUBLIC ${PROJECT_SOURCE_DIR}/LogGOPSim)
 target_link_libraries(trace_schema PRIVATE tomlplusplus::tomlplusplus ${CMAKE_DL_LIBS})
+
+# Optional in-process decoder compilation (LOGGOPSIM_DECODER=orc); without LLVM it falls back to the plan.
+option(LOGGOPSIM_WITH_LLVM "Build the LLVM ORC decoder backend if LLVM is found" ON)
+if(LOGGOPSIM_WITH_LLVM)
+  # LLVMConfig appends to CMAKE_MODULE_PATH, which the includes below use as a single directory.
+  set(LOGGOPSIM_MODULE_PATH "${CMAKE_MODULE_PATH}")
+  find_package(LLVM CONFIG QUIET)
+  set(CMAKE_MODULE_PATH "${LOGGOPSIM_MODULE_PATH}")
+endif()
+if(LLVM_FOUND)
+  message(STATUS "LLVM ${LLVM_PACKAGE_VERSION}: ORC decoder enabled")
+  if(LLVM_LINK_LLVM_DYLIB)
+    set(LOGGOPSIM_LLVM_LIBRARIES LLVM)
+  else()
+    llvm_map_components_to_libnames(LOGGOPSIM_LLVM_LIBRARIES orcjit native passes)
+  endif()
+  # Keep LLVM out of the tools and open the plugin on first use, so runs without LOGGOPSIM_DECODER=orc do not pay LLVM's load time.
+  add_library(loggopsim_orc MODULE LogGOPSim/binary_reading/OrcDecoder.cpp)
+  target_include_directories(loggopsim_orc PRIVATE ${PROJECT_SOURCE_DIR}/LogGOPSim)
+  target_include_directories(loggopsim_orc SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+  target_link_directories(loggopsim_orc PRIVATE ${LLVM_LIBRARY_DIRS})
+  target_link_libraries(loggopsim_orc PRIVATE ${LOGGOPSIM_LLVM_LIBRARIES})
+  add_dependencies(trace_schema loggopsim_orc)
+  target_compile_definitions(trace_schema PUBLIC LOGGOPSIM_HAVE_LLVM
+    PRIVATE LOGGOPSIM_ORC_LIBRARY="$<TARGET_FILE:loggopsim_orc>")
+endif()
 
 # Optional integration with ATLAHS's existing packet simulator and GOAL scheduler.
 option(BUILD_ATLAHS "Build and test the optional ATLAHS integration" OFF)

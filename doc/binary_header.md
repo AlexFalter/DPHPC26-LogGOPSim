@@ -95,7 +95,7 @@ After reading the header, `NodeDecoder(layout, requirements)` runs `resolve_requ
 ## Specialized decoders
 
 `LOGGOPSIM_DECODER` selects the decoding path for `read_node_into`: `generic` (default),
-`plan` or `jit`. All three produce identical results; `tests/decode_plan.cpp` checks this
+`plan`, `jit` or `orc`. All produce identical results; `tests/decode_plan.cpp` checks this
 differentially.
 
 `plan` (`DecodePlan`) is compiled once from the selected fields at reader setup. Each field
@@ -107,3 +107,9 @@ plan's range (bad code, send to ANY, spill past file end) fall through to the ge
 cached under `$LOGGOPSIM_JIT_CACHE` (default `~/.cache/loggopsim-jit`) keyed by a hash of
 the source and compiler; concurrent builds write under a temp name and rename. Falls back to
 `plan` on any failure.
+
+`orc` (`OrcDecoder`) builds the same function as LLVM IR and compiles it in-process with
+LLVM ORC (`-O2` pipeline), without a compiler process, file or cache. It is built only when
+CMake finds LLVM (`-DLOGGOPSIM_WITH_LLVM=OFF` disables it) and lives in the `loggopsim_orc`
+plugin, opened on first use so other runs never load LLVM; `$LOGGOPSIM_ORC_LIBRARY`
+overrides the plugin path. Falls back to `plan` on any failure.
