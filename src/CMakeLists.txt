@@ -153,6 +153,11 @@ if (Unwind_FOUND)
   target_link_libraries(mpipflog unwind::unwind)
 endif()
 
+option(LOGGOPSIM_BUILD_BENCHMARKS "Build the benchmarks in bench/ (fetches Google Benchmark)" ON)
+if(LOGGOPSIM_BUILD_BENCHMARKS)
+  add_subdirectory(${PROJECT_SOURCE_DIR}/../bench ${CMAKE_CURRENT_BINARY_DIR}/bench)
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
   # Legacy fixtures have no custom attributes; the toolchain tests below convert them with an

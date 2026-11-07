@@ -138,6 +138,17 @@ The runner correctness checks verify the selected decoder and compare complete
 simulations with the legacy format. They do not measure speed; that belongs in
 `bench/`. `LOGGOPSIM_TRACE_DECODER=1` prints the actual decoder to stderr.
 
+Benchmarks
+==========
+
+`bench/` holds the decoding benchmarks (Google Benchmark), a profiling script and the
+end-to-end decode-share measurement; see [`bench/README.md`](bench/README.md). In short:
+
+```sh
+cmake --build build --target bench_traces decode_bench
+build/bench/decode_bench --benchmark_filter='^ReadNodes/'
+```
+
 Project report
 ==============
 
