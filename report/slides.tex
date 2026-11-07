@@ -1,0 +1,807 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{array,booktabs}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}
+
+% Same TikZ styles as plan-style.sty, so the report's diagrams render unchanged.
+\tikzset{box/.style={draw=black!65,rounded corners=3pt,minimum height=9mm,
+ align=center,font=\small,inner sep=5pt},
+ inputbox/.style={box,fill=blue!10},processbox/.style={box,fill=green!12},
+ outputbox/.style={box,fill=orange!20},arrow/.style={-{Stealth[length=2mm]},thick},
+ message/.style={arrow,dashed,draw=orange!85!black}}
+\tikzset{card/.style={draw=black!25,fill=#1,rounded corners=4pt,minimum width=44mm,minimum height=30mm,align=center,inner sep=5pt}}
+\newif\ifranktable % diagrams/header-details.tex: no rank table on the slides
+\newcommand{\secnum}[1]{} % no report section numbers in the diagrams
+\newcommand{\diagram}[1]{\resizebox{\linewidth}{!}{\input{diagrams/#1.tex}}}
+
+\definecolor{navy}{HTML}{1B2340}
+\definecolor{gold}{HTML}{D4A537}
+\definecolor{cream}{HTML}{F6EDCF}
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{title}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamercolor{item}{fg=gold!85!black}
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{\hfill\scriptsize\color{black!50}
+ DPHPC 2026 · Self-describing GOAL traces\quad\insertframenumber\hspace*{4mm}\vspace*{2mm}}
+\setbeamertemplate{itemize items}[circle]
+
+\lstset{basicstyle=\ttfamily\scriptsize,columns=fullflexible,keepspaces=true,
+ breaklines=true,showstringspaces=false,frame=single,rulecolor=\color{black!18},
+ backgroundcolor=\color{black!3},xleftmargin=3pt,xrightmargin=3pt}
+
+% Shared encoding figures; the validation slide adds an overlay to the offset diagram.
+\newcommand{\encodingfig}[1]{%
+\begingroup
+\def\encodingextra{#1}%
+\input{diagrams/offset-encoding.tex}%
+\endgroup}
+\newcommand{\dictfig}{\input{diagrams/dictionary-encoding.tex}}
+
+% A row of example values for the encoding slides.
+\newcommand{\vals}[1]{\foreach \v [count=\k] in {#1} \node[draw=black!65,fill=blue!8,minimum height=6mm,minimum width=14mm,font=\small,inner sep=2pt] at (\k*1.5,0) {\v};}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\smallnote}[1]{\par\vspace{2mm}{\small\color{black!60}#1}}
+\newcommand{\highlight}[1]{\colorbox{cream}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}}
+
+\tikzset{runnercard/.style={draw=black!35,fill=#1,rounded corners=3pt,text width=44mm,align=left,
+  inner sep=2.5mm,minimum height=27mm,anchor=north}}
+% Contents of a runner card: name, role, how it decodes, strength, weakness.
+\newcommand{\runner}[5]{%
+  \scriptsize{\usebeamercolor[fg]{title}{\footnotesize\bfseries\ttfamily #1}}\\
+  {\itshape\color{black!65}#2}\\[1.5mm]
+  #3\\[1.5mm]
+  {\color{green!45!black}$+$} #4\\
+  {\color{red!60!black}$-$} #5\par}
+\title{Self-describing GOAL traces for LogGOPSim}
+\subtitle{DPHPC 2026 progress presentation}
+\author{Joshua Durrant, Alexander Falter, Samuel Garcin, Mykhaylo Gershman}
+\date{Supervised by Timo Schneider \\ 17.11.26}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+\begin{enumerate}
+\item \textbf{Task:} the problem, our goals, who did what, structure of our implementation.
+\item \textbf{Self-describing format:} file layout, encodings, conversion.
+\item \textbf{Reading and validation:} simulator adapters, errors before the simulation starts.
+\item \textbf{Case study: ATLAHS:} explicit GPU and message fields, two scheduler fixes.
+\item \textbf{Fast decoding:} why it matters, one decode plan, five runners.
+\item \textbf{Benchmarks:} writing (file size and conversion), then reading (all runners, throughput and startup).
+\item Next steps and questions.
+\end{enumerate}
+\end{frame}
+
+\section{Task}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Task\par}
+\vspace{3mm}
+{\small\color{black!60}problem $\cdot$ goals $\cdot$ who did what $\cdot$ structure\par}
+\vfill
+\end{frame}
+
+\begin{frame}{The problem: a fixed 39-byte record}
+\diagram{legacy-record}
+\vspace{2mm}
+\begin{itemize}
+\item Every node uses every field at full width, whatever values actually occur.
+\item There is no place for extra information, so producers reuse fields.
+\item ATLAHS puts the GPU into \texttt{nic} and packs five message components into the tag.
+\item The file doesn't record this: a wrong guess simulates silently with wrong results.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Goals and status}
+\small
+\begin{tabular}{L{0.3\linewidth}L{0.42\linewidth}L{0.2\linewidth}}
+\toprule
+\textbf{Goal} & \textbf{Question} & \textbf{Status} \\
+\midrule
+Self-describing, extensible traces & Can the file describe compact fields and extra attributes? & done \\
+Load-time schema validation & Does the file supply what the simulator needs? & done \\
+Runtime specialization & Can decoding exploit the known schema? & done: five runners \\
+Benchmarking & Smaller and faster than legacy? & preliminary results; full study upcoming \\
+\bottomrule
+\end{tabular}
+\vspace{4mm}
+\begin{itemize}
+\item LogGOPSim and ATLAHS's htsim both read the new format through the same reader.
+\item Legacy files remain readable; legacy output is still the default.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Who did what}
+\small
+\begin{tabular}{L{0.25\linewidth}L{0.68\linewidth}}
+\toprule
+\textbf{Name} & \textbf{Work} \\
+\midrule
+Joshua Durrant & Full benchmarking study (upcoming) \\
+Alexander Falter & OpenMP parallelization and optimizations (upcoming) \\
+Samuel Garcin & Decode replay benchmark, decode plan (optimized interpreter), C JIT with cache, in-process JIT with LLVM ORC, differential test against the generic decoder \\
+Mykhaylo Gershman & Self-describing format and converter, bit packing (including 0-bit constant fields), custom fields, validating reader and simulator adapters, LogGOPSim restructuring, ATLAHS integration, runner architecture and registry, templated runners, test suite (GoogleTest, pytest), benchmark suite and profiler, report \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Structure of our implementation}
+\centering\vfill
+\diagram{design-overview}
+\vfill
+\end{frame}
+
+\section{Self-describing format}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Self-describing format\par}
+\vspace{4mm}
+{\large Mykhaylo Gershman\par}
+\vspace{3mm}
+{\small\color{black!60}file layout $\cdot$ encodings $\cdot$ conversion\par}
+\vfill
+\end{frame}
+
+\begin{frame}{The self-describing file}
+\diagram{file-sections}
+\vspace{2mm}
+\begin{itemize}
+\item Same components as the legacy file (rank table, records, dependency lists, roots), but records and indices use inferred widths.
+\item New: a \textbf{schema header} that describes every field, so a reader needs no built-in knowledge of the layout.
+\item All records in a file share one layout, so node $i$ of a rank is found directly at \texttt{rank\_start + i $\times$ record\_size}, without scanning.
+\item A new magic number distinguishes it from legacy files, which remain readable.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The header describes every field}
+\centering\vfill
+\resizebox{\linewidth}{!}{\input{diagrams/header-details.tex}}
+\vfill
+\par\raggedright
+\small
+\begin{itemize}
+\item Readers reject unknown versions and type codes, truncated headers and overlapping fields.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Choosing an encoding for the fields}
+\begin{itemize}
+\item Each field already gets only as many bits as its largest value needs.
+\item An \textbf{encoding} stores something smaller than the value itself, so it can save even more.
+\end{itemize}
+\vspace{4mm}
+\textbf{Example 1:} one value repeated
+\vspace{2mm}
+
+\begin{tikzpicture}[x=1cm]\vals{1024,1024,1024,1024}\end{tikzpicture}
+\vspace{3mm}
+
+Plain value: \textbf{11 bits} per value, although every value is the same.
+\end{frame}
+
+\begin{frame}{Offset encoding}
+\begin{itemize}
+\item The header stores the field's smallest value, the \textbf{base}; each record stores only the \textbf{offset} from it.
+\end{itemize}
+\vspace{4mm}
+\centering\encodingfig{}
+\par\raggedright
+\vspace{4mm}
+\begin{itemize}
+\item Example 1: base 1024, every offset is 0, so \textbf{0 bits} per value instead of 11.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{A case offsets don't fix}
+\textbf{Example 2:} two values far apart
+\vspace{2mm}
+
+\begin{tikzpicture}[x=1cm]\vals{1,1000000,1,1000000}\end{tikzpicture}
+\vspace{3mm}
+
+\begin{itemize}
+\item Plain value: \textbf{20 bits} per value, to hold 1,000,000.
+\item Offset encoding: base 1, but offsets still reach 999,999, so still \textbf{20 bits}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Dictionary encoding (proposed)}
+\begin{itemize}
+\item The header stores the field's distinct values; each record stores only the \textbf{index} into that list.
+\end{itemize}
+\vspace{4mm}
+\centering\dictfig
+\par\raggedright
+\vspace{4mm}
+\begin{itemize}
+\item Example 2: \textbf{1 bit} per value instead of 20, at the cost of storing the list in the header.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Combining both}
+\begin{itemize}
+\item Offset encoding suits values close together; dictionary encoding suits few values far apart.
+\item Using both, with the cheaper one chosen for each field, is probably the best approach.
+\item Offset encoding is implemented; dictionary encoding and the combination are not yet.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conversion reads the input twice}
+\diagram{conversion-overview}
+\vspace{3mm}
+\begin{itemize}
+\item The layout must be fixed before the first record is written: if tags 0--7 fit in three bits but a later rank uses tag 1000, earlier records cannot be widened.
+\item \textbf{Pass 1} keeps only file-wide statistics: each field's minimum and maximum, wildcards, dependency counts, the largest rank's node count.
+\item \textbf{Pass 2} parses each rank again and packs its records, dependencies and roots with the final layout.
+\item Each pass holds one rank's graph at a time, so memory is bounded by the largest rank and no temporary file is needed. The cost is parsing twice.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Making conversion cheaper}
+Reading and parsing the text twice costs time. Options we considered:
+\vspace{3mm}
+
+\footnotesize
+\begin{tabular}{L{0.17\linewidth}L{0.29\linewidth}L{0.23\linewidth}L{0.23\linewidth}}
+\toprule
+\textbf{Idea} & \textbf{How} & \textbf{Trade-off} & \textbf{Status} \\
+\midrule
+Lighter first pass & Collect ranges and dependency counts without building the graph & Still reads the text twice & In progress: Alexander Falter, on the GPU \\
+Temporary binary file & Parse once, store values in a temporary file, then pack from it & Extra disk space and I/O & Prototype: 1.36$\times$ faster on 2.1M nodes, 193 MB temporary data \\
+Keep all graphs & Parse once and keep every rank in memory & Whole schedule must fit in memory & Infeasible for large schedules \\
+Per-rank layouts & Choose a layout for each rank separately & One pass, but needs a format change & Proposed \\
+\bottomrule
+\end{tabular}
+\vspace{4mm}
+
+\highlight{\textbf{Switch by input size:} keep all graphs in memory when the schedule is small enough, otherwise fall back to a temporary file or two passes. Each option is then used where it is cheapest.}
+\end{frame}
+
+\begin{frame}[fragile]{Standard and custom fields}
+\begin{columns}[T]
+\begin{column}{0.44\textwidth}
+\begin{lstlisting}
+# config/custom_fields.toml
+[[fields]]
+name = "gpu_id"
+type = "unsigned"
+\end{lstlisting}
+\begin{lstlisting}
+l1: send 1024b to 1 tag 42 gpu_id 3
+l2: calc 1000 gpu_id 3
+\end{lstlisting}
+\end{column}
+\begin{column}{0.54\textwidth}
+\begin{itemize}
+\item \textbf{Custom fields} are declared in TOML and must appear on every operation.
+\item From then on they're treated exactly like standard fields.
+\item \textbf{Standard fields} (\texttt{type}, \texttt{peer}, \texttt{size}, \texttt{tag}, \texttt{cpu}, \texttt{nic}) stay standard because they're part of GOAL itself.
+\item A file can contain fields a simulator doesn't need: each simulator reads only what it binds.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Reading and validation}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Reading and validation\par}
+\vspace{4mm}
+{\large Mykhaylo Gershman\par}
+\vspace{3mm}
+{\small\color{black!60}simulator adapters $\cdot$ load-time checks $\cdot$ backward compatibility\par}
+\vfill
+\end{frame}
+
+\begin{frame}{Reading: adapters bind fields to node structs}
+\centering\resizebox{!}{0.5\textheight}{\input{diagrams/schema-agreement.tex}}
+\par\raggedright
+\small
+\begin{itemize}
+\item Each simulator declares its node type and binds file fields to its members; unbound fields are skipped, so one file serves several simulators.
+\item The file is memory-mapped; a node is decoded only when the scheduler requests it, and counters are decremented in a private copy, so the file can be reused.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Validation: errors before the simulation starts}
+\textbf{At load time}, the reader checks that every field the simulator needs exists and that its values fit the simulator's node struct, using only the header.
+\vspace{6mm}
+
+\centering
+\resizebox{0.95\linewidth}{!}{\encodingfig{%
+  \node[box,fill=red!12,text width=25mm,right=20mm of value] (member) {Node member\\\texttt{uint8\_t}: 0--255};
+  \draw[arrow,red!70!black] (value) -- node[above,font=\scriptsize,align=center]{1000--1003\\don't fit} (member);}}
+\par\raggedright
+\vspace{3mm}
+
+\small
+Example: the file says the field holds 1000--1003, but the simulator stores it in a \texttt{uint8\_t}. Copying 1002 would silently give 234, so the reader refuses the file before reading any node.
+\vspace{2mm}
+
+\textbf{When a node is read}, cheap checks catch corrupt records (bounds, operation codes, peer ranks).
+\vspace{3mm}
+
+\highlight{A missing or incompatible field is a clear error, instead of a silently misread value.}
+\end{frame}
+
+\begin{frame}{Backward compatibility: one reader, both formats}
+\vspace{2mm}\centering\resizebox{!}{0.42\textheight}{\input{diagrams/backward-compat.tex}}
+\par\raggedright\small
+\begin{itemize}
+\item Existing legacy files run unchanged: the reader detects the format by its magic number.
+\item The simulators have no legacy code of their own; both formats go through the same field bindings.
+\item Legacy files have only the standard fields; binding a custom field to one is an error.
+\item \texttt{txt2bin} still writes legacy by default; \texttt{-{}-save-mem} still invalidates the file.
+\item Same output as the original LogGOPSim, with both formats, on every benchmark trace it can run.
+\end{itemize}
+\end{frame}
+
+
+\section{Case study: ATLAHS}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Case study: ATLAHS\par}
+\vspace{4mm}
+{\large Mykhaylo Gershman\par}
+\vspace{3mm}
+{\small\color{black!60}explicit GPU and message fields $\cdot$ scheduler fixes $\cdot$ results\par}
+\vfill
+\end{frame}
+
+\begin{frame}{ATLAHS: GPU and message identity were hidden in other fields}
+\vspace{6mm}
+\diagram{legacy-gpu-record}
+\vspace{5mm}
+\begin{itemize}
+\item No GPU field: the GPU goes into \texttt{nic}, the stream into \texttt{cpu}.
+\item Five message-identity numbers are glued into the tag as decimal digits.
+\item The file doesn't say so; htsim guesses, and a wrong guess gives wrong results without an error.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Explicit fields: eight custom fields, no format change}
+\begin{lstlisting}
+before: l2: send 1024b to 1 tag 3050012001 cpu 0 nic 2
+after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
+            chunk_id 3 channel_id 5 sequence_id 12 message_kind 0 communicator_id 1
+\end{lstlisting}
+\vspace{2mm}
+\begin{itemize}
+\item \textbf{Generator:} new option \texttt{-{}-explicit-fields} writes each value as a named field.
+\item \textbf{New: the partner's GPU} (\texttt{peer\_gpu\_id}); the old trace had no place for it.
+\item \textbf{htsim} reads both formats through our \texttt{AtlahsAdapter}; its scheduler now uses these fields (next two slides).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Scheduler fix 1: messages went to the wrong GPU}
+\begin{columns}[c]
+\begin{column}{0.45\textwidth}
+\centering
+\input{diagrams/gpu-routing.tex}
+\end{column}
+\begin{column}{0.53\textwidth}
+\small
+\textbf{Problem:} upstream used the sender's GPU index at both ends. A send from A/GPU 0 to a receive on B/GPU 2 travelled to B/GPU 0, so the wrong network endpoints were simulated.
+\vspace{2mm}
+
+\textbf{Fix:} we changed htsim to send from the sender's \texttt{gpu\_id} to the receiver's \texttt{peer\_gpu\_id}. Its queues and completion callbacks now keep both endpoints, so each host updates its own resource clocks.
+\vspace{2mm}
+
+\textbf{Also:} htsim now tracks execution per \texttt{stream\_id} (32-bit) instead of the 8-bit \texttt{cpu} field; the number of streams comes from the file's schema.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Scheduler fix 2: different messages could get the same tag}
+\small
+Upstream, the generator glued five numbers together as decimal digits to form the tag, and htsim matched sends and receives by that one number:
+\vspace{3mm}
+
+\centering
+\input{diagrams/tag-collision.tex}
+\par\raggedright
+\vspace{3mm}
+\begin{itemize}
+\item \textbf{Problem:} a sequence number above 9999 takes five digits instead of four and shifts the rest. Two different messages can then produce the same tag, and htsim may match a receive with the wrong send, without any error.
+\item \textbf{Fix:} htsim now compares the five numbers separately, plus the sender. Explicit-field messages must use tag 0, and a message that never matches stops the run with an error.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{ATLAHS: a recorded Llama training run gets 54\% smaller}
+\centering\vfill
+\begin{tikzpicture}
+\node[card=blue!8] (c1) at (0,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 5.7M}\\[2mm]\small operations\\\small 4 hosts, 16 GPUs};
+\node[card=orange!15] (c2) at (56mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 54\%}\\[2mm]\small smaller trace\\\small 240.6 $\to$ 111.4 MiB};
+\end{tikzpicture}
+\vfill
+\par\raggedright
+\highlight{Smaller although the new trace carries all eight ATLAHS fields.}
+\end{frame}
+
+\section{Fast decoding}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Fast decoding\par}
+\vspace{4mm}
+{\large Samuel Garcin, Mykhaylo Gershman\par}
+\vspace{3mm}
+{\small\color{black!60}why $\cdot$ one decode plan, five runners $\cdot$ compiled and templated runners\par}
+\vfill
+\end{frame}
+
+\begin{frame}{Why: decoding was up to half of the simulation time}
+\centering\vfill
+\begin{tikzpicture}
+\node[card=blue!8] (c1) at (0,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 40\%}\\[2mm]\small bcast\_64k};
+\node[card=orange!15] (c2) at (48mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 47\%}\\[2mm]\small dissem\_16k};
+\node[card=black!5] (c3) at (96mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 2\%}\\[2mm]\small alltoall\_256\\\scriptsize message matching dominates};
+\end{tikzpicture}
+\vfill
+\par\raggedright
+\highlight{Share of the simulation time spent decoding records with the first, generic decoder, which interprets the schema for every field of every node.}
+\end{frame}
+
+\begin{frame}{One decode plan, five runners}
+\vspace{3mm}
+\centering\vfill
+\resizebox{0.95\linewidth}{!}{\input{diagrams/plan-runners.tex}}
+\vfill
+\end{frame}
+
+\begin{frame}{The five runners at a glance}
+\centering\vfill
+\resizebox{\linewidth}{!}{\begin{tikzpicture}
+\node[runnercard=blue!6] at (0,0) {\runner{plan}{Interpreter; default and fallback}
+  {Loops over the plan's steps.}
+  {Works for every trace; needs nothing at setup.}
+  {Reads each step's shift, mask and range at run time.}};
+\node[runnercard=green!8] at (56mm,0) {\runner{jit}{Generated C, compiled with \texttt{cc}}
+  {Generates C for the schema, compiles it into a library and caches it.}
+  {Every position and mask is a constant.}
+  {Needs a C compiler; compiles on first use.}};
+\node[runnercard=green!8] at (112mm,0) {\runner{orc}{In-process JIT with LLVM}
+  {Builds the same function in memory with LLVM ORC.}
+  {No compiler process, no files.}
+  {Needs LLVM; compiles on every run.}};
+\coordinate (row2) at ([yshift=-4mm]current bounding box.south);
+\coordinate (x1) at (28mm,0);
+\coordinate (x2) at (84mm,0);
+\node[runnercard=orange!12] at (x1 |- row2) {\runner{templated\_node}{Template per simulator node type}
+  {Fixes the field count and store widths at compile time.}
+  {No compiler at run time; works for every trace.}
+  {Positions and masks still come from the plan.}};
+\node[runnercard=black!4,dashed] at (x2 |- row2) {\runner{templated\_schema}{Lower bound for comparison}
+  {The generated C's code, compiled into the simulator ahead of time.}
+  {The best a specialized runner can do: every constant known, nothing compiled at run time.}
+  {Only for layouts compiled in, so not a choice for new traces.}};
+\end{tikzpicture}}
+\vfill
+\end{frame}
+
+\begin{frame}[fragile]{Compiled runners hard-code the schema}
+\begin{columns}[T]
+\begin{column}{0.47\textwidth}
+\begin{lstlisting}
+int decode(const u8* r, u8* const* t) {
+  u64 w, c;
+  // type: 2 bits at bit 1, base 1
+  memcpy(&w, r + 0x0, 8);
+  c = (w >> 0x1) & 0x3;
+  if (c > 0x2) return 0;
+  c += 0x1;
+  store8(t[0] + 0x38, c);
+  // peer: 16 bits at bit 3
+  memcpy(&w, r + 0x0, 8);
+  c = (w >> 0x3) & 0xffff;
+  store32(t[0] + 0x3c, c);
+  // size: 0 bits, constant 1024
+  store64(t[0] + 0x40, 0x400);
+  // ... 8 further fields
+  return 1;
+}
+\end{lstlisting}
+\smallnote{Generated C for bcast\_64k, abridged.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\small
+\begin{itemize}
+\item Every position, mask and range is a constant: no loop, no dispatch; a 0-bit field is a single store.
+\item \textbf{\texttt{jit}:} compiled with \texttt{cc}, cached on disk.
+\item \textbf{\texttt{orc}:} the same function compiled in memory with LLVM, loaded as a plugin only when used.
+\item Only numbers from the header go into the code, so a trace cannot inject code.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Preliminary benchmarks}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Preliminary benchmarks\par}
+\vspace{4mm}
+{\large Samuel Garcin, Mykhaylo Gershman\par}
+\vspace{3mm}
+{\small\color{black!60}writing: size and conversion $\cdot$ reading: throughput and startup\par}
+\vspace{6mm}
+\highlight{\centering One laptop (Apple M3 Pro), few repetitions. Joshua Durrant will run the full benchmarking study.}
+\vfill
+\end{frame}
+
+\subsection{Writing}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Writing\par}
+\vspace{3mm}
+{\large GOAL text $\to$ binary trace\par}
+\vspace{3mm}
+{\small\color{black!60}file size $\cdot$ conversion time\par}
+\vfill
+\end{frame}
+
+\begin{frame}{Writing: file size is 26--93\% smaller}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Trace} & \textbf{Nodes} & \textbf{Record} & \textbf{Legacy $\to$ new} & \textbf{Smaller} \\
+\midrule
+bcast\_8 & 14 & 39 $\to$ 2 B & 808 $\to$ 594 B & 26\% \\
+bcast\_1k & 2k & 39 $\to$ 4 B & 110 $\to$ 30 KiB & 73\% \\
+bcast\_64k & 131k & 39 $\to$ 4 B & 6.9 $\to$ 1.9 MiB & 73\% \\
+wide\_64k (random 64-bit values) & 131k & 39 $\to$ 15 B & 6.9 $\to$ 3.2 MiB & 53\% \\
+alltoall\_256 & 131k & 39 $\to$ 2 B & 5.4 MiB $\to$ 404 KiB & 93\% \\
+ring\_256 & 261k & 39 $\to$ 4 B & 10.7 $\to$ 1.3 MiB & 88\% \\
+dissem\_16k & 459k & 39 $\to$ 4 B & 19.2 $\to$ 2.4 MiB & 88\% \\
+ATLAHS Llama run (8 extra fields) & 5.7M & 39 $\to$ 17 B & 240.6 $\to$ 111.4 MiB & 54\% \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\begin{itemize}
+\item Narrow or constant fields shrink most; even random 64-bit values save half.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Writing: conversion time}
+\small
+Complete \texttt{txt2bin} run on the same GOAL text, \textbf{ms}.
+\vspace{1mm}
+
+\centering
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Trace} & \textbf{Original \texttt{txt2bin}} & \textbf{Ours, legacy} & \textbf{Ours, new format} \\
+\midrule
+bcast\_8 & 53 & 51 & \textbf{3.3} \\
+bcast\_1k & 63 & 119 & \textbf{7.3} \\
+bcast\_64k & 758 & 4527 & \textbf{247} \\
+dissem\_16k & 362 & 1462 & \textbf{333} \\
+ring\_256 & \textbf{138} & 187 & 252 \\
+alltoall\_256 & \textbf{74} & 136 & 82 \\
+wide\_64k & 779 & 4571 & \textbf{295} \\
+atlahs\_64k (8 extra fields) & n/a & n/a & 585 \\
+\midrule
+ATLAHS Llama run & 6\,500 & n/a & 19\,500 \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\small
+\begin{itemize}
+\item New format: faster than the original on most traces despite two passes.
+\item Our legacy writer remaps the file per rank: up to 6$\times$ slower; to be fixed.
+\end{itemize}
+{\scriptsize\color{black!60}\par
+Median of 5 interleaved runs. Legacy converters end with a system-wide \texttt{sync()} ($\approx$50\,ms). n/a: legacy cannot hold the custom fields (ours also rejects the Llama run's ${>}$32-bit tags). ATLAHS: one run.}
+\end{frame}
+
+\subsection{Reading}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Reading\par}
+\vspace{3mm}
+{\large binary trace $\to$ simulation\par}
+\vspace{3mm}
+{\small\color{black!60}decoding $\cdot$ access pattern $\cdot$ startup $\cdot$ complete simulations\par}
+\vfill
+\end{frame}
+
+\begin{frame}[t]{Reading: decoding throughput}
+\small
+Read every node once, \textbf{ns per node}; setup and compilation excluded.
+\vspace{3mm}
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lr rrr rr}
+\toprule
+\textbf{Trace} & \textbf{Nodes} & \texttt{plan} & \texttt{jit} & \texttt{orc} &
+\shortstack{\texttt{templated\_}\\\texttt{node}} &
+\textcolor{black!55}{\shortstack{lower bound\\\texttt{(templ.\_schema)}}} \\
+\midrule
+bcast\_8 & 14 & 30.2 & \textbf{17.8} & \textbf{17.9} & 24.1 & \textcolor{black!55}{17.4} \\
+bcast\_1k & 2k & 27.5 & \textbf{13.9} & \textbf{13.8} & 21.2 & \textcolor{black!55}{13.3} \\
+bcast\_64k & 131k & 26.5 & \textbf{13.4} & \textbf{13.4} & 21.1 & \textcolor{black!55}{13.2} \\
+dissem\_16k & 459k & 29.2 & \textbf{12.9} & \textbf{12.8} & 24.0 & \textcolor{black!55}{12.4} \\
+ring\_256 & 261k & 30.2 & \textbf{12.7} & 13.3 & 24.0 & \textcolor{black!55}{13.1} \\
+alltoall\_256 & 131k & 29.0 & \textbf{12.4} & \textbf{12.4} & 24.1 & \textcolor{black!55}{11.9} \\
+wide\_64k & 131k & 26.4 & \textbf{13.7} & \textbf{13.8} & 21.1 & \textcolor{black!55}{13.5} \\
+atlahs\_64k & 131k & 41.2 & 17.2 & \textbf{16.6} & 29.9 & \textcolor{black!55}{16.3} \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\highlight{\texttt{jit} and \texttt{orc} come within 6\% of the lower bound: generated code is no longer the limit.}
+{\scriptsize\color{black!60}\par\vspace{2mm}
+Median of three repetitions. Bold: fastest runner (within 3\%).}
+\end{frame}
+
+\begin{frame}[t]{Reading: the simulator's access pattern}
+\small
+Replay of LogGOPSim's reads and counter updates, without the network model; \textbf{ns per node}.
+\vspace{3mm}
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l r rrr rr}
+\toprule
+\textbf{Trace} & \textbf{Legacy} & \texttt{plan} & \texttt{jit} & \texttt{orc} &
+\shortstack{\texttt{templated\_}\\\texttt{node}} &
+\textcolor{black!55}{\shortstack{lower bound\\\texttt{(templ.\_schema)}}} \\
+\midrule
+bcast\_8 & 131 & \textbf{148} & 159 & 172 & 157 & \textcolor{black!55}{151} \\
+bcast\_1k & 27.3 & 39.7 & \textbf{34.0} & \textbf{33.8} & 37.5 & \textcolor{black!55}{33.6} \\
+bcast\_64k & 26.3 & 39.0 & \textbf{32.9} & \textbf{32.6} & 36.8 & \textcolor{black!55}{32.6} \\
+dissem\_16k & 26.4 & 35.6 & \textbf{30.6} & \textbf{30.5} & 33.4 & \textcolor{black!55}{30.4} \\
+ring\_256 & 22.6 & 36.2 & \textbf{31.7} & \textbf{31.7} & 34.3 & \textcolor{black!55}{31.3} \\
+alltoall\_256 & 7.4 & \textbf{13.5} & \textbf{13.4} & \textbf{13.5} & \textbf{13.5} & \textcolor{black!55}{13.5} \\
+wide\_64k & 26.1 & 39.8 & \textbf{33.7} & 35.8 & 41.1 & \textcolor{black!55}{35.7} \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\highlight{\texttt{jit} and \texttt{orc} reach the lower bound; the remaining 4--9\,ns gap to legacy lies in record and dependency-list access, not in decoding.}
+{\scriptsize\color{black!60}\par\vspace{2mm}
+Median of three repetitions; bcast\_8 is dominated by fixed costs. Bold: fastest runner for the new format (within 3\%).}
+\end{frame}
+
+\begin{frame}[t]{Reading: startup cost}
+\small
+Setup with an \textbf{empty JIT cache}, then read every node once; no network simulation; \textbf{ms}.
+\vspace{3mm}
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l rrr r r}
+\toprule
+\textbf{Trace} & \texttt{plan} & \texttt{jit} & \texttt{orc} &
+\shortstack{\texttt{templated\_}\\\texttt{node}} &
+\textcolor{black!55}{\shortstack{lower bound\\\texttt{(templ.\_schema)}}} \\
+\midrule
+bcast\_8 & \textbf{0.006} & 329 & 2.6 & \textbf{0.006} & \textcolor{black!55}{0.006} \\
+bcast\_1k & 0.074 & 334 & 3.0 & \textbf{0.066} & \textcolor{black!55}{0.048} \\
+bcast\_64k & 4.2 & 350 & 5.4 & \textbf{3.5} & \textcolor{black!55}{2.4} \\
+dissem\_16k & 13.9 & 345 & \textbf{8.8} & 11.6 & \textcolor{black!55}{6.1} \\
+ring\_256 & 8.0 & 332 & 7.3 & \textbf{7.0} & \textcolor{black!55}{3.8} \\
+alltoall\_256 & 3.8 & 347 & 4.4 & \textbf{3.2} & \textcolor{black!55}{1.6} \\
+wide\_64k & 4.2 & 342 & 5.7 & \textbf{3.4} & \textcolor{black!55}{2.4} \\
+atlahs\_64k & 6.1 & 338 & 6.1 & \textbf{4.6} & \textcolor{black!55}{2.8} \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\highlight{Compiling costs 330--350\,ms for \texttt{jit} and about 2.5\,ms for \texttt{orc}; \texttt{templated\_node} needs none and wins most cold starts.}
+{\scriptsize\color{black!60}\par\vspace{2mm}
+Median of three repetitions. Bold: fastest runner (within 3\%).}
+\end{frame}
+
+\begin{frame}[t]{Reading: complete simulations}
+\vspace{-2mm}\small
+Complete LogGOPSim runs including startup, \textbf{ms}; lower is better.
+\vspace{1mm}
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{l r r rrr r r}
+\toprule
+\textbf{Trace} & \shortstack{\textbf{Original}\\\textbf{LogGOPSim}} & \shortstack{\textbf{Ours,}\\\textbf{legacy}} &
+\texttt{plan} & \shortstack{\texttt{jit}\\(cached)} & \texttt{orc} &
+\shortstack{\texttt{templated\_}\\\texttt{node}} &
+\textcolor{black!55}{\shortstack{lower bound\\\texttt{(templ.\_schema)}}} \\
+\midrule
+bcast\_8 & 3.1 & 3.3 & 3.3 & 3.6 & 12.8 & 3.4 & \textcolor{black!55}{3.2} \\
+bcast\_1k & 3.8 & 3.9 & 3.9 & 4.1 & 13.2 & 3.9 & \textcolor{black!55}{3.8} \\
+bcast\_64k & 48.4 & 43.9 & 45.1 & 43.7 & 52.9 & 44.1 & \textcolor{black!55}{43.6} \\
+dissem\_16k & 146.4 & 122.7 & 116.6 & 110.8 & 118.3 & 114.3 & \textcolor{black!55}{110.2} \\
+ring\_256 & 39.8 & 32.8 & 34.5 & 32.9 & 41.8 & 33.6 & \textcolor{black!55}{32.4} \\
+alltoall\_256 & 1950 & 2004 & 1997 & 1996 & 2010 & 1999 & \textcolor{black!55}{1998} \\
+wide\_64k & crashes & 78.4 & 79.6 & 79.5 & 88.3 & 81.3 & \textcolor{black!55}{77.8} \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{1mm}
+\small
+\begin{itemize}\setlength{\itemsep}{0pt}
+\item Larger collectives: all runners but \texttt{orc} (loads LLVM in every run) are 7--24\% faster than the original.
+\item alltoall\_256: message matching dominates, at most 3\% slower. Results identical everywhere; the original crashes on wide\_64k.
+\end{itemize}
+{\scriptsize\color{black!60}\par
+Median of 21 runs, configurations interleaved in a seeded random order. Original: last upstream commit (76451de), same build type, on the legacy files.}
+\end{frame}
+
+\begin{frame}{Which runner wins where}
+\centering
+\begin{tikzpicture}[choice/.style={text width=29mm,minimum width=0pt,minimum height=34mm}]
+\node[card=blue!8,choice] at (0,0) {\small Tiny trace\\[2mm]{\usebeamercolor[fg]{title}\large\bfseries\texttt{plan}}\\[2mm]\scriptsize nothing to amortize};
+\node[card=green!12,choice] at (36mm,0) {\small Cold start,\\small/medium traces\\[2mm]{\usebeamercolor[fg]{title}\large\bfseries\texttt{templated\_}\\\texttt{node}}\\[2mm]\scriptsize no compilation};
+\node[card=orange!15,choice] at (72mm,0) {\small Cold start,\\\texttt{dissem\_16k}\\[2mm]{\usebeamercolor[fg]{title}\large\bfseries\texttt{orc}}\\[2mm]\scriptsize compilation pays off};
+\node[card=red!10,choice] at (108mm,0) {\small Long read phase\\[2mm]{\usebeamercolor[fg]{title}\large\bfseries\texttt{jit} $\approx$ \texttt{orc}}\\[2mm]\scriptsize similar throughput};
+\end{tikzpicture}
+\par\raggedright\vspace{5mm}
+\small
+\begin{itemize}
+\item Lower bound (\texttt{templated\_schema}): after setup, \texttt{jit} and \texttt{orc} come within 6\% of it; at startup, the best runner needs 1.4--2$\times$ its time.
+\item Measured on one laptop; automatic selection needs crossover points on more layouts.
+\end{itemize}
+\end{frame}
+
+\section{Next steps}
+
+\begin{frame}{Next steps}
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
+\small
+\textbf{Reading}
+\begin{itemize}
+\item Select the runner using startup cost, trace size and cache availability.
+\item Profile the remaining rank-lookup, packed-index and counter-update costs.
+\end{itemize}
+\vspace{3mm}
+\textbf{Writing}
+\begin{itemize}
+\item Make legacy I/O comparable: per-rank remapping and flush policy.
+\item Measure the phases, then evaluate a lean analysis pass or dictionary encoding.
+\end{itemize}
+\end{column}
+\begin{column}{0.47\textwidth}
+\small
+\textbf{Evaluation}
+\begin{itemize}
+\item Euler study (Joshua): Linux/x86-64, cold file caches and peak memory.
+\item Larger recorded workloads and custom-field-heavy traces.
+\item Parallelization experiments (Alexander), keeping cross-format and cross-runner checks.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Questions}
+
+\begin{frame}{Questions}
+\begin{itemize}
+\item \textbf{Runner selection:} should cold-start cost or repeated-read throughput guide the default? Keep an explicit override?
+\vspace{4mm}
+\item \textbf{Writing:} after matching I/O policies, should we prioritize a cheaper analysis pass or dictionary compression?
+\vspace{4mm}
+\item \textbf{Evaluation:} which larger workloads and cold-cache scenarios should the Euler study prioritize?
+\end{itemize}
+\end{frame}
+
+\end{document}

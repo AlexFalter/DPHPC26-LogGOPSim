@@ -1,0 +1,21 @@
+\begin{tikzpicture}[
+  cell/.style={draw=black!65,minimum height=7mm,font=\small,inner sep=2pt},
+  other/.style={cell,minimum width=9mm,fill=black!6},
+  bit/.style={cell,minimum width=6mm,fill=orange!25,line width=0.9pt,font=\small\ttfamily}]
+\node[font=\small\bfseries,anchor=east] at (-0.2,0) {Header};
+\node[other,anchor=west] (h1) at (0,0) {};
+\node[cell,fill=blue!12,line width=0.9pt,minimum width=21mm,right=0mm of h1] (base) {base 1000};
+\node[other,right=0mm of base] (h2) {};
+\node[font=\small\bfseries,anchor=east] at (-0.2,-1.9) {Record};
+\node[other,anchor=west] (r1) at (0,-1.9) {};
+\node[other,right=0mm of r1] (r2) {};
+\node[other,right=0mm of r2] (r3) {};
+\node[bit,right=0mm of r3] (f1) {1};
+\node[bit,right=0mm of f1] (f2) {0};
+\node[font=\scriptsize,above=0.5mm of f1.north east] {offset = 2 (2 bits)};
+\node[outputbox,text width=34mm,right=10mm of h2.east,yshift=-9.5mm] (value) {value = base + offset\\$1000 + 2 =$ \textbf{1002}};
+\draw[arrow] (base.north) -- ++(0,2.5mm) -| (value.north);
+\draw[arrow] (f2.east) -| (value.south);
+% Optional annotation used by the validation slide.
+\ifdefined\encodingextra\encodingextra\fi
+\end{tikzpicture}

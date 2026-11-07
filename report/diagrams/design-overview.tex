@@ -1,25 +1,60 @@
+% \secnum{3.2} prints the report section on a new line; the slides define it as empty.
 \begin{tikzpicture}
-\node[inputbox,text width=24mm] (t) at (0,0.9) {GOAL text};
-\node[inputbox,text width=24mm] (d) at (0,-0.9) {Custom fields\\(3.1)};
+\node[inputbox,text width=24mm] (t) at (0,0.9) {GOAL text\\\texttt{.goal}};
+\node[inputbox,text width=24mm] (d) at (0,-0.9) {Custom fields\\\texttt{.toml}\secnum{3.2}};
 \node[processbox,text width=25mm] (p) at (4.1,0) {Parser};
-\node[processbox,text width=26mm] (a) at (6.7,2.4) {Layout inference\\(3.2)};
-\node[processbox,text width=26mm] (w) at (9.3,0) {Writer\\(3.2)};
+\node[processbox,text width=26mm] (a) at (6.7,2.4) {Layout inference\secnum{3.3}};
+\node[processbox,text width=26mm] (w) at (9.3,0) {Writer\secnum{3.3}};
 \node[font=\small] (joint) at (6.7,-1.1) {Pass 2: parse and write one rank at a time};
 \begin{scope}[on background layer]
 \node[draw=black!35,fill=black!2,rounded corners=5pt,inner sep=4mm,
   fit=(p)(w)(joint)] {};
 \end{scope}
-\node[outputbox,text width=22mm] (f) at (13,0) {Binary file\\(3.3)};
-\node[processbox,text width=24mm] (r) at (16.2,0) {Reader +\\adapters (3.4)};
-\node[outputbox,text width=24mm] (s) at (19.6,0) {Simulator};
-\node[inputbox,text width=26mm,dashed] (j) at (16.2,-2.1) {Specialized\\decoder (3.5)};
+\node[outputbox,text width=22mm] (f) at (13,0) {Binary file\secnum{3.4}};
+% Reading: one reader, adapter and simulator per row; the dashed row stands for any further ones.
+\foreach \k/\y/\sim/\adapter in {1/2.3/LogGOPSim/LogGOPSimAdapter,2/0.6/ATLAHS htsim/AtlahsAdapter} {
+  \node[processbox,text width=20mm] (r\k) at (16.4,\y) {Reader \k\secnum{3.5}};
+  \node[processbox,text width=29mm] (a\k) at (20.1,\y) {\texttt{\adapter}\secnum{3.5}};
+  \node[outputbox,text width=26mm] (s\k) at (23.8,\y) {Simulator \k\\\footnotesize \sim};
+}
+\node[processbox,dashed,text width=20mm] (r3) at (16.4,-1.1) {Reader $n$};
+\node[processbox,dashed,text width=29mm] (a3) at (20.1,-1.1) {Adapter};
+\node[outputbox,dashed,text width=26mm] (s3) at (23.8,-1.1) {Simulator $n$};
+\begin{scope}[on background layer]
+\coordinate (stackcorner) at ([xshift=2.4mm,yshift=-2.4mm]r3.south east);
+\node[draw=black!30,fill=black!2,rounded corners=5pt,inner sep=2.5mm,fit=(r1)(r3)(stackcorner)] (readers) {};
+\foreach \col/\color in {r3/green!12,a3/green!12,s3/orange!20}
+  \foreach \offset in {2,1}
+    \draw[draw=black!40,dashed,fill=\color,rounded corners=3pt]
+      ([xshift=\offset*1.2mm,yshift=-\offset*1.2mm]\col.south west) rectangle ([xshift=\offset*1.2mm,yshift=-\offset*1.2mm]\col.north east);
+\end{scope}
+\node[inputbox,text width=18mm] (j) at (16.4,-3.4) {Decoder\secnum{3.6}};
+% The decoder uses one runner: a radio-button list with the default selected.
+\foreach \name [count=\i] in {plan,jit,orc,templated\_node,templated\_schema} {
+  \node[anchor=west,font=\footnotesize\ttfamily,inner sep=1pt] (run\i) at (18.55,{-2.2-0.4*\i}) {\name};
+  \draw[black!65,fill=white] ([xshift=-1.9mm]run\i.west) circle (0.95mm);
+}
+\fill[black!65] ([xshift=-1.9mm]run1.west) circle (0.55mm);
+\coordinate (radioleft) at ([xshift=-3.1mm]run1.west);
+\begin{scope}[on background layer]
+\node[draw=black!30,fill=black!3,rounded corners=3pt,inner sep=1.5mm,fit=(run1)(run5)(radioleft)] (runners) {};
+\end{scope}
+\draw[black!45] (j.east) -- (runners.west);
 \draw[arrow] (t.east) -- (p.west);
 \draw[arrow] (d.east) -- (p.west);
 \draw[arrow] (p.north) |- node[pos=.7,above,font=\small] {pass 1} (a.west);
 \draw[arrow] (a.east) -| node[pos=.3,above,font=\small] {schema} (w.north);
 \draw[arrow] (p.east) -- (w.west);
 \draw[arrow] (w)--(f);
-\draw[arrow] (f)--(r);
-\draw[arrow] (r)--(s);
-\draw[arrow,dashed] (j)--node[right,font=\small]{planned}(r);
+\foreach \k in {1,2,3} {
+  \draw[arrow] (f.east)--(r\k.west);
+  \draw[arrow] (r\k)--(a\k);
+  \draw[arrow] (a\k)--(s\k);
+}
+\draw[arrow] (j)--node[right,font=\small]{decode}(readers.south -| j);
+% The two halves: writing the binary (conversion) and reading it (simulation).
+\draw[decorate,decoration={brace,mirror,amplitude=6pt},thick,black!60]
+  (-1.3,-4.6) -- node[below=8pt,font=\small,align=center] {\textbf{Writing:} \texttt{txt2bin}, once per schedule} (12.9,-4.6);
+\draw[decorate,decoration={brace,mirror,amplitude=6pt},thick,black!60]
+  (13.1,-4.6) -- node[below=8pt,font=\small,align=center] {\textbf{Reading:} each simulator, once per run} (25.3,-4.6);
 \end{tikzpicture}
