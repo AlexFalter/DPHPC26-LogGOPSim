@@ -8,28 +8,6 @@
 
 namespace traceschema {
 
-FieldValue get_node_field_value(
-    const Node& node, FieldId field, std::uint64_t dependency_appendix_index) {
-    switch (field) {
-    case FieldId::DependencyCount: return std::uint64_t{node.DependenciesCnt};
-    case FieldId::Type: return static_cast<std::uint64_t>(node.Type);
-    case FieldId::Peer:
-        if (node.Peer == Node::any_source) return Wildcard{};
-        return std::uint64_t{node.Peer};
-    case FieldId::Size: return node.Size;
-    case FieldId::Tag:
-        if (node.Tag == Node::any_tag) return Wildcard{};
-        return std::uint64_t{node.Tag};
-    case FieldId::Cpu: return std::uint64_t{node.Proc};
-    case FieldId::Nic: return std::uint64_t{node.Nic};
-    case FieldId::CompletionCount: return std::uint64_t{node.DependOnMe.size()};
-    case FieldId::CompletionIndex: return dependency_appendix_index;
-    case FieldId::StartCount: return std::uint64_t{node.StartDependOnMe.size()};
-    case FieldId::StartIndex: return dependency_appendix_index + node.DependOnMe.size();
-    }
-    throw std::invalid_argument("Unknown standard node field");
-}
-
 RankPacker::RankPacker(RecordLayout layout, std::uint32_t node_index_bits,
                        std::span<const FieldValueInfo> custom_fields)
     : record_packer_(std::move(layout)), node_index_bits_(node_index_bits),
@@ -37,28 +15,28 @@ RankPacker::RankPacker(RecordLayout layout, std::uint32_t node_index_bits,
     if (node_index_bits < 1 || node_index_bits > 64)
         throw std::invalid_argument("Node index width must be 1..64 bits");
     for (const auto& field : get_layout().fields) {
-        if (const auto* id = std::get_if<FieldId>(&field.field)) field_sources_.push_back(*id);
+        if (const auto* id = std::get_if<FieldId>(&field.field)) value_origins_.push_back(*id);
         else {
             const auto definition = std::ranges::find(custom_fields, field.field, &FieldValueInfo::field);
             if (definition == custom_fields.end())
                 throw std::invalid_argument("Undeclared node field '" + std::get<std::string>(field.field) + "'");
-            field_sources_.push_back(static_cast<std::size_t>(definition - custom_fields.begin()));
+            value_origins_.push_back(static_cast<std::size_t>(definition - custom_fields.begin()));
         }
     }
-    field_values_.reserve(field_sources_.size());
+    field_values_.reserve(value_origins_.size());
 }
 
 void RankPacker::collect_field_values(const Node& node, std::uint64_t dependency_appendix_index) {
     if (node.custom_values.size() != custom_field_count_)
         throw std::invalid_argument("Node custom value count does not match declarations");
     field_values_.clear();
-    for (std::size_t index = 0; index < field_sources_.size(); ++index) {
-        const auto& source = field_sources_[index];
-        if (const auto* id = std::get_if<FieldId>(&source)) {
+    for (std::size_t index = 0; index < value_origins_.size(); ++index) {
+        const auto& origin = value_origins_[index];
+        if (const auto* id = std::get_if<FieldId>(&origin)) {
             if (node.Type == std::to_underlying(traceschema::OperationType::Calculation) && (*id == FieldId::Peer || *id == FieldId::Tag))
                 field_values_.push_back(get_layout().fields[index].offset_encoding.value_base);
             else field_values_.push_back(get_node_field_value(node, *id, dependency_appendix_index));
-        } else field_values_.push_back(node.custom_values[std::get<std::size_t>(source)]);
+        } else field_values_.push_back(node.custom_values[std::get<std::size_t>(origin)]);
     }
 }
 
@@ -98,9 +76,11 @@ static PackedRankData allocate_packed_rank(
     return {std::move(bytes), appendix_offset, dependency_count, root_indices_offset, root_count};
 }
 
+using ParsedNodes = decltype(std::declval<const Goal&>().GetNodes());
+
 class DependencyAppendixWriter {
 public:
-    DependencyAppendixWriter(std::span<std::byte> bytes, std::span<Node* const> nodes,
+    DependencyAppendixWriter(std::span<std::byte> bytes, ParsedNodes nodes,
                             std::uint32_t index_bits, std::uint32_t entry_count)
         : bytes_(bytes), nodes_(nodes), index_bits_(index_bits), entry_count_(entry_count) {}
 
@@ -110,9 +90,9 @@ public:
         if (dependents.size() > entry_count_ - entry_index_)
             throw std::invalid_argument("Dependency count does not match the graph");
         for (const auto* dependent : dependents) {
-            if (!dependent || dependent->offset >= nodes_.size() || nodes_[dependent->offset] != dependent)
+            if (!dependent || dependent->node_index >= nodes_.size() || nodes_[dependent->node_index] != dependent)
                 throw std::invalid_argument("Dependency points outside its rank");
-            bit_packing::write_bits(bytes_, entry_index_ * index_bits_, index_bits_, dependent->offset);
+            bit_packing::write_bits(bytes_, entry_index_ * index_bits_, index_bits_, dependent->node_index);
             ++entry_index_;
         }
     }
@@ -124,7 +104,7 @@ public:
 
 private:
     std::span<std::byte> bytes_;
-    std::span<Node* const> nodes_;
+    ParsedNodes nodes_;
     std::uint32_t index_bits_;
     std::uint32_t entry_count_;
     std::uint64_t entry_index_ = 0;
@@ -160,11 +140,11 @@ PackedRankData RankPacker::pack(const Goal& graph) {
 
         collect_field_values(*node, appendix.get_entry_index());
         const auto record_bytes = take_next_bytes(remaining_node_records, record_size_bytes);
-        record_packer_.pack_into(field_values_, record_bytes);
+        record_packer_.pack(field_values_, record_bytes);
 
-        // Completion dependents precede start dependents, matching the record's list indices.
-        appendix.append(node->DependOnMe);
-        appendix.append(node->StartDependOnMe);
+        // Finish dependents precede start dependents, matching the record's list indices.
+        appendix.append(node->finish_dependents);
+        appendix.append(node->start_dependents);
     }
     appendix.validate_complete();
     return packed_rank;

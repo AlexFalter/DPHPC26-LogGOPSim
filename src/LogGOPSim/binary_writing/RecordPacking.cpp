@@ -22,13 +22,7 @@ RecordPacker::RecordPacker(RecordLayout schema) : schema_(std::move(schema)) {
         clear_from_byte_ = static_cast<std::size_t>(payload_bits / bits_per_byte);
 }
 
-std::vector<std::byte> RecordPacker::pack(const RecordValues& values) const {
-    std::vector<std::byte> bytes(static_cast<std::size_t>(schema_.get_record_size_bytes()));
-    pack_into(values, bytes);
-    return bytes;
-}
-
-void RecordPacker::pack_into(std::span<const FieldValue> values, std::span<std::byte> bytes) const {
+void RecordPacker::pack(std::span<const FieldValue> values, std::span<std::byte> bytes) const {
     if (values.size() != schema_.fields.size())
         throw std::invalid_argument("Record value count does not match schema");
     if (bytes.size() != schema_.get_record_size_bytes())

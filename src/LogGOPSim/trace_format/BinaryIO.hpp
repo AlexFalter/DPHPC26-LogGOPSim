@@ -8,6 +8,7 @@
 #include <cstring>
 #include <cstddef>
 #include <limits>
+#include <optional>
 #include <span>
 #include <stdexcept>
 #include <type_traits>
@@ -18,6 +19,11 @@ inline constexpr std::uint32_t bits_per_byte = 8;
 
 [[nodiscard]] inline std::uint32_t calculate_required_bits(std::uint64_t maximum) {
     return std::max(1, std::bit_width(maximum));
+}
+
+// The lowest bit_count bits set (0..64).
+[[nodiscard]] inline std::uint64_t low_bit_mask(std::uint32_t bit_count) {
+    return bit_count >= 64 ? std::numeric_limits<std::uint64_t>::max() : (std::uint64_t{1} << bit_count) - 1;
 }
 
 [[nodiscard]] inline std::uint64_t round_up_to_byte(std::uint64_t bit_count) {
@@ -43,6 +49,18 @@ requires std::same_as<std::remove_const_t<Byte>, std::byte>
 static_assert(std::endian::native == std::endian::little ||
               std::endian::native == std::endian::big,
               "Mixed-endian machines are unsupported");
+
+// Legacy files use host byte order and may contain unaligned integers.
+template<std::integral Integer>
+[[nodiscard]] Integer read_native(const std::byte* bytes) {
+    Integer value;
+    std::memcpy(&value, bytes, sizeof(value));
+    return value;
+}
+template<std::integral Integer>
+void write_native(std::byte* bytes, Integer value) {
+    std::memcpy(bytes, &value, sizeof(value));
+}
 
 // Whole integers and packed fields both use little-endian, least-significant-bit-first storage.
 template<std::unsigned_integral Integer>
@@ -138,6 +156,30 @@ inline void write_bits(std::span<std::byte> bytes, std::uint64_t bit_offset,
     if (bit_count != 0)
         code |= read_partial_byte(bytes[byte_index], 0, bit_count) << copied_bits;
     return code;
+}
+
+// Decrements the unsigned code at bit_offset in place and returns the new code, leaving every
+// other bit unchanged. Returns nothing, changing nothing, for a code of zero or above maximum.
+// bytes may extend beyond the field's record: when the 8 bytes from the field's first byte are
+// available and hold the whole field, one word is updated, since subtracting one at the field's
+// lowest bit cannot borrow beyond a nonzero field.
+[[nodiscard]] inline std::optional<std::uint64_t> try_decrement_bits(
+    std::span<std::byte> bytes, std::uint64_t bit_offset, std::uint32_t bit_count, std::uint64_t maximum) {
+    const auto first_byte = bit_offset / bits_per_byte;
+    const auto shift = static_cast<std::uint32_t>(bit_offset % bits_per_byte);
+    if (shift + bit_count <= 64 && bytes.size() >= sizeof(std::uint64_t) &&
+        first_byte <= bytes.size() - sizeof(std::uint64_t)) {
+        const auto word_bytes = bytes.subspan(first_byte, sizeof(std::uint64_t));
+        const auto word = read_little_endian<std::uint64_t>(word_bytes);
+        const auto code = (word >> shift) & low_bit_mask(bit_count);
+        if (code == 0 || code > maximum) return std::nullopt;
+        write_little_endian(word - (std::uint64_t{1} << shift), word_bytes);
+        return code - 1;
+    }
+    const auto code = read_bits(bytes, bit_offset, bit_count);
+    if (code == 0 || code > maximum) return std::nullopt;
+    write_bits(bytes, bit_offset, bit_count, code - 1);
+    return code - 1;
 }
 
 } // namespace traceschema::bit_packing

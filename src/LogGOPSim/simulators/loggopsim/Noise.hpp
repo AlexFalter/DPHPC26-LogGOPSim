@@ -38,12 +38,12 @@ class Noise {
 
         if(buffer[0] == '#') continue;
 
-        double offset, duration;
+        double node_index, duration;
         // format: line ::= <start-time>\t<duration> - all times in nanoseconds
-        sscanf(buffer, "%lf\t%lf", &offset, &duration);
+        sscanf(buffer, "%lf\t%lf", &node_index, &duration);
         
-        //std::cout << offset << " " << duration << "\n";
-        trcnoise.push_back(std::make_pair((uint64_t)round(offset), (uint64_t)round(duration)));
+        //std::cout << node_index << " " << duration << "\n";
+        trcnoise.push_back(std::make_pair((uint64_t)round(node_index), (uint64_t)round(duration)));
 
         eof = trace.eof();
       }

@@ -3,11 +3,9 @@ __pycache__
 *_cmdline.h
 # Written into the source tree by the schedgen2_bcast test
 src/Schedgen2/schedule.goal
-# Personal build and editor settings
-.clangd
-build/build-local.sh
 
-# Local build products and editor state
+# Local build products, editor settings and state
 /build/
+.clangd
 /.vscode/
 .DS_Store

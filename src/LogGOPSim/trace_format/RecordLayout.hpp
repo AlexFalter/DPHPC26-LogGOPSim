@@ -41,7 +41,7 @@ struct FieldRequirement {
     std::uint32_t capacity_bits;
 };
 
-// Built by the consumer and passed to NodeDecoder at setup; the decoder checks
+// Built by the consumer and passed to Decoder at setup; the decoder checks
 // these requirements and retains the matching field layouts, not this list.
 using FieldRequirements = std::vector<FieldRequirement>;
 

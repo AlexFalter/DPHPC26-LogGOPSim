@@ -46,7 +46,7 @@ static void validate_rank_table_location(std::uint64_t header_size, std::uint32_
 }
 
 static FieldId decode_field_id(std::uint32_t code) {
-    if (code < std::to_underlying(FieldId::Type) || code > std::to_underlying(FieldId::StartIndex))
+    if (code < std::to_underlying(FieldId::Type) || code > std::to_underlying(FieldId::StartDependentsIndex))
         throw std::invalid_argument("Unknown standard field ID in header");
     return static_cast<FieldId>(code);
 }

@@ -24,10 +24,26 @@ struct AtlahsNode : BaseDeserializedGraphNode {
     std::uint64_t start_time = 0;
 };
 
-// Used by ATLAHS's existing scheduler; packet simulation stays in htsim.
+// Used by ATLAHS's existing scheduler; packet simulation stays in htsim. Self-describing traces
+// carry explicit GPUs, streams and message identities. Legacy traces hold only the standard
+// fields: the NIC also selects the local and the peer GPU, the CPU selects the stream, and
+// messages are matched by tag.
 class AtlahsAdapter final : public SimulatorAdapter<AtlahsNode> {
 public:
     explicit AtlahsAdapter(std::span<std::byte> file);
+    explicit AtlahsAdapter(std::shared_ptr<MappedTraceFile> file);
+    // shared maps the file MAP_SHARED, which htsim's --save-mem allows for legacy traces only.
+    explicit AtlahsAdapter(const char* filename, bool shared = false);
+
+    // Explicit endpoints, streams and tuple message identities, rather than legacy NIC/CPU/tag conventions.
+    [[nodiscard]] bool uses_explicit_metadata() const { return !is_legacy(); }
+    [[nodiscard]] std::uint32_t get_stream_count() const;
+    [[nodiscard]] std::uint32_t get_gpu_count() const;
+
+private:
+    AtlahsAdapter(std::span<std::byte> file, bool legacy);
+    AtlahsAdapter(std::shared_ptr<MappedTraceFile> file, bool legacy);
+    void check_gpu_endpoints() const;
 };
 
 } // namespace traceschema

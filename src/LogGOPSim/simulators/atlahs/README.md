@@ -43,7 +43,7 @@ The backend is compiled as C++23 so that it can include the shared reader. This 
 
 ## Running a trace
 
-The converter must know the eight unsigned ATLAHS fields. Either copy these declarations into `config/custom_fields.toml`, or pass `--custom-fields tests/atlahs_custom_fields.toml` to `txt2bin`:
+The converter must know the eight unsigned ATLAHS fields. Either copy these declarations into `config/custom_fields.toml`, or pass `--custom-fields tests/data/atlahs_custom_fields.toml` to `txt2bin`:
 
 ```toml
 [[fields]]
@@ -109,7 +109,7 @@ The NCCL generator writes the explicit fields when given `--explicit-fields`. It
 build/txt2bin \
   -i /tmp/generated-goal/InterNode_MicroEvents_Dependency.goal \
   -o /tmp/generated.bin --format self-describing \
-  --custom-fields tests/atlahs_custom_fields.toml
+  --custom-fields tests/data/atlahs_custom_fields.toml
 ```
 
 `--zero-red-copy` sets reduction and copy times to zero, so the example needs no benchmark data; leave it out when you have upstream's benchmark inputs. Only the final `InterNode_MicroEvents_Dependency.goal` is in the new syntax; the intermediate files keep upstream's.
@@ -125,9 +125,9 @@ The standard `cpu`, `nic` and `tag` fields are zero. Calculations use zero for t
 
 ## How the adapter works
 
-`AtlahsAdapter` derives from `SimulatorAdapter<AtlahsNode>`, which wraps the shared `TraceReader`. `AtlahsNode` adds Type, Peer, Size, Tag, CPU and NIC; 32-bit `Gpu`, `PeerGpu` and `Stream`; and 64-bit `Communicator`, `Channel`, `Sequence`, `MessageKind` and `Chunk`. The reader fills the dependency lists. `start_time` is scheduler state and is not stored in the trace. The adapter declares fourteen field bindings and which values mean "any source".
+`AtlahsAdapter` derives from `SimulatorAdapter<AtlahsNode>`, which wraps the shared `TraceReader`. `AtlahsNode` adds Type, Peer, Size, Tag, CPU and NIC; 32-bit `Gpu`, `PeerGpu` and `Stream`; and 64-bit `Communicator`, `Channel`, `Sequence`, `MessageKind` and `Chunk`. The reader fills the dependency lists. `start_time` is scheduler state and is not stored in the trace. The adapter declares fourteen field bindings and which values mean "any source". For a legacy trace (`is_legacy()`), it binds only the standard fields: the CPU also fills `Stream`, the NIC fills `Gpu` and `PeerGpu`, and messages are matched by tag as upstream ATLAHS does; only the int-sized message limit is checked. `get_stream_count()` and `get_gpu_count()` read `stream_id`/`gpu_id`, or the legacy CPU and NIC counts. htsim's `Parser` just constructs the adapter from the file name; `--save-mem` (a shared mapping) is accepted for legacy traces only.
 
-**Loading.** The ATLAHS parser checks the file signature. For packed files it uses the adapter but keeps ATLAHS's mapping and ready queues, and its five dependency-release paths call the shared reader to decrement counters. For legacy files nothing changes: they keep the original reader, tag matching and GPU mapping, with the NIC value copied into `Gpu` and `PeerGpu` and the CPU value into `Stream`.
+**Loading.** The ATLAHS loader constructs `AtlahsAdapter` with the input filename. The shared adapter owns its `MappedTraceFile` and reader, so cleanup is automatic, including on setup errors. Self-describing input uses a private mapping; shared mapping is rejected. Legacy input also uses the adapter, with the NIC bound to `Gpu` and `PeerGpu`, the CPU to `Stream`, and tag-based matching. htsim retains its own ready queues and scheduling loop. `RankSchedule` uses one dependency-release helper, reading only the selected start or finish list. Timed completions retain the latest prerequisite timestamp until the join becomes ready. The original converter uses `LegacyGraph.hpp`; the runtime loader no longer includes that writer or the unused DOT/DSN helpers.
 
 **Matching.** A receive matches a message if the source agrees (or either side is a wildcard) and all five identity fields are equal. For explicit traces the matcher also requires the GPU endpoints to agree at both ends. Legacy traces are matched by tag, so the two kinds never match each other. A run that ends with unmatched sends or receives fails.
 
@@ -135,7 +135,7 @@ The standard `cpu`, `nic` and `tag` fields are zero. Calculations use zero for t
 
 **Limits.**
 - htsim's message API takes an `int` byte count, so the adapter rejects sends and receives larger than `INT_MAX`; calculation durations keep the full 64 bits.
-- `save_mem` (destructive mapping) is not supported.
+- `save_mem` (destructive shared mapping) is rejected for self-describing input; legacy input permits it and is marked consumed through the shared adapter, so later runs reject the changed file.
 - A packed trace missing any of the eight fields fails at load time. Other custom fields are ignored.
 - The adapter runs inside htsim's own executable; LogGOPSim cannot select it at run time.
 - Only the NDP transport has been tested; EQDS and UEC have not.
@@ -143,31 +143,32 @@ The standard `cpu`, `nic` and `tag` fields are zero. Calculations use zero for t
 
 ## Tests
 
-Pass `-DATLAHS_GENERATOR_PYTHON=/path/to/venv/bin/python` to CMake if the generator's dependencies are installed in a separate environment. Then:
+The integration tests run with the Python interpreter in CMake's `TEST_PYTHON`. It needs pytest (`tests/integration/requirements.txt`) and the generator's dependencies; pass `-DTEST_PYTHON=/path/to/venv/bin/python` if they are installed in a separate environment. Then:
 
 ```sh
-cmake --build build --target atlahs_generator txt2bin test_trace_reader test_atlahs_matching -j4
-ctest --test-dir build --output-on-failure -R '^(trace_reader|atlahs_matching|atlahs_generator|atlahs_simulation|atlahs_upstream_ndp)$'
+cmake --build build --target atlahs_htsim txt2bin test_trace_reader test_atlahs_matching -j4
+ctest --test-dir build --output-on-failure -R '^(AtlahsAdapterTest\.|AtlahsMatching\.|atlahs_generator|atlahs_simulation|atlahs_upstream_ndp)'
 ```
 
-- **`trace_reader`**: the adapter's field requirements, full-width values, invalid tags and message kinds, graph metadata and the message-size limit.
-- **`atlahs_matching`**: the production matcher with identities that differ in one field each, source wildcards, legacy/explicit separation and receive order.
-- **`atlahs_generator`**: runs the real event emitter on two-host, four-GPU point-to-point, ring and tree AllReduce inputs. It checks that default output is byte-identical to the pristine generator extracted from the fork point, checks the explicit fields, then converts and simulates the output. It also covers a case where upstream's decimal tags collide, and invalid field values.
-- **`atlahs_simulation`**: simulates explicit-field traces and the equivalent unique-tag legacy traces and requires identical finish times. Cases: a broadcast, compute/reply workloads, message pairs differing in one identity field under both arrival orders, and messages received on a different GPU than they were sent from. It also checks that a trace with NIC 7 but `gpu_id` 0–3 gives the same times as the NIC-based legacy trace, and that moving all traffic to GPU 0 changes them. With `ATLAHS_TRACE_ROUTES=1` it reads the transport endpoints, for example 0→4, 0→6 and 2→4 for GPU pairs 0→0, 0→2 and 2→0 between two four-GPU hosts. Finally, it checks that inconsistent peer GPUs and unmatched messages fail and that input files stay unchanged.
-- **`atlahs_upstream_ndp`**: runs upstream's own [test runner](https://github.com/spcl/atlahs/blob/fb51a99f908e550318056ebb3e084f3d2fff55bd/sim/htsim-backend/sim/tests/tests.py) against its stored `dumbell_ndp/default.ref`, to check that the NDP network code itself is unchanged. Our wrapper turns the runner's printed failures into a non-zero exit code.
+- **`AtlahsAdapterTest`** (in `tests/unit/trace_reader.cpp`): the adapter's field requirements, full-width values, invalid tags and message kinds, graph metadata and the message-size limit.
+- **`AtlahsSchedule`** (`tests/unit/atlahs_schedule.cpp`): the actual rank scheduler on both formats, checking timestamp joins under both completion orders, start/finish list selection, and private/shared input lifecycle.
+- **`AtlahsMatching`** (`tests/unit/atlahs_matching.cpp`): the production matcher with identities that differ in one field each, source wildcards, legacy/explicit separation and receive order.
+- **`atlahs_generator`** (`tests/integration/test_atlahs_generator.py`): runs the real event emitter on two-host, four-GPU point-to-point, ring and tree AllReduce inputs. It checks that default output is byte-identical to the pristine generator extracted from the fork point, checks the explicit fields, then converts and simulates the output. It also covers a case where upstream's decimal tags collide, and invalid field values.
+- **`atlahs_simulation`** (`tests/integration/test_atlahs_simulation.py`): simulates explicit-field traces and the equivalent unique-tag legacy traces and requires identical finish times. Cases: a broadcast, compute/reply workloads, message pairs differing in one identity field under both arrival orders, and messages received on a different GPU than they were sent from. It also checks that a trace with NIC 7 but `gpu_id` 0–3 gives the same times as the NIC-based legacy trace, and that moving all traffic to GPU 0 changes them. With `ATLAHS_TRACE_ROUTES=1` it reads the transport endpoints, for example 0→4, 0→6 and 2→4 for GPU pairs 0→0, 0→2 and 2→0 between two four-GPU hosts. Finally, it checks that inconsistent peer GPUs and unmatched messages fail and that input files stay unchanged.
+- **`atlahs_upstream_ndp`** (`tests/integration/test_atlahs_upstream.py`): runs upstream's own [test runner](https://github.com/spcl/atlahs/blob/fb51a99f908e550318056ebb3e084f3d2fff55bd/sim/htsim-backend/sim/tests/tests.py) against its stored `dumbell_ndp/default.ref`, to check that the NDP network code itself is unchanged. Our test turns the runner's printed failures into a test failure.
 
 Upstream's [Docker quick test](https://github.com/spcl/atlahs#running-a-quick-test) and `scripts/run_validation_exp.py` have not been run with this integration. Upstream's HPC demo uses UEC, which is untested here.
 
 ### Recorded-trace comparison
 
-`tests/check_atlahs_recorded.py` compares the two pipelines on a real recording, upstream's four-host, sixteen-GPU Llama quick-test dataset:
+`tests/integration/test_atlahs_recorded.py` compares the two pipelines on a real recording, upstream's four-host, sixteen-GPU Llama quick-test dataset:
 
 - **Baseline:** the pinned upstream generator, converter and backend. Instrumentation prints the matches upstream makes, and the upstream converter needed an explicit `int` return type on `main` to compile with current compilers. Nothing else changes.
 - **New:** our generator with `--explicit-fields`, the packed converter and the adapted backend.
 
-Both use `--zero-red-copy`. The test requires identical matched send/receive pairs and per-rank finish times, and every send must be matched.
+Both use `--zero-red-copy`. The test requires identical matched send/receive pairs, and every send must be matched. Per-rank finish times are recorded but not compared: with explicit partner GPUs and streams they differ slightly from upstream's, about 0.02% earlier on this recording.
 
-Download URLs, sizes and SHA-256 checksums are in `tests/atlahs_recorded_traces.json`. Inputs and outputs stay under `build/`; allow several GB of disk space. To export the reports to SQLite on Apple Silicon, build the pinned Nsight exporter image:
+Download URLs, sizes and SHA-256 checksums are in `tests/data/atlahs_recorded_traces.json`. Inputs and outputs stay under `build/`; allow several GB of disk space. To export the reports to SQLite on Apple Silicon, build the pinned Nsight exporter image:
 
 ```sh
 docker build --platform linux/arm64 -t dhpc-nsys-export:2026.3.1 \
@@ -195,7 +196,7 @@ Build the reference and run the test; the topology matches the sixteen GPUs:
 
 ```sh
 cmake -S src -B build -DBUILD_ATLAHS=ON \
-  -DATLAHS_GENERATOR_PYTHON=/path/to/venv/bin/python \
+  -DTEST_PYTHON=/path/to/venv/bin/python \
   -DATLAHS_RECORDED_TRACE_DIR="$PWD/build/atlahs-recorded/sqlite"
 cmake --build build --target atlahs_reference atlahs_htsim txt2bin -j4
 ctest --test-dir build -R '^atlahs_recorded$' --output-on-failure

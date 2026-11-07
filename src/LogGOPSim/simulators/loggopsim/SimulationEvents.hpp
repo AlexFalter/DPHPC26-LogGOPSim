@@ -25,7 +25,7 @@ class graph_node_properties {
 		uint64_t size;						// number of bytes to send, recv, or time to spend in loclop
 		uint32_t target;					// partner for send/recv
     uint32_t host;            // owning host 
-		uint32_t offset;          // rank-local schedule node index
+		uint32_t node_index;          // rank-local schedule node index
 		uint32_t tag;							// tag for send/recv
     uint32_t handle;          // handle for network layer :-/
 		uint8_t proc;							// processing element for this operation

@@ -54,7 +54,7 @@ gengetopt_args_info args_info;
 typedef struct {
   // TODO: src and tag can go in case of hashmap matching
   btime_t starttime; // only for visualization
-  uint32_t size, src, tag, offset;
+  uint32_t size, src, tag, node_index;
 } ruqelem_t;
 
 typedef unsigned int uint;
@@ -141,6 +141,8 @@ int main(int argc, char **argv) try {
   const uint32_t S=args_info.LogGOPS_S_arg;
 
   SimulationSchedule schedule(args_info.filename_arg, args_info.save_mem_given);
+  if (std::getenv("LOGGOPSIM_TRACE_DECODER"))
+    std::cerr << "Trace decoder: " << schedule.get_runner_name() << '\n';
   Network net(&args_info);
 
   const uint p = schedule.schedules.size();
@@ -211,6 +213,7 @@ int main(int argc, char **argv) try {
 
   int host=0; 
   uint64_t num_events=0;
+  RankSchedule::nodelist_t free_ops;
   for(SimulationSchedule::schedules_t::iterator sched=schedule.schedules.begin(); sched!=schedule.schedules.end(); ++sched, ++host) {
     // initialize free operations (only once per run!)
     //sched->init_free_operations();
@@ -218,7 +221,7 @@ int main(int argc, char **argv) try {
     // retrieve all free operations
     //typedef std::vector<std::string> freeops_t;
     //freeops_t free_ops = sched->get_free_operations();
-    SerializedGraph::nodelist_t free_ops;
+    free_ops.clear();
     sched->GetExecutableNodes(&free_ops);
     // ensure that the free ops are ordered by type
     std::sort(free_ops.begin(), free_ops.end(), gnp_op_comp_func());
@@ -226,7 +229,7 @@ int main(int argc, char **argv) try {
     num_events += sched->GetNumNodes();
 
     // walk all new free operations and throw them in the queue 
-    for(SerializedGraph::nodelist_t::iterator freeop=free_ops.begin(); freeop != free_ops.end(); ++freeop) {
+    for(RankSchedule::nodelist_t::iterator freeop=free_ops.begin(); freeop != free_ops.end(); ++freeop) {
       //if(print) std::cout << *freeop << " " ;
 
       freeop->host = host;
@@ -280,8 +283,8 @@ int main(int argc, char **argv) try {
           //schedule.schedules[elem.host].issue_node(elem.node);
           // satisfy requires+irequires
           //schedule.schedules[elem.host].remove_node(elem.node);
-          schedule.schedules[elem.host].MarkNodeAsStarted(elem.offset);
-          schedule.schedules[elem.host].MarkNodeAsDone(elem.offset);
+          schedule.schedules[elem.host].MarkNodeAsStarted(elem.node_index);
+          schedule.schedules[elem.host].MarkNodeAsDone(elem.node_index);
           check_hosts.push_back(elem.host);
           // add to timeline
           tlviz.add_loclop(elem.host, elem.time, elem.time+elem.size, elem.proc);
@@ -298,7 +301,7 @@ int main(int argc, char **argv) try {
 
         if(std::max(nexto[elem.host][elem.proc],nextgs[elem.host][elem.nic]) <= elem.time) { // local o,g available!
           if(print) printf("-- satisfy local irequires\n");
-          schedule.schedules[elem.host].MarkNodeAsStarted(elem.offset);
+          schedule.schedules[elem.host].MarkNodeAsStarted(elem.node_index);
           check_hosts.push_back(elem.host);
           
           // check if OS Noise occurred
@@ -327,10 +330,10 @@ int main(int argc, char **argv) try {
           if(elem.size <= S) { // eager message
             if(print) printf("-- [%i] eager -- satisfy local requires at t: %lu\n", h, (long unsigned int) elem.starttime+o);
             // satisfy local requires (host and target swapped!) 
-            schedule.schedules[h].MarkNodeAsDone(elem.offset);
+            schedule.schedules[h].MarkNodeAsDone(elem.node_index);
             //tlviz.add_transmission(elem.target, elem.host, elem.starttime+o, elem.time-o, elem.size, G);
           } else {
-            if(print) printf("-- [%i] start rendezvous message to: %i (offset: %i)\n", h, elem.host, elem.offset);
+            if(print) printf("-- [%i] start rendezvous message to: %i (node_index: %i)\n", h, elem.host, elem.node_index);
           }
 
         } else { // local o,g unavailable - retry later
@@ -343,7 +346,7 @@ int main(int argc, char **argv) try {
       case OP_RECV: {
         if(print) printf("[%i] found recv from %i - t: %lu (CPU: %i)\n", elem.host, elem.target, (ulint)elem.time, elem.proc);
 
-        schedule.schedules[elem.host].MarkNodeAsStarted(elem.offset);
+        schedule.schedules[elem.host].MarkNodeAsStarted(elem.node_index);
         check_hosts.push_back(elem.host);
         if(print) printf("-- satisfy local irequires\n");
         
@@ -370,7 +373,7 @@ int main(int argc, char **argv) try {
           // buffer must not turn an eager message into a rendezvous one (double completion).
           if(matched_elem.size > S) { // rendezvous - free remote request
             // satisfy remote requires 
-            schedule.schedules[matched_elem.src].MarkNodeAsDone(matched_elem.offset); // this must be the offset of the remote packet!
+            schedule.schedules[matched_elem.src].MarkNodeAsDone(matched_elem.node_index); // this must be the node_index of the remote packet!
             check_hosts.push_back(matched_elem.src);
 
             // TODO: uh, this is ugly ... we actually need to set the
@@ -386,13 +389,13 @@ int main(int argc, char **argv) try {
             if(nexto[matched_elem.src][elem.proc] < elem.time) nexto[matched_elem.src][elem.proc] = elem.time;
             if(nextgs[matched_elem.src][elem.nic] < elem.time) nextgs[matched_elem.src][elem.nic] = elem.time;
             
-            if(print) printf("-- satisfy remote requires at host %i (offset: %i)\n", elem.target, elem.offset);
+            if(print) printf("-- satisfy remote requires at host %i (node_index: %i)\n", elem.target, elem.node_index);
             tlviz.add_transmission(elem.host, matched_elem.src, matched_elem.starttime+o, elem.time, matched_elem.size, G);
           }
           tlviz.add_orecv(elem.host, elem.time, elem.time+o, elem.proc);
 
           // satisfy local requires
-          schedule.schedules[elem.host].MarkNodeAsDone(elem.offset);
+          schedule.schedules[elem.host].MarkNodeAsDone(elem.node_index);
           check_hosts.push_back(elem.host);
           if(print) printf("-- satisfy local requires\n");
         } else { // not found in local UQ - add to RQ
@@ -406,7 +409,7 @@ int main(int argc, char **argv) try {
           nelem.size = elem.size;
           nelem.src = elem.target;
           nelem.tag = elem.tag;
-          nelem.offset = elem.offset;
+          nelem.node_index = elem.node_index;
 #ifdef LIST_MATCH
           rq[elem.host].push_back(nelem);
 #else
@@ -447,7 +450,7 @@ int main(int argc, char **argv) try {
             if(print) printf("-- found in RQ\n");
             if(elem.size > S) { // rendezvous - free remote request
               // satisfy remote requires
-              schedule.schedules[elem.target].MarkNodeAsDone(elem.offset);
+              schedule.schedules[elem.target].MarkNodeAsDone(elem.node_index);
               check_hosts.push_back(elem.target);
               // TODO: uh, this is ugly ... we actually need to set the
               // time of the remote freed elements to elem.time now :-/
@@ -468,7 +471,7 @@ int main(int argc, char **argv) try {
             tlviz.add_orecv(elem.host, elem.time+(elem.size-1)*G-(elem.size-1)*O, elem.time+o+std::max((elem.size-1)*O,(elem.size-1)*G), elem.proc);
             tlviz.add_noise(elem.host, elem.time+o+std::max((elem.size-1)*O,(elem.size-1)*G), elem.time+o+noise+std::max((elem.size-1)*O,(elem.size-1)*G), elem.proc);
             // satisfy local requires
-            schedule.schedules[elem.host].MarkNodeAsDone(matched_elem.offset);
+            schedule.schedules[elem.host].MarkNodeAsDone(matched_elem.node_index);
             check_hosts.push_back(elem.host);
 
 
@@ -484,7 +487,7 @@ int main(int argc, char **argv) try {
             nelem.size = elem.size;
             nelem.src = elem.target;
             nelem.tag = elem.tag;
-            nelem.offset = elem.offset;
+            nelem.node_index = elem.node_index;
             nelem.starttime = elem.time; // when it was started
 #ifdef LIST_MATCH
             uq[elem.host].push_back(nelem);
@@ -513,16 +516,16 @@ int main(int argc, char **argv) try {
     for(std::vector<int>::iterator iter=check_hosts.begin(); iter!=check_hosts.end(); ++iter) {
       host = *iter;
     //for(host = 0; host < p; host++) 
-      SerializedGraph *sched=&schedule.schedules[host];
+      RankSchedule *sched=&schedule.schedules[host];
 
       // retrieve all free operations
-      SerializedGraph::nodelist_t free_ops;
+      free_ops.clear();
       sched->GetExecutableNodes(&free_ops);
       // ensure that the free ops are ordered by type
       std::sort(free_ops.begin(), free_ops.end(), gnp_op_comp_func());
       
       // walk all new free operations and throw them in the queue 
-      for(SerializedGraph::nodelist_t::iterator freeop=free_ops.begin(); freeop != free_ops.end(); ++freeop) {
+      for(RankSchedule::nodelist_t::iterator freeop=free_ops.begin(); freeop != free_ops.end(); ++freeop) {
         //if(print) std::cout << *freeop << " " ;
 
 
@@ -536,15 +539,15 @@ int main(int argc, char **argv) try {
         switch(freeop->type) {
           case OP_LOCOP:
             freeop->time = nexto[host][freeop->proc];
-            if(print) printf("%i (%i,%i) loclop: %lu, time: %lu, offset: %i\n", host, freeop->proc, freeop->nic, (long unsigned int) freeop->size, (long unsigned int)freeop->time, freeop->offset);
+            if(print) printf("%i (%i,%i) loclop: %lu, time: %lu, node_index: %i\n", host, freeop->proc, freeop->nic, (long unsigned int) freeop->size, (long unsigned int)freeop->time, freeop->node_index);
             break;
           case OP_SEND:
             freeop->time = std::max(nexto[host][freeop->proc], nextgs[host][freeop->nic]);
-            if(print) printf("%i (%i,%i) send to: %i, tag: %i, size: %lu, time: %lu, offset: %i\n", host, freeop->proc, freeop->nic, freeop->target, freeop->tag, (long unsigned int) freeop->size, (long unsigned int)freeop->time, freeop->offset);
+            if(print) printf("%i (%i,%i) send to: %i, tag: %i, size: %lu, time: %lu, node_index: %i\n", host, freeop->proc, freeop->nic, freeop->target, freeop->tag, (long unsigned int) freeop->size, (long unsigned int)freeop->time, freeop->node_index);
             break;
           case OP_RECV:
             freeop->time = nexto[host][freeop->proc];
-            if(print) printf("%i (%i,%i) recvs from: %i, tag: %i, size: %lu, time: %lu, offset: %i\n", host, freeop->proc, freeop->nic, freeop->target, freeop->tag, (long unsigned int) freeop->size, (long unsigned int)freeop->time, freeop->offset);
+            if(print) printf("%i (%i,%i) recvs from: %i, tag: %i, size: %lu, time: %lu, node_index: %i\n", host, freeop->proc, freeop->nic, freeop->target, freeop->tag, (long unsigned int) freeop->size, (long unsigned int)freeop->time, freeop->node_index);
             break;
           default:
             printf("not implemented!\n");

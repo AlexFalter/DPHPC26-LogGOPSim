@@ -1,7 +1,7 @@
 """Build the edited ATLAHS NDP sources outside their checkout.
 
 ATLAHS's Makefiles write objects beside their inputs, so build a working copy in
-the build directory. The readable, maintained sources stay in ../upstream.
+the build directory. The readable, maintained sources stay in the supplied ATLAHS checkout.
 """
 
 import argparse

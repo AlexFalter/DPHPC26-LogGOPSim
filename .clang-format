@@ -1,0 +1,27 @@
+BasedOnStyle: LLVM
+
+# Four-space indentation, including wrapped lines, without alignment padding.
+IndentWidth: 4
+ContinuationIndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+AlignAfterOpenBracket: DontAlign
+AlignOperands: false
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+
+# Keep long argument lists and initializers easy to scan.
+BinPackArguments: false
+BinPackParameters: false
+Cpp11BracedListStyle: true
+BreakBeforeBraces: Attach
+NamespaceIndentation: None
+
+# Give control flow its own lines.
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+PointerAlignment: Left
+DerivePointerAlignment: false
