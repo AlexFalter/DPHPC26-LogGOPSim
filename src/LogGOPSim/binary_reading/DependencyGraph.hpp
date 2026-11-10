@@ -48,6 +48,8 @@ public:
     // Decrements the node's dependency count in place and returns the new value; rejects a count
     // that is already zero or outside the field's range.
     std::uint64_t decrement(std::uint32_t rank, std::uint32_t index) const;
+    // The node's stored dependency count, without changing it; rejects a count outside the range.
+    [[nodiscard]] std::uint64_t read_count(std::uint32_t rank, std::uint32_t index) const;
 
 private:
     const TraceFileView& file_;

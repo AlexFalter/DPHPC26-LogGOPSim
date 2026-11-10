@@ -4,6 +4,7 @@ version "0.1"
 
 option "filename"       f  "Prefix for the filenames which contain the schedules" string
 option "save-mem"       -  "Map the schedules as MAP_SHARED to enable processing of large schedule (larger than main memory). This will invalidate the schedules during simulation." flag off
+option "lazy-decoding"  -  "Keep ready nodes as indices and dependency counts in memory: each node is decoded once, when it is executed, and the schedule file is never written. Cannot be combined with --save-mem." flag off
 option "LogGOPS_L"        L  "The latency parameter L in the LogGP model" int default="2500" optional
 option "LogGOPS_o"        o  "The overhead parameter o in the LogGP model" int default="1500" optional
 option "LogGOPS_g"        g  "The gap per message parameter g in the LogGP model" int default="1000" optional

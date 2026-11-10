@@ -140,7 +140,8 @@ int main(int argc, char **argv) try {
   print=args_info.verbose_given;
   const uint32_t S=args_info.LogGOPS_S_arg;
 
-  SimulationSchedule schedule(args_info.filename_arg, args_info.save_mem_given);
+  SimulationSchedule schedule(args_info.filename_arg, args_info.save_mem_given,
+                              args_info.lazy_decoding_flag ? ScheduleMode::Lazy : ScheduleMode::Eager);
   if (std::getenv("LOGGOPSIM_TRACE_DECODER"))
     std::cerr << "Trace decoder: " << schedule.get_runner_name() << '\n';
   Network net(&args_info);

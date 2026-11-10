@@ -32,6 +32,11 @@ std::uint64_t SelfDescribingTraceReader::decrement_dependency_count(std::uint32_
     return graph_->decrement(rank, index);
 }
 
+std::uint64_t SelfDescribingTraceReader::read_dependency_count(std::uint32_t rank, std::uint32_t index) const {
+    if (!graph_) throw std::invalid_argument("No dependency counter configured");
+    return graph_->read_count(rank, index);
+}
+
 std::uint64_t SelfDescribingTraceReader::get_resource_count(FieldIdentity identity) const {
     const auto& encoding = require_unsigned_field(identity).offset_encoding;
     const auto maximum = std::get<std::uint64_t>(encoding.decode(encoding.maximum_offset));
