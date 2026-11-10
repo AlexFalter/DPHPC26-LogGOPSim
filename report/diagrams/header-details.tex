@@ -1,29 +1,58 @@
-\begin{tikzpicture}[cell/.style={draw=black!65,minimum height=11mm,inner sep=1pt,align=center,font=\small}]
-\node[anchor=west,font=\small\bfseries] at (0,9mm) {Fixed prefix};
-\node[cell,fill=green!15,minimum width=22mm,anchor=west] (r0c0) at (0,0mm) {Magic\\8 B};
-\node[cell,fill=green!15,minimum width=18mm,right=0mm of r0c0] (r0c1) {Version\\2 B};
-\node[cell,fill=blue!8,minimum width=25mm,right=0mm of r0c1] (r0c2) {Header size\\8 B};
-\node[cell,fill=blue!8,minimum width=25mm,right=0mm of r0c2] (r0c3) {Record bits\\8 B};
-\node[cell,fill=blue!8,minimum width=19mm,right=0mm of r0c3] (r0c4) {Fields\\4 B};
-\node[cell,fill=blue!8,minimum width=19mm,right=0mm of r0c4] (r0c5) {Ranks\\4 B};
-\node[cell,fill=blue!8,minimum width=23mm,right=0mm of r0c5] (r0c6) {Index bits\\1 B};
-\node[cell,fill=orange!20,minimum width=27mm,right=0mm of r0c6] (r0c7) {Table offset\\8 B};
-\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65] ([yshift=-2mm]r0c0.south west) -- ([yshift=-2mm]r0c7.south east) node[midway,below=6pt,font=\small] {43 bytes; once per file};
-\node[anchor=west,font=\small\bfseries] at (0,-22mm) {Field descriptor};
-\node[cell,fill=green!15,minimum width=16mm,anchor=west] (r1c0) at (0,-31mm) {Kind\\1 B};
-\node[cell,fill=green!15,minimum width=16mm,right=0mm of r1c0] (r1c1) {Type\\1 B};
-\node[cell,fill=blue!8,minimum width=17mm,right=0mm of r1c1] (r1c2) {Width\\1 B};
-\node[cell,fill=blue!8,minimum width=22mm,right=0mm of r1c2] (r1c3) {Wildcard\\1 B};
-\node[cell,fill=blue!8,minimum width=22mm,right=0mm of r1c3] (r1c4) {Bit offset\\8 B};
-\node[cell,fill=blue!8,minimum width=19mm,right=0mm of r1c4] (r1c5) {Base\\8 B};
-\node[cell,fill=blue!8,minimum width=25mm,right=0mm of r1c5] (r1c6) {Max. offset\\8 B};
-\node[cell,fill=orange!20,minimum width=31mm,right=0mm of r1c6] (r1c7) {ID / name length\\4 B};
-\node[cell,fill=orange!20,minimum width=22mm,right=0mm of r1c7] (r1c8) {Name\\variable};
-\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65] ([yshift=-2mm]r1c0.south west) -- ([yshift=-2mm]r1c8.south east) node[midway,below=6pt,font=\small] {32 bytes + name; repeated for each field};
-\node[anchor=west,font=\small\bfseries] at (0,-53mm) {Rank-table entry};
-\node[cell,fill=orange!20,minimum width=66mm,anchor=west] (r2c0) at (0,-62mm) {Record offset\\8 B};
-\node[cell,fill=black!6,minimum width=44mm,right=0mm of r2c0] (r2c1) {Node count\\4 B};
-\node[cell,fill=black!6,minimum width=46mm,right=0mm of r2c1] (r2c2) {Dependency count\\4 B};
-\node[cell,fill=black!6,minimum width=44mm,right=0mm of r2c2] (r2c3) {Root count\\4 B};
-\draw[decorate,decoration={brace,mirror,amplitude=4pt},draw=black!65] ([yshift=-2mm]r2c0.south west) -- ([yshift=-2mm]r2c3.south east) node[midway,below=6pt,font=\small] {20 bytes; repeated for each rank};
+% Header and rank table in file order (middle row), with one field descriptor (top) and one
+% rank-table entry (bottom) zoomed in. Values in the zoomed rows are an example.
+% \ifranktable draws the rank table; the report sets it, the slides leave it out because the
+% rank table works as in the legacy format.
+\begin{tikzpicture}[
+  cell/.style={draw=black!65,minimum height=11mm,inner sep=1pt,align=center,font=\small},
+  detail/.style={draw=black!65,minimum height=15mm,inner sep=1pt,align=center,font=\small},
+  value/.style={font=\footnotesize\ttfamily},
+  size/.style={font=\scriptsize\color{black!60}},
+  zoom/.style={draw=black!45,dashed},
+  part/.style={decorate,decoration={brace,amplitude=4pt},draw=black!65}]
+% Middle row: the start of the file.
+% Without the rank table, centre the header row under the enlarged descriptor.
+\ifranktable\def\headerx{0mm}\else\def\headerx{36mm}\fi
+\node[cell,fill=green!15,minimum width=34mm,anchor=west] (prefix) at (\headerx,0) {Fixed prefix\\{\scriptsize\color{black!60}magic, version, \dots; 43 B}};
+\node[cell,fill=blue!8,minimum width=19mm,right=0mm of prefix] (f1) {Field 1};
+\node[cell,fill=blue!25,line width=1pt,minimum width=19mm,right=0mm of f1] (f2) {Field 2};
+\node[cell,fill=blue!8,minimum width=12mm,right=0mm of f2] (fd) {\dots};
+\node[cell,fill=blue!8,minimum width=19mm,right=0mm of fd] (fn) {Field $n$};
+\ifranktable
+\node[cell,fill=black!6,minimum width=20mm,right=3mm of fn] (t0) {Rank 0};
+\node[cell,fill=black!20,line width=1pt,minimum width=20mm,right=0mm of t0] (t1) {Rank 1};
+\node[cell,fill=black!6,minimum width=12mm,right=0mm of t1] (td) {\dots};
+\node[cell,fill=black!6,minimum width=20mm,right=0mm of td] (tr) {Rank $r{-}1$};
+\draw[part] ([yshift=1.5mm]t0.north west) -- node[above=5pt,font=\small\bfseries] {Rank table} ([yshift=1.5mm]tr.north east);
+\fi
+% Each label sits on the side its zoom does not use.
+\draw[part] ([yshift=-1.5mm]fn.south east) -- node[below=5pt,font=\small\bfseries] {Schema header} ([yshift=-1.5mm]prefix.south west);
+
+% Top row: one field descriptor, 32 bytes plus the name of a custom field.
+\begin{scope}[yshift=30mm]
+\node[detail,fill=green!15,minimum width=19mm,anchor=west] (k) at (0,0) {Kind\\[-1pt]{\footnotesize\ttfamily 0}{\scriptsize\ standard}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=green!15,minimum width=19mm,right=0mm of k] (ty) {Type\\[-1pt]{\footnotesize\ttfamily 1}{\scriptsize\ unsigned}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=blue!8,minimum width=15mm,right=0mm of ty] (w) {Width\\[-1pt]{\footnotesize\ttfamily 3}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=blue!8,minimum width=18mm,right=0mm of w] (wc) {Wildcard\\[-1pt]{\footnotesize\ttfamily 0}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=blue!8,minimum width=19mm,right=0mm of wc] (bo) {Bit offset\\[-1pt]{\footnotesize\ttfamily 23}\\[-1pt]{\scriptsize\color{black!60}8 B}};
+\node[detail,fill=blue!8,minimum width=15mm,right=0mm of bo] (b) {Base\\[-1pt]{\footnotesize\ttfamily 0}\\[-1pt]{\scriptsize\color{black!60}8 B}};
+\node[detail,fill=blue!8,minimum width=21mm,right=0mm of b] (mo) {Max. offset\\[-1pt]{\footnotesize\ttfamily 7}\\[-1pt]{\scriptsize\color{black!60}8 B}};
+\node[detail,fill=orange!20,minimum width=27mm,right=0mm of mo] (id) {ID / name length\\[-1pt]{\footnotesize\ttfamily 4}{\scriptsize\ = tag}\\[-1pt]{\scriptsize\color{black!60}4 B}};
+\node[detail,fill=orange!20,minimum width=21mm,right=0mm of id] (nm) {Name\\[-1pt]{\scriptsize custom only}\\[-1pt]{\scriptsize\color{black!60}variable}};
+\node[anchor=south west,font=\small\bfseries] at ([yshift=1mm]k.north west) {Field descriptor \normalfont(example: \texttt{tag}, values 0--7 in 3 bits)};
+\end{scope}
+\draw[zoom] (f2.north west) -- (k.south west);
+\draw[zoom] (f2.north east) -- (nm.south east);
+
+% Bottom row: one rank-table entry, 20 bytes.
+\ifranktable
+\begin{scope}[yshift=-30mm]
+\node[detail,fill=orange!20,minimum width=60mm,anchor=west] (ro) at (20mm,0) {Start of rank data\\[-1pt]{\footnotesize byte \texttt{4096}}\\[-1pt]{\scriptsize\color{black!60}8 B}};
+\node[detail,fill=black!6,minimum width=36mm,right=0mm of ro] (nc) {Node count\\[-1pt]{\footnotesize\ttfamily 7}\\[-1pt]{\scriptsize\color{black!60}4 B}};
+\node[detail,fill=black!6,minimum width=36mm,right=0mm of nc] (dc) {Dependency count\\[-1pt]{\footnotesize\ttfamily 6}\\[-1pt]{\scriptsize\color{black!60}4 B}};
+\node[detail,fill=black!6,minimum width=36mm,right=0mm of dc] (rc) {Root count\\[-1pt]{\footnotesize\ttfamily 1}\\[-1pt]{\scriptsize\color{black!60}4 B}};
+\node[anchor=north west,font=\small\bfseries] at ([yshift=-1mm]ro.south west) {Rank-table entry \normalfont(example: rank 1)};
+\end{scope}
+\draw[zoom] (t1.south west) -- (ro.north west);
+\draw[zoom] (t1.south east) -- (rc.north east);
+\fi
 \end{tikzpicture}

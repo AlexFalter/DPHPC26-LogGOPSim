@@ -1,6 +1,8 @@
 % Report source. Edit this file directly; build with report/build.sh.
 \documentclass[10pt,a4paper]{article}
 \usepackage{plan-style}
+\newif\ifranktable\ranktabletrue % diagrams/header-details.tex shows the rank table
+\newcommand{\secnum}[1]{\\(#1)} % section numbers in diagrams/design-overview.tex
 \title{Self-describing GOAL traces}
 \author{}
 \date{}
@@ -31,14 +33,14 @@ The project brief sets four goals. The table shows where each is addressed:
 \endhead
 \bottomrule
 \endfoot
-Self-describing, extensible traces & How can the file describe compact fields and carry additional attributes? & 3.1--3.3, 4 \\
-Load-time schema validation & How can a simulator check that the file supplies the values it requires? & 3.4 \\
-Runtime specialization & How can decoding exploit a known schema instead of interpreting it per node? & 3.5 \\
+Self-describing, extensible traces & How can the file describe compact fields and carry additional attributes? & 3.1--3.4, 4 \\
+Load-time schema validation & How can a simulator check that the file supplies the values it requires? & 3.5 \\
+Runtime specialization & How can decoding exploit a known schema instead of interpreting it per node? & 3.6, 5.3 \\
 Benchmarking & Does the new format preserve correctness and improve size or speed? & 5 \\
 \end{longtable}
 }
 
-\textbf{Status:} the format, converter, validating reader and LogGOPSim integration are implemented and tested, and ATLAHS's htsim simulator uses the same reader with a new GPU attribute (Section 4). Runtime specialization is designed but not implemented, and the performance evaluation is outstanding.
+\textbf{Status:} the format, converter, validating reader and LogGOPSim integration are implemented and tested, and ATLAHS's htsim simulator uses the same reader with a new GPU attribute (Section 4). Legacy files remain readable through the same reader, without format-specific code in either simulator (Section 3.5.2). Runtime specialization is implemented as five interchangeable plan runners: an optimized interpreter, two compiled decoders (system C compiler and LLVM ORC) and two template-based ones (Section 3.6). Preliminary measurements show decoding close to legacy speed and identify which runner is fastest in which scenario (Sections 5.3 and 5.4); the full performance evaluation is still outstanding.
 
 \hypertarget{background}{}
 \section{Background}
@@ -85,7 +87,7 @@ Getting from an application to simulated times takes three steps, each run as a 
 \item \textbf{Simulation.} LogGOPSim memory-maps the binary file and simulates it with a given set of network parameters. It does not parse text: it reads each node's record directly when it needs it. By default, simulation leaves the binary file unchanged so it can be reused.
 \end{enumerate}
 
-The split between conversion and simulation pays off because parsing is done once while simulation is typically repeated, for example to sweep network parameters or compare network models. The binary file is the interface between the two steps, which is why its format is the subject of this project: Sections 3.1--3.3 cover the conversion side and Section 3.4 the simulation side.
+The split between conversion and simulation pays off because parsing is done once while simulation is typically repeated, for example to sweep network parameters or compare network models. The binary file is the interface between the two steps, which is why its format is the subject of this project: Sections 3.1--3.4 cover the conversion side and Section 3.5 the simulation side.
 
 \hypertarget{simulation}{}
 \subsection{Simulation}
@@ -133,7 +135,7 @@ This determines what a binary trace must provide for every node:
 
 \begin{itemize}
 \item \textbf{Operation fields} used when the node is processed: type, peer, size, tag, CPU and NIC.
-\item \textbf{Graph fields} used to release dependents: the dependency counter and the lists of start and completion dependents.
+\item \textbf{Graph fields} used to release dependents: the dependency counter and the lists of nodes released when a node starts and when it finishes.
 \item \textbf{The roots} of each rank, which seed the event queue.
 \end{itemize}
 
@@ -192,7 +194,7 @@ The new design follows a trace from text to simulation. The numbers identify the
 \par\nopagebreak\small\itshape Pass 1 determines the schema for the whole input. Pass 2 alternates parsing and writing for each rank. Numbers refer to subsections.
 \end{center}
 
-The code separates conversion from simulation: \texttt{txt2bin.\allowbreak{}cpp} coordinates parsing, layout inference and binary writing. Each simulator is a separate executable that calls the shared reader through its adapter, decoding the fields its node type needs.
+The code separates conversion from simulation: \texttt{txt2bin.\allowbreak{}cpp} coordinates parsing, layout inference and binary writing. Each simulator is a separate executable with its own adapter and reader, which decodes only the fields its node type needs, using one of the plan runners (Section 3.6).
 
 The main source folders, relative to \texttt{src/\allowbreak{}LogGOPSim/\allowbreak{}}, follow these responsibilities:
 
@@ -211,7 +213,7 @@ The main source folders, relative to \texttt{src/\allowbreak{}LogGOPSim/\allowbr
 \texttt{goal\_\allowbreak{}parsing/\allowbreak{}} & Parse GOAL text, load custom-field declarations and collect ranges and counts for layout inference. \\
 \texttt{binary\_\allowbreak{}writing/\allowbreak{}} & Pack records and ranks, and write legacy or self-describing binary files. \\
 \texttt{trace\_\allowbreak{}format/\allowbreak{}} & Define shared field types, encodings, record layouts, headers and rank tables. \\
-\texttt{binary\_\allowbreak{}reading/\allowbreak{}} & Validate and map binary files, decode selected fields and update dependency counters. \\
+\texttt{binary\_\allowbreak{}reading/\allowbreak{}} & Map binary files, detect their format, validate them, decode selected fields from either format and update dependency counters. \\
 \texttt{simulators/\allowbreak{}} & Provide the shared adapter interface and graph-node base, with simulator implementations and adapters under \texttt{loggopsim/\allowbreak{}} and \texttt{atlahs/\allowbreak{}}. \\
 \end{longtable}
 }
@@ -282,10 +284,21 @@ Per-rank layouts (proposed) & Parse a rank, infer its local layout, write it and
 
 The temporary-file experiment was removed. On a synthetic 2.1-million-node trace it reduced conversion time from 2.32 s to 1.71 s (1.36\(\times\)), using 193 MB of temporary data. This used a warm file cache without measuring peak memory; it is not reproducible with the current code and does not establish a general speedup.
 
+Alexander Falter is currently implementing a lighter first pass on the GPU. Keeping all graphs is infeasible for large schedules, but the options need not exclude each other: the converter could choose by input size, keeping all graphs in memory when the schedule is small enough and otherwise falling back to a temporary file or two passes.
+
 \hypertarget{field-encoding}{}
 \subsubsection{Field encoding}
 
-Each field is stored as an offset from the smallest observed value. A field with minimum \texttt{m} and maximum \texttt{M} uses \texttt{max(1, bit\_\allowbreak{}length(M \(-\) m\allowbreak{}))} bits, and the header stores the base \texttt{m}. If a field uses the wildcard ANY (a receive from any source or with any tag), one extra code above the maximum represents it. For example:
+\textbf{Choosing an encoding.} Sizing each field to its largest value already avoids the legacy format's fixed widths, but a field still costs the bits of its largest value, however little it varies. An encoding stores something smaller than the value itself. If a field is 1024 on every node, the plain value needs 11 bits per node; with offset encoding, 1024 is stored once in the header and each node needs 0 bits. If a field alternates between 1 and 1,000,000, the plain value needs 20 bits, and offset encoding does not help, because offsets still reach 999,999; with dictionary encoding, the header stores the list [1, 1000000] once and each node stores only its index, 1 bit. Offset encoding therefore suits values that lie close together, and dictionary encoding few values far apart. On a Schedgen binomial-tree reduction over 262,144 ranks, offset encoding alone shrinks the record from 39 to 5 bytes (Section 5.2). Combining both, by choosing the cheaper encoding for each field, would probably work best.
+
+Each field is stored as an offset from the smallest observed value. A field with minimum \texttt{m} and maximum \texttt{M} uses \texttt{bit\_\allowbreak{}length(M \(-\) m\allowbreak{})} bits, and the header stores the base \texttt{m}; a constant field therefore uses no bits at all. The reader reconstructs each value as base plus offset:
+
+\begin{center}
+\resizebox{0.8\linewidth}{!}{\input{diagrams/offset-encoding.tex}}
+\par\nopagebreak\small\itshape Offset encoding: the header stores the base once; each record stores only the offset.
+\end{center}
+
+ If a field uses the wildcard ANY (a receive from any source or with any tag), one extra code above the maximum represents it. For example:
 
 {\small
 \begin{longtable}{P{0.22\dimexpr\linewidth-6\tabcolsep\relax}P{0.37\dimexpr\linewidth-6\tabcolsep\relax}P{0.41\dimexpr\linewidth-6\tabcolsep\relax}}
@@ -309,9 +322,39 @@ The same rule applies to the graph fields. The dependency counter's range must s
 
 \texttt{txt2bin -\allowbreak{}-\allowbreak{}report-\allowbreak{}schema} prints the inferred layout, including every field's range, base, width and position.
 
-\textbf{Dictionary encoding (proposed).} Offset encoding can waste bits when a field has only a few distinct values spread over a wide range. For example, \texttt{\{1, 10000\}} requires 14 bits with offsets. Instead, the converter could use a hash map to assign each distinct value a compact code: \texttt{1 \(\rightarrow\) 0} and \texttt{10000 \(\rightarrow\) 1}. Each record would then need only one bit for this field. The header would store the reverse dictionary \texttt{[1, 10000]}, allowing the reader to recover the original value by indexing it with the stored code. The codes are unique identifiers, not hash values, so hash collisions do not lose information.
+\textbf{Dictionary encoding (proposed).} Offset encoding can waste bits when a field has only a few distinct values spread over a wide range. For example, \texttt{\{1, 1000000\}} requires 20 bits with offsets. Instead, the converter could use a hash map to assign each distinct value a compact code: \texttt{1 \(\rightarrow\) 0} and \texttt{1000000 \(\rightarrow\) 1}. Each record would then need only one bit for this field. The header would store the reverse dictionary \texttt{[1, 1000000]}, allowing the reader to recover the original value by indexing it with the stored code:
+
+\begin{center}
+\resizebox{0.8\linewidth}{!}{\input{diagrams/dictionary-encoding.tex}}
+\par\nopagebreak\small\itshape Dictionary encoding (proposed): the header stores the distinct values; each record stores only an index.
+\end{center}
+
+ The codes are unique identifiers, not hash values, so hash collisions do not lose information.
 
 This helps when a small set of values occurs repeatedly. The cost is keeping the distinct values during analysis, storing their dictionary in the header, and performing a lookup during encoding and decoding. If most values are distinct, this overhead can outweigh the savings; the converter could compare the total size with offset encoding before choosing. Supporting this requires an encoding-kind marker and dictionary support in the writer and reader. Mutable dependency counters would need special handling because decrementing a code does not decrement its original value.
+
+\textbf{Combining both encodings (proposed).} Neither encoding is best for every field, so the converter would choose per field:
+
+{\small
+\begin{longtable}{P{0.28\dimexpr\linewidth-8\tabcolsep\relax}P{0.16\dimexpr\linewidth-8\tabcolsep\relax}P{0.36\dimexpr\linewidth-8\tabcolsep\relax}P{0.2\dimexpr\linewidth-8\tabcolsep\relax}}
+\toprule
+\textbf{Field values} & \textbf{Offset (per node)} & \textbf{Dictionary (per node, plus header)} & \textbf{Choice} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Field values} & \textbf{Offset (per node)} & \textbf{Dictionary (per node, plus header)} & \textbf{Choice} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+0--262,143 (dense range) & 18 bits & 18 bits, plus 262,144 values in the header & offset \\
+always 1024 & 0 bits & 0 bits, plus 1 value in the header & offset \\
+8 B, 1 MiB, 64 MiB (few, far apart) & 26 bits & 2 bits, plus 3 values in the header & dictionary \\
+\{1, 1000000\} & 20 bits & 1 bit, plus 2 values in the header & dictionary \\
+\end{longtable}
+}
+
+The first conversion pass already collects each field's range; it would also count distinct values up to a limit. For each field, the converter compares the record bits times the node count plus the dictionary's size in the header, and records the chosen encoding in the field descriptor. Dependency counters always use offsets. Each field then costs at most what either encoding alone would, which matters most for fields such as message sizes, whose few distinct values are often far apart.
 
 \hypertarget{the-file-format}{}
 \subsection{The file format}
@@ -327,12 +370,12 @@ The rank counts move into the rank table, and root indices follow the dependency
 
 \begin{center}
 \resizebox{\linewidth}{!}{\input{diagrams/header-details.tex}}
-\par\nopagebreak\small\itshape Stored fields in file order; cell widths are illustrative. The name bytes occur only for custom fields.
+\par\nopagebreak\small\itshape Header and rank table in file order, with one field descriptor and one rank-table entry enlarged; the values are an example and cell widths are illustrative. The fixed prefix holds the magic number, version, header and record sizes, field and rank counts, index width and table offset.
 \end{center}
 
 All node records in a file share one layout, so node \texttt{i} of a rank is found directly at \texttt{rank\_\allowbreak{}start + i \(\times\) \allowbreak{}record\_\allowbreak{}size}, without scanning. Dependency and root entries are packed node indices using the file-wide index width. Multi-byte integers are little-endian and bits are numbered from the least significant bit of the first byte, so files are portable between machines.
 
-The magic number distinguishes the new format from legacy files, which keep their own magic and are still read through the original path. Readers reject unknown versions, unknown type codes, truncated headers, overlapping fields and table entries pointing outside the file.
+The magic number distinguishes the new format from legacy files, which keep their own magic and remain readable (Section 3.5.2). Readers reject unknown versions, unknown type codes, truncated headers, overlapping fields and table entries pointing outside the file.
 
 Legacy output remains the default for existing workflows. \texttt{txt2bin -\allowbreak{}-\allowbreak{}format self-\allowbreak{}describing} selects the new format, which also supports custom fields; legacy output warns that it omits them.
 
@@ -351,17 +394,17 @@ Each simulator creates its own adapter object. The adapter provides the connecti
 \par\nopagebreak\small\itshape Both adapters inherit the same interface, specialized for their node type. Each simulator owns a separate adapter and reader instance.
 \end{center}
 
-The node type tells the adapter what to return; it is not a buffer containing every node. Both adapters use the same reader implementation, but each has its own reader instance and mapping. The simulators are independent programs and can read a compatible binary concurrently using separate private mappings. Both must support its operations and message-matching convention; the explicit ATLAHS convention in Section 4 currently requires its backend.
+The node type tells the adapter what to return; it is not a buffer containing every node. Both adapters use the same reader implementation. For file input, each adapter owns its reader and mapping, keeping the bytes alive until the reader is destroyed. The simulators are independent programs and can read a compatible binary concurrently using separate private mappings. Both must support its operations and message-matching convention; the explicit ATLAHS convention in Section 4 currently requires its backend.
 
 All graph simulators' node types inherit a common base that the reader fills automatically: the node's index, its remaining dependency count, and the nodes it releases when it starts and when it completes. The adapter adds only the members its model uses, so supporting a new simulator means declaring its node type and bindings and making its input loader call the reader.
 
-LogGOPSim itself was restructured into the first adapter. Its simulator code moved into its own directory; at startup it detects the file format and reads either legacy files through the original path or self-describing files through its adapter. Event timing, message matching and dependency processing are shared by both paths, so only storage access differs. Along the way, legacy reads were made safe for unaligned data, and empty schedules are now supported.
+LogGOPSim itself was restructured into the first adapter. Its simulator code moved into its own directory; at startup its adapter opens the file, and the shared reader selects the legacy or self-describing implementation. Event timing, message matching and dependency processing are shared by both formats, so only storage access differs. Along the way, legacy reads were made safe for unaligned data, and empty schedules are now supported.
 
 The procedure has four steps:
 
 \begin{enumerate}
 \item \textbf{Define the connection.} The adapter names its node type and binds file fields to that type's members. The member's C++ type tells the reader which values it can accept.
-\item \textbf{Prepare once.} The simulator maps the file and constructs its adapter. The shared reader checks the schema against the bindings and resolves the selected fields' positions and encodings. Missing fields, incompatible types, values outside the destination type's range and unsupported wildcard representations are rejected before simulation starts.
+\item \textbf{Prepare once.} The simulator supplies the filename to its adapter, which opens and owns the mapping and constructs the reader. The shared reader checks the schema against the bindings and resolves the selected fields' positions and encodings. Missing fields, incompatible types, values outside the destination type's range and unsupported wildcard representations are rejected before simulation starts.
 \item \textbf{Request a node.} The scheduler calls \texttt{adapter.\allowbreak{}read\_\allowbreak{}root\_\allowbreak{}nodes(rank)} to get initially ready nodes, or \texttt{adapter.\allowbreak{}read\_\allowbreak{}node(rank, i\allowbreak{}ndex)} to get a particular node. The reader locates that record and decodes the bound fields directly into the chosen node type. For ATLAHS the result is an \texttt{AtlahsNode}; for LogGOPSim it is a \texttt{LogGOPSimNod\allowbreak{}e}.
 \item \textbf{Simulate and continue.} The simulator processes the returned node using its own timing and communication model. As prerequisites are satisfied, it updates dependency counters through the adapter and requests newly ready nodes. The scheduler decides which node to request; there is no sequential \texttt{get\_\allowbreak{}next\_\allowbreak{}node()} operation.
 \end{enumerate}
@@ -371,10 +414,29 @@ The procedure has four steps:
 \par\nopagebreak\small\itshape Construct once, then read nodes on demand.
 \end{center}
 
+\hypertarget{backward-compatibility}{}
+\subsubsection{Backward compatibility}
+
+Existing legacy traces must keep working without conversion, and the simulators should not need a second code path for them. The adapters therefore do not read files themselves: they hold a \texttt{TraceReader}, which looks at the file's magic number and creates one of two readers. Both accept the adapter's field bindings and fill the same node struct.
+
+\begin{center}
+\resizebox{\linewidth}{!}{\input{diagrams/backward-compat.tex}}
+\par\nopagebreak\small\itshape The format is detected once; the adapter's bindings and node type are the same for both.
+\end{center}
+
+\begin{itemize}
+\item \textbf{Self-describing files} are read through the header and a decode plan (Section 3.6); any standard or custom field can be bound.
+\item \textbf{Legacy files} are read by a small reader that knows the fixed position and width of each standard field in the 39-byte record: type, peer, size, tag, CPU and NIC, plus the dependency count and lists. Each binding becomes a copy from that position into the bound member, so one field may be bound to several members. The member must hold every value of the stored width. Peer and tag store ``any'' as all ones, which becomes the binding's wildcard value. A binding to a custom field is rejected, because the legacy record cannot contain one.
+\end{itemize}
+
+An adapter can ask \texttt{is\_\allowbreak{}legacy()} to bind only the fields that exist. LogGOPSim binds the same six standard fields for both formats. ATLAHS binds its eight custom fields only for self-describing files. For legacy files it keeps the upstream convention: the NIC field is bound to both \texttt{Gpu} and \texttt{PeerGpu}, the CPU field to \texttt{Stream}, and messages are matched by tag (Section 4). Neither simulator's scheduler contains format-specific code.
+
+The legacy reader validates each rank's bounds, its roots and its dependency indices when the file is opened, as the self-describing reader does. Files invalidated by an earlier \texttt{-\allowbreak{}-\allowbreak{}save-\allowbreak{}mem} run are rejected with a clear error. The converter still writes the legacy format by default. On the benchmark traces, LogGOPSim's output is identical to that of the original LogGOPSim for both formats (Section 5.3.2).
+
 \hypertarget{validation-before-and-during-simulation}{}
 \subsubsection{Validation before and during simulation}
 
-The schema check compares the destination member's type with the \textbf{decoded value range}. The stored bits represent an offset, and decoding reconstructs the original value as \texttt{base + offse\allowbreak{}t}. For example, a 2-bit field stores offsets \texttt{0.\allowbreak{}.\allowbreak{}3}; with a base of \texttt{1000}, it represents values \texttt{1000.\allowbreak{}.\allowbreak{}1003}. Although the stored code fits in two bits, the decoded value does not fit in an 8-bit unsigned member. The reader therefore checks the base and maximum offset together when validating a binding.
+The schema check compares the destination member's type with the \textbf{decoded value range}. The stored bits represent an offset, and decoding reconstructs the original value as \texttt{base + offse\allowbreak{}t}. For example, a 2-bit field stores offsets \texttt{0.\allowbreak{}.\allowbreak{}3}; with a base of \texttt{1000}, it represents values \texttt{1000.\allowbreak{}.\allowbreak{}1003}. Copying such a value into an 8-bit unsigned member would silently truncate it, for example 1002 to 234. The stored code fits in two bits, so a check on the stored width would accept this binding; the reader therefore checks the decoded range, base plus maximum offset, against the member type and rejects the file before any node is read.
 
 Validation is divided between setup and individual reads:
 
@@ -388,56 +450,130 @@ Validation is divided between setup and individual reads:
 
 The reader accesses the binary through a memory mapping. The scheduler starts from each rank's roots and requests dependent nodes as their counters reach zero, so the reader decodes nodes on demand.
 
-Dependency lists remain views into the mapped bytes rather than being copied into a new vector for every node. This avoids those allocations, but the mapping must stay alive while the lists are used. A consumer that needs a list after closing the mapping must copy its indices first. Analysis tools can also read selected field values without constructing a graph-node type.
+Dependency lists remain views into the mapped bytes rather than being copied into a new vector for every node. Graph setup validates the immutable dependency indices once; each node read still checks its list bounds, without scanning the indices again. Field-only consumers do not scan dependency arrays. The mapping must stay alive while the lists are used. A consumer that needs a list after closing the mapping must copy its indices first. Analysis tools can bind selected fields into a small struct without inheriting the graph-node base.
 
 \hypertarget{dependency-counters-and-file-reuse}{}
 \subsubsection{Dependency counters and file reuse}
 
 Dependency counters change during simulation; the other stored node values stay unchanged. The reader currently decrements counters in the mapped bytes. With the default private mapping (\texttt{MAP\_\allowbreak{}PRIVATE}), the operating system gives a process its own copy of a page when it modifies it. The original file stays unchanged, and each simulation uses a fresh mapping, allowing independent runs to reuse the same binary, including concurrently.
 
-LogGOPSim's \texttt{-\allowbreak{}-\allowbreak{}save-\allowbreak{}mem} instead uses a shared mapping: counter changes reach the file on disk, which is marked unusable for later runs. This mode is destructive and must not be used on an input shared by several simulations. ATLAHS rejects it for the new format and always uses a private mapping.
+LogGOPSim's \texttt{-\allowbreak{}-\allowbreak{}save-\allowbreak{}mem} instead uses a shared mapping: counter changes reach the file on disk, which is marked unusable for later runs. This mode is destructive and must not be used on an input shared by several simulations. ATLAHS accepts it only for legacy traces, as upstream did; for the new format it always uses a private mapping, because packed counters share bytes with other fields.
 
 Private mappings copy whole pages even when only a counter changes. Keeping the trace read-only and storing counters separately for each run is a possible improvement; its memory and access costs still need measurement.
 
 
-\hypertarget{runtime-specialization-todo}{}
-\subsection{Runtime specialization (TODO)}
+\hypertarget{runtime-specialization}{}
+\subsection{Runtime specialization}
 
-Runtime specialization would replace the shared reader's field-decoding loop with a function generated for the opened file and the simulator's bindings. The adapter would still expose the same node-reading interface, and the simulator would keep requesting nodes in the same way. This is a proposed extension; the current implementation uses the generic decoder.
+Runtime specialization replaces the shared reader's generic field-decoding loop with code prepared for the opened file and the simulator's bindings. The adapter still exposes the same node-reading interface, and the simulator requests nodes in the same way.
 
 \hypertarget{where-it-fits}{}
 \subsubsection{Where it fits}
 
-The file schema and adapter bindings are already resolved at setup. Together, they determine which bits to read, how to reconstruct each value and which node member receives it. A just-in-time (JIT) decoder could turn this information into executable code once, then use that function for subsequent reads:
+The file schema and adapter bindings are already resolved at setup. Together, they determine which bits to read, how to reconstruct each value and which node member receives it. The reader turns this information into a specialized decoder once, then uses it for every node read:
 
 \begin{center}
-\resizebox{\linewidth}{!}{\input{diagrams/runtime-specialization.tex}}
-\par\nopagebreak\small\itshape Proposed integration: specialize decoding beneath the adapter while retaining the shared reader and generic fallback.
+\begin{minipage}{\linewidth}
+\centering
+\resizebox{0.94\linewidth}{!}{\input{diagrams/plan-runners.tex}}
+\par\small\itshape All runners share boundary handling; compiled runners execute C- or LLVM-generated code.
+\end{minipage}
 \end{center}
 
-The two decoders would be alternatives behind the same reader interface. The generated function would decode the selected fields into the simulator's node type. Record bounds checks, dependency views and counter updates would stay in shared code. Each simulator would use a decoder prepared for its own bindings, even when both read the same binary.
+The decoders are alternatives behind the same reader interface. Record bounds checks, dependency views and counter updates stay in shared code. Each simulator uses a decoder prepared for its own bindings, even when both read the same binary.
 
 \hypertarget{why-it-could-be-faster}{}
 \subsubsection{Why it could be faster}
 
-The generic decoder visits the selected fields for every node, reading their positions, widths and bases from prepared metadata and invoking their assignment functions. A generated function could put these choices directly into its instructions. For a field stored at bit position 13 with width 2 and base 0, for example, it could extract those known bits and assign the result directly to \texttt{node.\allowbreak{}Gpu}.
+The generic decoder visits the selected fields for every node, reading their positions, widths and bases from prepared metadata, passing values through \texttt{std::\allowbreak{}variant} and invoking an assignment function per field. A specialized decoder puts these choices directly into its instructions. For a field stored at bit position 13 with width 2 and base 0, for example, it extracts those known bits and stores the result directly into \texttt{node.\allowbreak{}Gpu}.
 
-Knowing these constants lets the compiler simplify shifts and masks, remove the per-field loop and indirect assignments, and potentially combine nearby loads. Field selection already avoids decoding unwanted values; specialization would reduce the cost of decoding the selected ones. It would not speed up message matching or network simulation directly.
+Knowing these constants lets the compiler simplify shifts and masks, remove the per-field loop and indirect assignments, and combine nearby loads. Field selection already avoids decoding unwanted values; specialization reduces the cost of decoding the selected ones. It does not speed up message matching or network simulation.
 
-\hypertarget{generating-and-reusing-a-decoder}{}
-\subsubsection{Generating and reusing a decoder}
+\hypertarget{choosing-an-approach}{}
+\subsubsection{Choosing an approach}
 
-We considered three approaches. Precompiled decoders have no runtime compilation cost but cover only layouts known at build time. An in-process JIT compiler supports arbitrary layouts but adds a large dependency. The planned approach generates C++, compiles it with the system compiler into a shared library, and loads its decoder function into the running simulator:
+{\small
+\begin{longtable}{P{0.24\dimexpr\linewidth-6\tabcolsep\relax}P{0.4\dimexpr\linewidth-6\tabcolsep\relax}P{0.36\dimexpr\linewidth-6\tabcolsep\relax}}
+\toprule
+\textbf{Approach} & \textbf{How it works} & \textbf{Tradeoff} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Approach} & \textbf{How it works} & \textbf{Tradeoff} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\textbf{Template instantiation} & Precompile decoders for known layouts and pick one at run time & No compiler needed, but covers only layouts known in advance \\
+\textbf{Generate C, compile, load} & Emit source for this schema, call the system compiler, load the shared library & Fully general and easy to inspect; compile latency, mitigated by a cache \\
+\textbf{In-process JIT} & Build machine code in memory, e.g.\ with LLVM ORC or asmjit & No external compiler, but a large dependency or per-architecture code \\
+\textbf{Optimized interpreter} & Precompute shifts and masks once and run them in a tight loop & Always works; some overhead remains \\
+\end{longtable}
+}
 
-\begin{enumerate}
-\item After validating the schema and bindings, look for a compatible cached decoder.
-\item On a miss, generate and compile a decoder for those fields and their destinations.
-\item Load the function and use it for subsequent node reads; retain the generic decoder as a fallback.
-\end{enumerate}
+We implemented all four approaches, the in-process JIT with LLVM ORC. All are built from the same \emph{decode plan}, so the interpreter also serves as the fallback when compilation is unavailable.
 
-The cache identity must include the layout, bindings, destination node layout, compiler settings and target platform so that code compiled for a different node representation is not reused accidentally. Linux and macOS support compiling and loading shared libraries; Windows would need its own loading implementation.
+\hypertarget{decode-plan-and-generated-decoder}{}
+\subsubsection{Decode plan and plan runners}
 
-Compilation adds startup time, and a call into a loaded library still has overhead and generally cannot be inlined into the caller. The benefit is therefore most plausible for large traces or repeated runs that reuse a cached decoder. If decoding is only a small part of simulation time, the overall gain will be limited. Implementation and evaluation remain TODO: generated and generic decoders must produce identical results, and Section 5's performance study must measure compilation, cached startup and end-to-end runtime before claiming a speedup.
+When the reader is constructed, it builds a decode plan with one step per selected field: where the field's bits are (first byte, shift, mask, base, maximum offset) and where its value goes (output struct, member offset and size, value for ANY). The plan is only data. The \texttt{Decoder} resolves and validates the requested fields, builds the plan and selects a runner. The shared \texttt{PlanRunner::decode} uses that runner's fast \texttt{run} when its wide loads are safe, or bounded reads near the end of the mapping. Invalid records are rejected directly. The environment variable \texttt{LOGGOPSIM\_\allowbreak{}DECODER} selects the runner; the shared interface and implementations are shown above.
+
+The runners are:
+
+\begin{itemize}
+\item \textbf{\texttt{plan}} (default, \texttt{InterpretedRunner}): runs the steps in a loop, without \texttt{std::\allowbreak{}variant} or \texttt{std::\allowbreak{}function}.
+\item \textbf{\texttt{jit}} (\texttt{CompiledRunner} with the system C compiler): turns the steps into a C function, compiles it with \texttt{cc -\allowbreak{}O2 -\allowbreak{}shared -\allowbreak{}fPIC} and loads it with \texttt{dlopen}.
+\item \textbf{\texttt{orc}} (\texttt{CompiledRunner} with LLVM ORC): builds the same function as LLVM IR and compiles it in-process, without a compiler process, file or cache. The LLVM code is a plugin, opened only when \texttt{orc} is selected, so other runs do not load LLVM: linking LLVM into the simulator directly added 7--11\,ms to every run. Builds without LLVM fall back to the interpreter. Within one process, readers of the same plan reuse the compiled function. It decodes as fast as \texttt{jit} (about 66\,ns per node in \texttt{decode\_\allowbreak{}bench} on a 524,286-node trace) and spends about 3\,ms more on setup than a cached \texttt{jit}, because it compiles on every run.
+\item \textbf{\texttt{templated\_node}} (\texttt{TemplatedNodeRunner}): a template instantiated for each simulator's node type, which fixes the number of steps and each member's size and output struct. The steps are unrolled and every store has a fixed size; bit positions, ranges and member offsets still come from the plan, so one instantiation serves every trace a simulator reads. It needs no compiler at run time.
+\item \textbf{\texttt{templated\_schema}} (\texttt{TemplatedSchemaRunner}): a template that takes every step as a template argument, so all positions, masks and ranges are constants, as in the generated C. It only matches traces with exactly the layout it was instantiated for; selecting it on another trace reports the missing match once and falls back to the interpreted runner.
+\end{itemize}
+
+\textbf{Runner registry.} The runners are listed in one place, \texttt{RunnerRegistry.\allowbreak{}cpp}. Each entry gives the runner's name, a description, whether it handles any plan, whether it is available in this build (for example, whether a C compiler or the LLVM plugin is present) and a function that creates it for a plan. \texttt{plan} is the default and the fallback. The decoder looks up \texttt{LOGGOPSIM\_\allowbreak{}DECODER} in the registry and rejects unknown names with the list of valid ones; if the runner cannot handle the trace, it says so once and uses \texttt{plan}. The unit tests and the benchmarks take their runners from the same list, so a new runner is tested and measured without further changes. Each runner lives in its own folder with its own build file; adding one means adding the folder, one \texttt{add\_\allowbreak{}subdirectory} line and its registry entry, and removing one is the reverse.
+
+All five runners give identical simulation results. Replaying the 524,286-node trace (\texttt{decode\_\allowbreak{}bench}, 7 interleaved rounds of 20 repetitions, median per repetition):
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Runner} & \textbf{ns/node} & \textbf{Setup (ms)} \\
+\midrule
+\texttt{plan} & 96.7 & 18.4 \\
+\texttt{templated\_node} & 84.3 & 16.1 \\
+\texttt{jit} (cached) & 66.5 & 13.1 \\
+\texttt{orc} & 66.5 & 15.9 \\
+\texttt{templated\_schema} & 66.2 & 12.9 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\texttt{templated\_schema} is as fast as the compiled runners: with all constants known, the compiler produces the same code. It is the fastest option without a run-time compiler, but only for traces whose layout was compiled in, and layouts change with each trace's value ranges. We therefore use it as a reference, showing what compiled code costs without compilation, rather than as a runner to choose for new traces. \texttt{templated\_node} helps every trace of a known node type and is 13\% faster than \texttt{plan}; it stays slower than the compiled runners because each step still loads its shift, mask and range from memory.
+
+The generated function contains every offset, shift, mask and range as a constant, with no loop or dispatch; a constant (0-bit) field becomes a single store. An abridged excerpt for a broadcast trace:
+
+\begin{lstlisting}
+int decode(const u8* r, u8* const* t) {
+  u64 w, c;
+  memcpy(&w, r + 0x0, 8);          // type: 2 bits at bit 1, base 1
+  c = (w >> 0x1) & 0x3;
+  if (c > 0x2) return 0;
+  c += 0x1;
+  store8(t[0] + 0x38, c);
+  memcpy(&w, r + 0x0, 8);          // peer: 16 bits at bit 3
+  c = (w >> 0x3) & 0xffff;
+  store32(t[0] + 0x3c, c);
+  store64(t[0] + 0x40, 0x400);     // size: 0 bits, constant 1024
+  /* ... further fields ... */
+  return 1;
+}
+\end{lstlisting}
+
+The source contains only numbers taken from the header, never strings from the trace, so a trace cannot inject code.
+
+\textbf{Fallbacks.} If a fast path rejects a record (a value outside its range, a send to ANY, or a record too close to the end of the file for a 64-bit load), the base class decodes it again exactly and reports the error, so error messages are unchanged. If compilation or loading fails, the reader uses the interpreted decoder. The dependency counter has a matching fast path for decrements.
+
+\textbf{Cache.} Compiled libraries are cached under \texttt{\textasciitilde{}/.\allowbreak{}cache/\allowbreak{}loggopsim-\allowbreak{}jit} (configurable with \texttt{LOGGOPSIM\_\allowbreak{}JIT\_\allowbreak{}CACHE}), keyed by a hash of the generated source, compiler and flags. The source encodes the layout, bindings and destination offsets, so the key covers them. Concurrent builds write under a temporary name and rename. The key does not include the compiler version or target architecture; on a home directory shared between different machines, loading fails and the reader falls back to the plan.
+
+Section 5.3 evaluates the runners against the original decoder, and Section 5.4 compares them across scenarios.
 
 \hypertarget{case-study-explicit-atlahs-metadata}{}
 \section{Case study: explicit ATLAHS metadata}
@@ -512,7 +648,7 @@ For the four-GPU example trace, conversion produces this packed record layout:
 
 \begin{center}
 \resizebox{\linewidth}{!}{\input{diagrams/packed-gpu-record.tex}}
-\par\nopagebreak\small\itshape Four-GPU example: 3 bytes per node instead of 39, including all eight custom fields.
+\par\nopagebreak\small\itshape Four-GPU example: 2 bytes per node instead of 39, including all eight custom fields.
 \end{center}
 
 \textbf{4. Bind.} The ATLAHS adapter supplies this node type. It inherits the common graph fields and adds the operation fields and explicit metadata its scheduler needs:
@@ -547,7 +683,7 @@ The other seven attributes bind to \texttt{PeerGpu}, \texttt{Stream}, \texttt{Co
 
 \textbf{5. Use.} \texttt{Gpu} selects the local GPU and \texttt{PeerGpu} the remote GPU; on a send these are the source and destination, respectively. \texttt{Stream} selects the execution stream. Receive matching compares the source and the \texttt{(Communicato\allowbreak{}r, Channel, \allowbreak{}Sequence, Me\allowbreak{}ssageKind, C\allowbreak{}hunk)} tuple, and checks that both GPU endpoints agree with the receive.
 
-With the new format htsim no longer guesses: the GPU count is the field's maximum plus one, read from the header. Legacy ATLAHS traces still work, because for them the loader copies the NIC into \texttt{Gpu} and keeps the upstream mapping.
+With the new format htsim no longer guesses: the GPU count is the field's maximum plus one, read from the header. Legacy ATLAHS traces still work: for them the adapter binds the NIC to \texttt{Gpu} and \texttt{PeerGpu} and keeps the upstream mapping.
 
 \hypertarget{integration}{}
 \subsection{Integration}
@@ -557,23 +693,37 @@ Declaring and binding the eight fields makes them available to ATLAHS, but its e
 \hypertarget{generator-emit-the-original-values}{}
 \subsubsection{Generator: emit the original values}
 
-Previously, the NCCL generator encoded the GPU in the NIC field and combined message-identity components into a decimal tag. The new \texttt{-\allowbreak{}-\allowbreak{}explicit-\allowbreak{}fields} option writes local GPU, peer GPU, execution stream and identity components directly as named attributes on every operation. The peer GPU is resolved from the communicator's peer-rank mapping and converted to its dense host-local index, for point-to-point, ring and tree communication. This preserves their values before they enter the converter, avoiding the ambiguity of reconstructing them from overloaded fields. Calculations and fences supply zero-valued identity attributes because they do not participate in message matching. Generation without the option keeps the original output convention.
+Previously, the NCCL generator encoded the GPU in the NIC field and combined message-identity components into a decimal tag. We added a new option, \texttt{-\allowbreak{}-\allowbreak{}explicit-\allowbreak{}fields}, to the generator. With it, every operation carries eight additional named attributes instead of packed numbers: the GPU it runs on, the GPU of its communication partner, its execution stream, and the five components of its message identity. To find the partner's GPU, the generator looks up which GPU the peer rank uses in that communicator and converts it to a dense host-local index (0, 1, 2, \ldots); this works for point-to-point, ring and tree communication. This preserves their values before they enter the converter, avoiding the ambiguity of reconstructing them from overloaded fields. Calculations and fences supply zero-valued identity attributes because they do not participate in message matching. Generation without the option keeps the original output convention.
 
 \hypertarget{input-loader-construct-the-schedulers-nodes}{}
 \subsubsection{Input loader: construct the scheduler's nodes}
 
-The existing ATLAHS loader read legacy records using fixed byte offsets. It now detects the self-describing format and creates an \texttt{AtlahsAdapte\allowbreak{}r} over the mapped file. When the scheduler needs a node, the loader obtains an \texttt{AtlahsNode} through that adapter. The shared reader handles field positions and decoding, while the adapter supplies the bindings and ATLAHS-specific checks.
+The existing ATLAHS loader read legacy records using fixed byte offsets. It now constructs an \texttt{AtlahsAdapte\allowbreak{}r} that owns the mapping and reads either format. When the scheduler needs a node, the loader obtains an \texttt{AtlahsNode} through that adapter. The shared reader handles field positions and decoding, while the adapter supplies the bindings and ATLAHS-specific checks. The rank scheduler reads only the dependency list released by each event. A single release helper updates counters and carries the latest prerequisite completion time into newly ready nodes. The old converter's graph writer is kept separately from this runtime loader.
 
-This is where the generic format connects to the existing simulator: the scheduler receives the operation fields it already uses, together with explicit GPU, stream and message identity. Legacy files continue through their original reading path, with the NIC value copied into \texttt{Gpu} to preserve their GPU mapping.
+This is where the generic format connects to the existing simulator: the scheduler receives the operation fields it already uses, together with explicit GPU, stream and message identity. Legacy files use the same adapter, which binds only the standard fields and binds the NIC to both GPU members to preserve their GPU mapping (Section 3.5.2).
 
 \hypertarget{scheduler-use-the-explicit-metadata}{}
 \subsubsection{Scheduler: use the explicit metadata}
 
-Upstream used the sender's GPU index at both network endpoints: a send from A/GPU 0 to a receive on B/GPU 2 still travelled to B/GPU 0. We added \texttt{peer\_\allowbreak{}gpu\_\allowbreak{}id} and changed endpoint selection to use \texttt{Gpu} at the source and \texttt{PeerGpu} at the destination. Queues and completion callbacks retain both endpoints, so matching checks the intended GPU pair and updates each host's own resource clocks. htsim's packet transport model stays the same.
+Upstream used the sender's GPU index at both network endpoints: a send from A/GPU 0 to a receive on B/GPU 2 still travelled to B/GPU 0.
 
-Execution clocks use the explicit 32-bit \texttt{Stream} member rather than the 8-bit CPU field; the stream count comes from the schema. Legacy input retains its original routing and copies CPU IDs into \texttt{Stream} when loading nodes.
+\begin{center}
+\resizebox{0.44\linewidth}{!}{\input{diagrams/gpu-routing.tex}}
+\par\nopagebreak\small\itshape Upstream delivered every message to the sender's GPU index on the receiving host.
+\end{center}
 
-Message matching also had to change. Previously, the matcher compared numeric tags containing concatenated components. Minimum-width decimal padding did not impose a maximum component size, so different component tuples could produce the same tag. For explicit-field messages, both the waiting-receive and unexpected-message queues now compare the source and the complete \texttt{(Communicato\allowbreak{}r, Channel, \allowbreak{}Sequence, Me\allowbreak{}ssageKind, C\allowbreak{}hunk)} tuple. The identity travels with the message through the network completion callback, so matching works whether the receive or message arrives first. Components remain unsigned 64-bit values throughout, avoiding narrowing or lossy replacement with a hash. If several queued operations match, the shared matcher selects the lowest operation index, preserving schedule order rather than relying on queue insertion order.
+ We added \texttt{peer\_\allowbreak{}gpu\_\allowbreak{}id} and changed endpoint selection to use \texttt{Gpu} at the source and \texttt{PeerGpu} at the destination. Queues and completion callbacks retain both endpoints, so matching checks the intended GPU pair and updates each host's own resource clocks. htsim's packet transport model stays the same.
+
+Execution clocks use the explicit 32-bit \texttt{Stream} member rather than the 8-bit CPU field; the stream count comes from the schema. Legacy input retains its original routing; its adapter binds the CPU field to \texttt{Stream}.
+
+Message matching also had to change. Previously, the matcher compared numeric tags containing concatenated components. Minimum-width decimal padding did not impose a maximum component size, so different component tuples could produce the same tag. For example, chunk 1, channel 2, sequence 12345 and chunk 10, channel 21, sequence 2345 (both with kind 0 and communicator 1) both produce the tag \texttt{10212345001}, because the five-digit sequence number shifts the other components:
+
+\begin{center}
+\resizebox{0.85\linewidth}{!}{\input{diagrams/tag-collision.tex}}
+\par\nopagebreak\small\itshape Two different messages produce the same concatenated tag.
+\end{center}
+
+ For explicit-field messages, both the waiting-receive and unexpected-message queues now compare the source and the complete \texttt{(Communicato\allowbreak{}r, Channel, \allowbreak{}Sequence, Me\allowbreak{}ssageKind, C\allowbreak{}hunk)} tuple. The identity travels with the message through the network completion callback, so matching works whether the receive or message arrives first. Components remain unsigned 64-bit values throughout, avoiding narrowing or lossy replacement with a hash. If several queued operations match, the shared matcher selects the lowest operation index, preserving schedule order rather than relying on queue insertion order.
 
 Legacy messages retain numeric-tag matching. Explicit-field messages require \texttt{tag 0}, message kinds keep the generator's values 0--5, and unmatched messages cause the run to fail. These checks prevent the two identity conventions from being mixed silently.
 
@@ -599,11 +749,12 @@ Other conventions remain:
 \hypertarget{correctness}{}
 \subsection{Correctness}
 
-The automated checks cover:
+The automated tests are split in two. \textbf{Unit tests} (\texttt{tests/\allowbreak{}unit/}, GoogleTest) check individual components in-process. \textbf{Integration tests} (\texttt{tests/\allowbreak{}integration/}, pytest) run the built programs end to end: converter, simulators, ATLAHS generator and the recorded workload. CTest runs both and labels them, so \texttt{ctest -\allowbreak{}L unit} runs only the fast tests; shared inputs are in \texttt{tests/\allowbreak{}data/}. The checks cover:
 
 \begin{itemize}
 \item \textbf{Format components:} header and rank-table round trips, byte order, packing at every bit alignment and width, wildcards, signed and custom fields, and rejection of malformed files.
 \item \textbf{Conversion:} new files are decoded independently and compared field by field with legacy output, including dependency lists, roots, wildcards, multiple custom fields and 64-bit values.
+\item \textbf{Specialized decoders:} a differential test generates 300 random layouts (widths 0--64, gaps, signed bases, wildcards, fields spilling into a ninth byte) with 2,000 random records each; 321,042 of the records are valid and 278,958 invalid. Every runner of the registry that handles any plan must accept exactly the records the exact decoder accepts and produce identical values, and the exact decoding into member destinations must agree as well; counter decrements must leave neighbouring bits unchanged. Removing the spill-byte load or the send-to-ANY check makes the test fail. Every runner, including the templated ones, also reads a trace that ends directly before a protected memory page. On all five benchmark traces, simulation results match the legacy format.
 \item \textbf{Simulation:} on a saved reference trace (\texttt{binomialtree\allowbreak{}bcast\_\allowbreak{}8}), the new format must reproduce the original simulator's per-rank finish times. Further tests cover both message arrival orders and both protocols, a regression test for the eager/rendezvous bug described below, and 60 random schedules with wildcards, start dependencies, several CPUs and NICs, mixed message sizes and custom fields, which must simulate identically in both formats under four network parameter sets.
 \end{itemize}
 
@@ -634,6 +785,7 @@ Endpoint routing & GPU pairs 0\(\rightarrow\)0, 0\(\rightarrow\)2 and 2\(\righta
 Message matching & Distinct identity components, wide values, old tag collisions and both arrival orders & Matches the unique-tag legacy reference; invalid or unmatched messages are rejected. \\
 Reuse and compatibility & Repeated simulation and upstream's NDP reference test & Input remains unchanged; reference test passes. \\
 Recorded Llama workload (before \texttt{stream\_\allowbreak{}id} and \texttt{peer\_\allowbreak{}gpu\_\allowbreak{}id}) & Four hosts, sixteen GPUs; 5,680,774 operations through the original and modified pipelines & All 475,452 matched message pairs and all four host finish times agree exactly. \\
+Recorded Llama workload (with \texttt{stream\_\allowbreak{}id} and \texttt{peer\_\allowbreak{}gpu\_\allowbreak{}id}) & The same workload with explicit partner GPUs and streams & All matched message pairs still agree; finish times are about 0.017\% earlier, because messages now reach the partner GPU instead of the sender's index. The test no longer compares finish times. \\
 \end{longtable}
 }
 
@@ -642,62 +794,402 @@ Both recorded-workload pipelines disable benchmark-based reduction/copy timing. 
 \hypertarget{file-size}{}
 \subsection{File size}
 
+The table compares both formats for the benchmark traces of Section 5.4, a large Schedgen reduction and the recorded ATLAHS workload. Record sizes are per node; file sizes include the header, rank table, dependency lists and roots.
+
 {\small
-\begin{longtable}{P{0.38\dimexpr\linewidth-8\tabcolsep\relax}P{0.1\dimexpr\linewidth-8\tabcolsep\relax}P{0.24\dimexpr\linewidth-8\tabcolsep\relax}P{0.28\dimexpr\linewidth-8\tabcolsep\relax}}
+\begin{longtable}{P{0.34\dimexpr\linewidth-10\tabcolsep\relax}P{0.12\dimexpr\linewidth-10\tabcolsep\relax}P{0.14\dimexpr\linewidth-10\tabcolsep\relax}P{0.28\dimexpr\linewidth-10\tabcolsep\relax}P{0.12\dimexpr\linewidth-10\tabcolsep\relax}}
 \toprule
-\textbf{Trace} & \textbf{Nodes} & \textbf{Record size} & \textbf{File size} \\
+\textbf{Trace} & \textbf{Nodes} & \textbf{Record} & \textbf{File (legacy \(\rightarrow\) new)} & \textbf{Smaller} \\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Trace} & \textbf{Nodes} & \textbf{Record size} & \textbf{File size} \\
+\textbf{Trace} & \textbf{Nodes} & \textbf{Record} & \textbf{File (legacy \(\rightarrow\) new)} & \textbf{Smaller} \\
 \midrule
 \endhead
 \bottomrule
 \endfoot
-Reference \texttt{binomialtree\allowbreak{}bcast\_\allowbreak{}8} & 14 & 39 \(\rightarrow\) 3 bytes & 808 \(\rightarrow\) 608 bytes \\
-ATLAHS four-GPU example & 8 & 39 \(\rightarrow\) 3 bytes & --- \\
-ATLAHS Llama recording & 5,680,774 & 39 \(\rightarrow\) 17 bytes & 240.6 \(\rightarrow\) 111.4 MiB \\
+bcast\_8 & 14 & 39 \(\rightarrow\) 2 B & 808 \(\rightarrow\) 594 B & 26\% \\
+bcast\_1k & 2,046 & 39 \(\rightarrow\) 4 B & 110 \(\rightarrow\) 30 KiB & 73\% \\
+bcast\_64k & 131,070 & 39 \(\rightarrow\) 4 B & 6.9 \(\rightarrow\) 1.9 MiB & 73\% \\
+wide\_64k (random 64-bit values) & 131,070 & 39 \(\rightarrow\) 15 B & 6.9 \(\rightarrow\) 3.2 MiB & 53\% \\
+alltoall\_256 & 130,560 & 39 \(\rightarrow\) 2 B & 5.4 MiB \(\rightarrow\) 404 KiB & 93\% \\
+ring\_256 & 261,120 & 39 \(\rightarrow\) 4 B & 10.7 \(\rightarrow\) 1.3 MiB & 88\% \\
+dissem\_16k & 458,752 & 39 \(\rightarrow\) 4 B & 19.2 \(\rightarrow\) 2.4 MiB & 88\% \\
+Schedgen binomial-tree reduce, 262,144 ranks & 524,286 & 39 \(\rightarrow\) 5 B & 29.4 \(\rightarrow\) 8.4 MB & 71\% \\
+ATLAHS Llama recording & 5,680,774 & 39 \(\rightarrow\) 17 B & 240.6 \(\rightarrow\) 111.4 MiB & 54\% \\
 \end{longtable}
 }
 
-The broadcast and four-GPU examples are small enough that metadata dominates their file sizes. The recorded Llama workload gives a larger example: the packed binary is 53.7\% smaller while retaining the then-current six explicit ATLAHS attributes. This historical measurement predates \texttt{stream\_\allowbreak{}id} and \texttt{peer\_\allowbreak{}gpu\_\allowbreak{}id}. This is a size measurement; runtime performance still needs a separate study.
+Most Schedgen collectives shrink by 73--93\%: their fields have narrow ranges or are constant, so records take 2--5 bytes instead of 39. On bcast\_8, the header and rank table dominate the small file. With random 64-bit sizes and tags (wide\_64k), records still need 15 bytes and the file is 53\% smaller. The recorded Llama workload is 54\% smaller while carrying all eight explicit ATLAHS fields, which the legacy format cannot store. Section 5.3 measures runtime.
 
-\hypertarget{performance-study-outstanding}{}
-\subsection{Performance study (outstanding)}
+\hypertarget{decoding-performance}{}
+\subsection{Decoding performance}
 
-The planned study compares the new format with the original LogGOPSim on MPI and ATLAHS traces of different sizes and rank counts, with legacy-equivalent, narrow, wide and custom-field schemas. A smaller file pays off only if the extra conversion and decoder preparation time is less than the number of simulation runs times the time saved per run, so all of these costs are measured:
+The initial measurements below predate the shared-memory-work improvements in Section 5.3.1. They compare the legacy format with the self-describing format, decoded by the original decoder (\emph{generic}, now the exact fallback) and by both fast paths of Section 3.6 (\emph{plan} and \emph{JIT}). All runs used an Apple M3 Pro with clang \texttt{-\allowbreak{}O3} and report medians of 21 runs (15 for setup times); end-to-end times also give 95\% confidence intervals after one warm-up run. Results varied by up to 30\% between sessions on this laptop, so each table comes from a single session.
+
+\textbf{Method.} The tool \texttt{decode\_\allowbreak{}bench} replays exactly the reader accesses of a simulation, three node reads per node and one counter decrement per dependency edge, without the network model. Its overhead over legacy agrees with that of full simulations (28.6 vs.\ 35.3 ms on bcast\_64k, 96.4 vs.\ 95.2 ms on dissem\_16k), so the replay isolates decoding. The allreduce\_1k trace is excluded from end-to-end runs because its simulation stops early on receives that never get a matching send, also with the original LogGOPSim; the replay still reads all its nodes.
+
+\textbf{How much time is decoding?} With the generic decoder, decoding costs 190--270 ns per node, compared with 19--48 ns for legacy records:
+
+{\small
+\begin{longtable}{P{0.3\dimexpr\linewidth-8\tabcolsep\relax}P{0.2\dimexpr\linewidth-8\tabcolsep\relax}P{0.2\dimexpr\linewidth-8\tabcolsep\relax}P{0.3\dimexpr\linewidth-8\tabcolsep\relax}}
+\toprule
+\textbf{Trace} & \textbf{Legacy (ms)} & \textbf{Generic (ms)} & \textbf{Decoding share} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Trace} & \textbf{Legacy (ms)} & \textbf{Generic (ms)} & \textbf{Decoding share} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+bcast\_64k & 51.7 & 87.0 & 40\% \\
+dissem\_16k & 147.7 & 242.9 & 47\% \\
+alltoall\_256 & 1196 & 1248 & 2\% \\
+\end{longtable}
+}
+
+The share is replay time divided by simulation time. Decoding is up to half of the run time on collectives; alltoall\_256 is dominated by message matching.
+
+\textbf{Per-node cost.} Replay time per node:
+
+{\small
+\begin{longtable}{P{0.28\dimexpr\linewidth-10\tabcolsep\relax}P{0.18\dimexpr\linewidth-10\tabcolsep\relax}P{0.18\dimexpr\linewidth-10\tabcolsep\relax}P{0.18\dimexpr\linewidth-10\tabcolsep\relax}P{0.18\dimexpr\linewidth-10\tabcolsep\relax}}
+\toprule
+\textbf{ns per node} & \textbf{Legacy} & \textbf{Generic} & \textbf{Plan} & \textbf{JIT} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ns per node} & \textbf{Legacy} & \textbf{Generic} & \textbf{Plan} & \textbf{JIT} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+bcast\_64k & 47.8 & 266.2 & 96.0 & 65.6 \\
+dissem\_16k & 40.7 & 250.9 & 84.0 & 53.6 \\
+alltoall\_256 & 18.8 & 190.3 & 72.8 & 32.6 \\
+allreduce\_1k & 30.8 & 251.2 & 80.9 & 47.1 \\
+\end{longtable}
+}
+
+The plan is 2.6--3.1\(\times\) faster than the generic decoder, and the generated decoder saves a further 30--40 ns per node (4.1--5.8\(\times\) faster than generic). It remains 1.3--1.7\(\times\) slower than legacy. At that stage, profiling attributed much of the remaining gap to repeated dependency-list validation and the indirect decoder call.
+
+\textbf{End-to-end time.} Complete simulations, median and 95\% confidence interval in milliseconds:
+
+{\small
+\begin{longtable}{P{0.2\dimexpr\linewidth-10\tabcolsep\relax}P{0.2\dimexpr\linewidth-10\tabcolsep\relax}P{0.2\dimexpr\linewidth-10\tabcolsep\relax}P{0.2\dimexpr\linewidth-10\tabcolsep\relax}P{0.2\dimexpr\linewidth-10\tabcolsep\relax}}
+\toprule
+\textbf{Trace} & \textbf{Legacy} & \textbf{Generic} & \textbf{Plan} & \textbf{JIT} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Trace} & \textbf{Legacy} & \textbf{Generic} & \textbf{Plan} & \textbf{JIT} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+bcast\_64k & 51.7 [51.0, 52.0] & 87.0 [85.2, 91.2] & 60.1 [58.6, 61.8] & 57.0 [55.3, 59.5] \\
+dissem\_16k & 147.7 [141.6, 156.9] & 242.9 [234.7, 251.4] & 146.0 [144.6, 147.9] & 129.5 [127.8, 133.3] \\
+alltoall\_256 & 1196 [1166, 1249] & 1248 [1203, 1285] & 1243 [1208, 1256] & 1237 [1187, 1255] \\
+\end{longtable}
+}
+
+On bcast\_64k the generated decoder is 10\% slower than legacy, against 68\% for the generic decoder. On dissem\_16k it is 12\% faster than legacy; our hypothesis is that the eight times smaller file (2.5 instead of 20 MB) causes fewer page faults, which remains to be verified. On alltoall\_256 all decoders are within 5\%.
+
+\textbf{Setup cost.} Loading the bcast\_64k schedule in a fresh process:
+
+{\small
+\begin{longtable}{P{0.34\dimexpr\linewidth-6\tabcolsep\relax}P{0.24\dimexpr\linewidth-6\tabcolsep\relax}P{0.42\dimexpr\linewidth-6\tabcolsep\relax}}
+\toprule
+\textbf{Decoder} & \textbf{Setup} & \textbf{Break-even vs.\ plan} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Decoder} & \textbf{Setup} & \textbf{Break-even vs.\ plan} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Plan & 4.2 ms & --- \\
+JIT, cached & 3.9 ms & immediate \\
+JIT, not cached & 375.6 ms & about 12 million nodes \\
+ORC & 13.1 ms & about 300,000 nodes \\
+\end{longtable}
+}
+
+The break-even point is the extra setup time divided by the saving per node (about 30 ns). Without the cache, compilation pays off only after about 12 million nodes; our largest trace has 4.2 million. Most of this time is not the compiler: in a separate run of 321 ms, compilation took 64 ms and the first \texttt{dlopen} 255 ms, because macOS verifies newly created binaries; later \texttt{dlopen} calls take about 1 ms. On Linux only compilation should count, giving a break-even of about 2.1 million nodes; this still needs to be measured. ORC compiles in memory on every run, which is cheaper than an uncached JIT by a factor of almost 30.
+
+\textbf{Predictions.} Before implementing the decoders we predicted that per-node cost would order generic \(>\) plan \(>\) JIT with the JIT close to legacy; the order held, but the JIT remains 1.3--1.7\(\times\) legacy. We predicted end-to-end times close to legacy on bcast and dissem (measured: +10\% and \(-\)12\%) and no visible change on alltoall\_256 (confirmed). We did not anticipate the uncached setup cost.
+
+\hypertarget{reducing-shared-memory-work}{}
+\subsubsection{Reducing shared memory work}
+
+The runners share the same node-reading and scheduling path. We removed repeated work there: graph setup validates dependency indices once, the reader resolves its type-erased validator once, and the scheduler reuses ready-node buffers instead of allocating a vector for each batch. List bounds and output-type checks remain on each read. These changes also reduce allocations in the legacy replay.
+
+The current \texttt{decode\_bench} generates its inputs through Schedgen and \texttt{txt2bin}. The table compares median replay time before and after these changes on the same machine, with nine repetitions per benchmark and \texttt{RelWithDebInfo} (\texttt{-O2 -g}). Values are nanoseconds per node; arrows indicate before \(\rightarrow\) after:
+
+{\small
+\begin{longtable}{P{0.24\dimexpr\linewidth-6\tabcolsep\relax}P{0.38\dimexpr\linewidth-6\tabcolsep\relax}P{0.38\dimexpr\linewidth-6\tabcolsep\relax}}
+\toprule
+\textbf{Runner} & \textbf{bcast\_64k} & \textbf{dissem\_16k} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Runner} & \textbf{bcast\_64k} & \textbf{dissem\_16k} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Legacy & 57.9 \(\rightarrow\) 32.1 & 40.5 \(\rightarrow\) 27.9 \\
+Plan & 112.6 \(\rightarrow\) 72.2 & 91.6 \(\rightarrow\) 69.7 \\
+Templated node & 93.2 \(\rightarrow\) 59.0 & 77.1 \(\rightarrow\) 56.5 \\
+Templated schema & 72.7 \(\rightarrow\) 39.1 & 57.7 \(\rightarrow\) 35.8 \\
+C JIT & --- \(\rightarrow\) 39.3 & 58.6 \(\rightarrow\) 36.2 \\
+LLVM ORC & 76.9 \(\rightarrow\) 40.5 & 58.5 \(\rightarrow\) 36.9 \\
+\end{longtable}
+}
+
+The comparable self-describing replay cases use 24--47\% less time per node. The broadcast C-JIT baseline was unavailable because its cache was not writable; its post-change value was measured separately with a writable cache. Reader setup does more work: the plan adapter increases from 0.35 to 0.56 ms on bcast\_64k and from 0.09 to 0.43 ms on dissem\_16k. The replay numbers exclude this setup cost.
+
+We also reran \texttt{bench/end\_to\_end/decode\_share.py} with 21 runs per configuration and a warm JIT cache. At that earlier stage, before list-only access, complete-simulation medians in milliseconds were:
+
+{\small
+\begin{longtable}{P{0.24\dimexpr\linewidth-6\tabcolsep\relax}P{0.38\dimexpr\linewidth-6\tabcolsep\relax}P{0.38\dimexpr\linewidth-6\tabcolsep\relax}}
+\toprule
+\textbf{Runner} & \textbf{bcast\_64k} & \textbf{dissem\_16k} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Runner} & \textbf{bcast\_64k} & \textbf{dissem\_16k} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Legacy & 42.5 & 131.1 \\
+Plan & 54.0 & 130.7 \\
+Templated node & 46.5 & 125.4 \\
+Templated schema & 43.1 & 112.1 \\
+C JIT & 44.5 & 112.2 \\
+LLVM ORC & 52.0 & 120.5 \\
+\end{longtable}
+}
+
+These timings include process startup, reading, scheduling and simulation. They compare runners at that earlier stage, rather than measuring an end-to-end before/after speedup. They do not establish results for other machines or cold caches.
+
+For ATLAHS, we timed both pipelines on the recorded Llama workload (5,680,774 operations, one run each, wall-clock time). Simulation with htsim takes the same time: 133.6\,s upstream and 134.0\,s with explicit fields and the new format. Generating the GOAL text takes 16.9 instead of 10.9\,s, because the generator writes eight more fields per operation, and conversion takes 19.5 instead of 6.5\,s, because our converter reads the input twice and packs the extra fields (Section 3.3).
+
+\hypertarget{reading-dependency-lists-only}{}
+\subsubsection{Reading only the required dependency list}
+
+LogGOPSim originally decoded a full node when it became ready, started and finished. Replacing the latter two reads with list-only access helped, but the first version still read both lists for each event. The scheduler now calls \texttt{read\_\allowbreak{}dependents(rank, index, event)}, selecting \texttt{DependencyEvent::Start} or \texttt{DependencyEvent::Finish} before decoding. It reads only the selected list's position and count and builds one view. The legacy path makes the same selection.
+
+The packed reader reuses \texttt{FieldSource}, resolving byte positions, shifts, masks and load extents at setup instead of maintaining separate extraction arithmetic. Zero-bit fields return their constant base without loading record bytes. Node indices and slice positions remain checked, including constant empty lists; wide fields and mapping tails keep their safe read paths. No dependency arrays are copied or allocated per read.
+
+Replay includes dependency access, counter updates and ready-node handling, so it does not isolate decoder time. The changes were measured incrementally in one session, with five repetitions per case. Medians in ns per node, from the initial list-only implementation to the retained optimizations:
+
+\begin{center}
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Runner} & \textbf{alltoall\_256} & \textbf{bcast\_64k} & \textbf{dissem\_16k} \\
+\midrule
+Legacy & 11.8 \(\rightarrow\) 7.4 & 26.5 \(\rightarrow\) 22.1 & 23.3 \(\rightarrow\) 19.4 \\
+\texttt{plan} & 25.4 \(\rightarrow\) 11.1 & 47.6 \(\rightarrow\) 37.1 & 42.8 \(\rightarrow\) 32.4 \\
+\texttt{jit} & 25.7 \(\rightarrow\) 11.1 & 40.3 \(\rightarrow\) 30.5 & 36.6 \(\rightarrow\) 26.5 \\
+\texttt{orc} & 25.8 \(\rightarrow\) 11.1 & 40.2 \(\rightarrow\) 30.7 & 36.6 \(\rightarrow\) 26.4 \\
+\texttt{templated\_node} & 25.6 \(\rightarrow\) 11.1 & 44.7 \(\rightarrow\) 34.5 & 40.1 \(\rightarrow\) 29.9 \\
+\texttt{templated\_schema} & 25.7 \(\rightarrow\) 11.1 & 40.3 \(\rightarrow\) 30.3 & 36.4 \(\rightarrow\) 26.0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The event-specific change produced the largest general improvement; constant-field handling especially helped the dependency-free trace. Reusing \texttt{FieldSource} produced a smaller timing change while removing duplicated code. An additional empty-view shortcut was rejected: it improved replay slightly but slowed shuffled reads (JIT on dissem\_16k rose from 14.4 to 18.7\,ns per node and returned to 14.4 after removal). The retained changes improve the new format's replay by roughly 20--57\% in these cases; legacy improves too and remains faster per node. Sampling points to dependency access and record lookup, but does not establish that memory stalls explain the remaining gap.
+
+Complete simulations were also measured against the original LogGOPSim: the last upstream commit before this project (76451de), exported from the repository's history and built with its own CMake files and the same build type (target \texttt{loggopsim\_\allowbreak{}original}). It simulates the legacy files; on all LogGOPSim benchmark traces except wide\_64k, whose random tags leave messages unmatched and on which the original crashes, it produces the same output as our simulator in both formats. Each configuration ran 21 times, all configurations interleaved in a seeded random order to reduce drift. The C JIT cache was warm; ORC compiled in each process. Wall-clock medians, including startup and simulation, in milliseconds:
+
+\begin{center}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Trace} & \textbf{Original} & \textbf{Ours, legacy} & \texttt{plan} & \texttt{jit} & \texttt{orc} & \texttt{templ.\_node} & \texttt{templ.\_schema} \\
+\midrule
+bcast\_8 & 3.1 & 3.3 & 3.3 & 3.6 & 12.8 & 3.4 & 3.2 \\
+bcast\_1k & 3.8 & 3.9 & 3.9 & 4.1 & 13.2 & 3.9 & 3.8 \\
+bcast\_64k & 48.4 & 43.9 & 45.1 & 43.7 & 52.9 & 44.1 & 43.6 \\
+dissem\_16k & 146.4 & 122.7 & 116.6 & 110.8 & 118.3 & 114.3 & 110.2 \\
+ring\_256 & 39.8 & 32.8 & 34.5 & 32.9 & 41.8 & 33.6 & 32.4 \\
+alltoall\_256 & 1950 & 2004 & 1997 & 1996 & 2010 & 1999 & 1998 \\
+wide\_64k & crashes & 78.4 & 79.6 & 79.5 & 88.3 & 81.3 & 77.8 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+On the three larger collectives, our simulator is 9--18\% faster than the original with legacy files, and every runner except \texttt{orc}, which loads LLVM and compiles in each process (about 10\,ms, visible on the small traces), is 7--24\% faster with the new format. The gain comes from the restructured simulator rather than from the format: dependency indices are checked once, ready-node buffers are reused and starting or finishing a node reads only one list. On alltoall\_256, where message matching dominates, all versions are at most 3\% slower than the original; on the two small traces, process startup dominates. These numbers were measured after the reader refactoring of Section 3.5.2, so the legacy column uses the binding-based legacy reader. These are single-machine measurements; scheduler and network work, process startup and measurement variation also contribute to total time.
+
+\hypertarget{preliminary-benchmarks}{}
+\subsection{Preliminary benchmarks: which runner wins where}
+
+Different trace sizes and field distributions can favor different runners. The Google Benchmark suite (\texttt{bench/}) measures these cases on one laptop; the full benchmarking study on other machines remains outstanding.
+
+\textbf{Scenarios.} The build generates eight traces, each of which varies one property. Record and file sizes compare the legacy format with the self-describing one (Section 5.2):
+
+{\small
+\begin{longtable}{P{0.15\dimexpr\linewidth-10\tabcolsep\relax}P{0.1\dimexpr\linewidth-10\tabcolsep\relax}P{0.12\dimexpr\linewidth-10\tabcolsep\relax}P{0.21\dimexpr\linewidth-10\tabcolsep\relax}P{0.42\dimexpr\linewidth-10\tabcolsep\relax}}
+\toprule
+\textbf{Trace} & \textbf{Nodes} & \textbf{Record} & \textbf{File} & \textbf{Property} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Trace} & \textbf{Nodes} & \textbf{Record} & \textbf{File} & \textbf{Property} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+bcast\_8 & 14 & 39 \(\rightarrow\) 2 B & 808 \(\rightarrow\) 594 B & Tiny trace: setup and compilation dominate \\
+bcast\_1k & 2,046 & 39 \(\rightarrow\) 4 B & 110 \(\rightarrow\) 30 KiB & Small trace \\
+bcast\_64k & 131,070 & 39 \(\rightarrow\) 4 B & 6.9 \(\rightarrow\) 1.9 MiB & Large trace, mostly constant (0-bit) fields \\
+dissem\_16k & 458,752 & 39 \(\rightarrow\) 4 B & 19.2 \(\rightarrow\) 2.4 MiB & Many dependencies per node \\
+ring\_256 & 261,120 & 39 \(\rightarrow\) 4 B & 10.7 \(\rightarrow\) 1.3 MiB & Long dependency chains \\
+alltoall\_256 & 130,560 & 39 \(\rightarrow\) 2 B & 5.4 MiB \(\rightarrow\) 404 KiB & No dependencies, many peers \\
+wide\_64k & 131,070 & 39 \(\rightarrow\) 15 B & 6.9 \(\rightarrow\) 3.2 MiB & bcast\_64k with random values: no constant fields, 64-bit sizes and tags \\
+atlahs\_64k & 131,070 & 25 B & 4.5 MiB & bcast\_64k with the eight ATLAHS custom fields, 19 fields per node, read through the ATLAHS adapter; no legacy file, which cannot store them \\
+\end{longtable}
+}
+
+\textbf{Benchmarks.} For each trace and every runner of the registry, \texttt{decode\_\allowbreak{}bench} measures \emph{Setup} (creating the adapter, with a warm JIT cache), \emph{ColdStart} (a one-shot run: setup with an empty cache, then reading every node once), \emph{ReadNodes} (reading every node once in order), \emph{RandomReads} (the same in a random order) and \emph{Replay} (the simulator's accesses, as in Section 5.3). A script tabulates the results and marks the fastest runner, counting runners within 3\% as tied. A sampling profiler script and Google Benchmark's statistical comparison support optimization work. The results are medians of three repetitions on an Apple M3 Pro, \texttt{RelWithDebInfo}.
+
+\textbf{Steady state.} Decoding time per node when reading every node once (ReadNodes):
+
+{\small
+\begin{longtable}{P{0.17\dimexpr\linewidth-12\tabcolsep\relax}P{0.11\dimexpr\linewidth-12\tabcolsep\relax}P{0.11\dimexpr\linewidth-12\tabcolsep\relax}P{0.11\dimexpr\linewidth-12\tabcolsep\relax}P{0.2\dimexpr\linewidth-12\tabcolsep\relax}P{0.2\dimexpr\linewidth-12\tabcolsep\relax}}
+\toprule
+\textbf{ns per node} & \textbf{plan} & \textbf{jit} & \textbf{orc} & \textbf{templated node} & \textbf{templated schema} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ns per node} & \textbf{plan} & \textbf{jit} & \textbf{orc} & \textbf{templated node} & \textbf{templated schema} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+bcast\_8 & 30.2 & 17.8 & 17.9 & 24.1 & 17.4 \\
+bcast\_1k & 27.5 & 13.9 & 13.8 & 21.2 & 13.3 \\
+bcast\_64k & 26.5 & 13.4 & 13.4 & 21.1 & 13.2 \\
+dissem\_16k & 29.2 & 12.9 & 12.8 & 24.0 & 12.4 \\
+ring\_256 & 30.2 & 12.7 & 13.3 & 24.0 & 13.1 \\
+alltoall\_256 & 29.0 & 12.4 & 12.4 & 24.1 & 11.9 \\
+wide\_64k & 26.4 & 13.7 & 13.8 & 21.1 & 13.5 \\
+atlahs\_64k & 41.2 & 17.2 & 16.6 & 29.9 & 16.3 \\
+\end{longtable}
+}
+
+The compiled runners and the known-schema template remain the fastest family for sequential node reads, with the node template between them and the interpreter. Additional ATLAHS fields increase the work per node. Random access costs more than sequential access, and is checked separately: an optimization that improves replay can still hurt a different read pattern.
+
+\textbf{Cold start.} A one-shot run (setup with an empty cache, then one read of every node), in milliseconds:
+
+{\small
+\begin{longtable}{P{0.17\dimexpr\linewidth-12\tabcolsep\relax}P{0.11\dimexpr\linewidth-12\tabcolsep\relax}P{0.11\dimexpr\linewidth-12\tabcolsep\relax}P{0.11\dimexpr\linewidth-12\tabcolsep\relax}P{0.2\dimexpr\linewidth-12\tabcolsep\relax}P{0.2\dimexpr\linewidth-12\tabcolsep\relax}}
+\toprule
+\textbf{ms} & \textbf{plan} & \textbf{jit} & \textbf{orc} & \textbf{templated node} & \textbf{templated schema} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ms} & \textbf{plan} & \textbf{jit} & \textbf{orc} & \textbf{templated node} & \textbf{templated schema} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+bcast\_8 & \textbf{0.006} & 329 & 2.6 & \textbf{0.006} & 0.006 \\
+bcast\_1k & 0.074 & 334 & 3.0 & \textbf{0.066} & 0.048 \\
+bcast\_64k & 4.2 & 350 & 5.4 & \textbf{3.5} & 2.4 \\
+dissem\_16k & 13.9 & 345 & \textbf{8.8} & 11.6 & 6.1 \\
+ring\_256 & 8.0 & 332 & 7.3 & \textbf{7.0} & 3.8 \\
+alltoall\_256 & 3.8 & 347 & 4.4 & \textbf{3.2} & 1.6 \\
+wide\_64k & 4.2 & 342 & 5.7 & \textbf{3.4} & 2.4 \\
+atlahs\_64k & 6.1 & 338 & 6.1 & \textbf{4.6} & 2.8 \\
+\end{longtable}
+}
+
+Bold marks the fastest runner that works for any trace. \texttt{jit} spends 330--350\,ms compiling and loading, so it never wins a cold start; ORC needs about 2.5\,ms and wins on dissem\_16k, the trace with the most nodes. Elsewhere \texttt{templated\_node} wins because it needs no compilation; on the tiny bcast\_8 it ties with \texttt{plan}. The best runner needs 1.4--2\(\times\) the time of \texttt{templated\_schema}. Setup with a warm cache is 0.004--0.8\,ms for all runners.
+
+\textbf{Which runner wins where.} No single runner is best everywhere:
 
 \begin{itemize}
-\item \textbf{Size:} complete file size, including header and index arrays, for bit-packed and byte-aligned layouts.
-\item \textbf{Conversion:} time and peak memory of \texttt{txt2bin} for both formats.
-\item \textbf{Simulation:} load and validation time, decoding throughput, end-to-end runtime and peak memory.
-\item \textbf{Specialization:} compilation time, cached and uncached runs, and the trace size at which compilation pays off.
+\item \textbf{Tiny traces} (bcast\_8): \texttt{plan}; there is nothing to amortize.
+\item \textbf{One-shot runs up to a few hundred thousand nodes}: \texttt{templated\_node}.
+\item \textbf{One-shot runs on large traces} (dissem\_16k): \texttt{orc}.
+\item \textbf{Repeated runs and long simulations}: \texttt{jit} (with a warm cache) or \texttt{orc}, which tie.
+\item \texttt{templated\_schema} matches the compiled runners without compiling anything, but only for layouts compiled in; here it covers the benchmark traces themselves. It serves as a reference, not as a choice for new traces.
 \end{itemize}
 
-All runs will use the same machine, compiler and settings, report medians and 95\% confidence intervals over repeated runs with cold and warm file caches, and save the scripts and trace identities for reproducibility.
+A sensible automatic choice would therefore be \texttt{plan} for tiny traces, \texttt{jit} when its cache already holds the trace's decoder, and otherwise \texttt{templated\_node} or \texttt{orc} by trace size. We have not implemented this yet.
+
+\hypertarget{conversion-time}{}
+\subsection{Conversion time}
+
+We timed the complete \texttt{txt2bin} process on the same GOAL text for the benchmark traces: the original converter (built from the last upstream commit, as in Section 5.3.2), our converter writing the legacy format, and our converter writing the self-describing format. The original and our legacy converter produce byte-identical files. Medians of five runs, all interleaved in a seeded random order, warm input cache, in milliseconds:
+
+\begin{center}
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Trace} & \textbf{Original} & \textbf{Ours, legacy} & \textbf{Ours, self-describing} \\
+\midrule
+bcast\_8 & 53 & 51 & 3.3 \\
+bcast\_1k & 63 & 119 & 7.3 \\
+bcast\_64k & 758 & 4527 & 247 \\
+dissem\_16k & 362 & 1462 & 333 \\
+ring\_256 & 138 & 187 & 252 \\
+alltoall\_256 & 74 & 136 & 82 \\
+wide\_64k & 779 & 4571 & 295 \\
+atlahs\_64k & n/a & n/a & 585 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The legacy format cannot store atlahs\_64k's custom fields. Despite reading the input twice, the self-describing converter is faster than the original on five of the seven traces and slower on ring\_256 (1.8\(\times\)) and, with its eight custom fields, on the recorded ATLAHS workload (19.5 instead of 6.5\,s, Section 5.3.2). Both legacy converters end with a system-wide \texttt{sync()}, which accounts for about 50\,ms even on the eight-rank trace; the self-describing writer closes its stream without one. Our legacy writer is up to 6\(\times\) slower than the original because it grows and remaps the output file for every rank, which dominates on traces with many ranks; this is a defect of our writer, not of the format, and remains to be fixed.
+
+\hypertarget{remaining-measurements}{}
+\subsection{Remaining measurements}
+
+The study above covers decoding on one laptop. The full benchmarking study is still outstanding, including:
+
+\begin{itemize}
+\item repeating all measurements on Euler (Linux, x86-64), including uncached JIT setup;
+\item peak memory of \texttt{txt2bin} for both formats, and conversion time on Linux;
+\item complete file sizes for bit-packed and byte-aligned layouts across schemas, including custom fields;
+\item peak simulation memory, and runs with cold file caches.
+\end{itemize}
 
 \hypertarget{limitations-and-future-work}{}
 \section{Limitations and future work}
 
-\textbf{Cheaper conversion.} Both passes currently run the full parser and build complete graphs. Section 3.2 compares lighter passes with alternatives that avoid the second text parse. Implementing and comparing these designs for conversion time, peak memory and temporary storage remains future work.
+\textbf{Cheaper conversion.} Both passes currently run the full parser and build complete graphs. Section 3.3 compares lighter passes with alternatives that avoid the second text parse. Implementing and comparing these designs for conversion time, peak memory and temporary storage remains future work.
 
-\textbf{Better compression.} Dictionary encoding, described in Section 3.2.1, remains a proposed alternative to offsets. Separately, the start-dependency position \texttt{sDepIx} always equals \texttt{depIx + nDep\allowbreak{}} and could be derived instead of stored.
+\textbf{Better compression.} Dictionary encoding, described in Section 3.3.1, remains a proposed alternative to offsets. Separately, the start-dependency position \texttt{sDepIx} always equals \texttt{depIx + nDep\allowbreak{}} and could be derived instead of stored.
 
 \textbf{Richer metadata.} The header does not yet describe units, which operations a field applies to, default values or provenance. A canonical schema hash would let decoders be cached by layout.
 
 \textbf{Standard field limits.} Standard fields are still limited by the parser and simulator types they are stored in, for example 32-bit tags and 8-bit CPU IDs; widening them requires changing those paths together, not only the file layout.
 
-\textbf{Runtime specialization and evaluation}, described in Sections 3.5 and 5, remain the main outstanding work.
+\textbf{Remaining decoding overhead.} Dependency indices are validated once at graph setup, ready-node buffers are reused, and starting or finishing a node reads only its dependency lists (Section 5.3.2). Excluding the 14-node trace, current replay medians span roughly 13--41\,ns per node against 7--27\,ns for legacy records; profiling points to dependency-list access and record lookup. The unused list reads are now removed. Repeated rank lookup, packed-index iteration and counter updates remain candidates for measurement; sampling alone does not establish memory latency as the cause.
+
+\textbf{Decoder selection.} The interpreted runner is the default and the others are selected with an environment variable; a command-line option would be more convenient, and Section 5.4 suggests choosing the runner automatically. Since a failed compilation or a missing template instantiation falls back to the interpreter, the adapters report which runner is in use (\texttt{get\_\allowbreak{}runner\_\allowbreak{}name}); LogGOPSim prints it, and the simulation tests run with every runner.
+
+\textbf{Evaluation.} The measurements in Sections 5.3--5.5 come from one laptop; Section 5.6 lists what remains.
+
+\textbf{Parallelization.} The simulator and converter are single-threaded. OpenMP parallelization and further optimizations are planned.
 
 \hypertarget{conclusion}{}
 \section{Conclusion}
 
-The project replaces LogGOPSim's fixed 39-byte binary trace with a self-describing format whose header names every field and gives its type, width and position. Producers can add custom fields without changing the format, readers validate at load time that a file supplies what each simulator needs, and fields are packed into only as many bits as their values require. The ATLAHS case study makes GPU and message identity explicit, replacing overloaded NICs and concatenated tags with validated fields and tuple-based matching. Correctness is established by the test suite against the original simulator. Runtime specialization and the performance evaluation remain to be completed.
+The project replaces LogGOPSim's fixed 39-byte binary trace with a self-describing format whose header names every field and gives its type, width and position. Producers can add custom fields without changing the format, readers validate at load time that a file supplies what each simulator needs, and fields are packed into only as many bits as their values require. The ATLAHS case study makes GPU and message identity explicit, replacing overloaded NICs and concatenated tags with validated fields and tuple-based matching. Correctness is established by the test suite against the original simulator. Runtime specialization recovers most of the decoding overhead: a decoder compiled for the file's schema decodes nodes 4--6\(\times\) faster than the generic decoder, with the current complete-simulation results reported in Section 5.3.1. Five runners share one decode plan behind a registry, and preliminary scenario benchmarks show that the best one depends on trace size and whether a run is one-shot or repeated (Section 5.4). The broader performance evaluation remains to be completed.
 
 \hypertarget{appendix-build-and-conversion}{}
 \section{Appendix: build and conversion}
 
-The header format is specified in \texttt{doc/\allowbreak{}binary\_\allowbreak{}header.\allowbreak{}md}. The project builds with CMake 3.20 or newer and C++23; the Makefile delegates to CMake. The tests run with \texttt{ctest} from the build directory; \texttt{ctest -\allowbreak{}L unit} runs only the fast unit tests and \texttt{ctest -\allowbreak{}L integratio\allowbreak{}n} the end-to-end checks. Convert a trace with:
+The header format is specified in \texttt{doc/\allowbreak{}binary\_\allowbreak{}header.\allowbreak{}md}. The project builds with CMake 3.20 or newer and C++23; the Makefile delegates to CMake. The tests run with \texttt{ctest} from the build directory; \texttt{ctest -\allowbreak{}L unit} runs only the fast unit tests and \texttt{ctest -\allowbreak{}L integratio\allowbreak{}n} the end-to-end checks. The benchmarks are in \texttt{bench/} and are described in \texttt{bench/\allowbreak{}README.\allowbreak{}md}; each runner's folder and how to add one are described in \texttt{src/\allowbreak{}LogGOPSim/\allowbreak{}binary\_\allowbreak{}reading/\allowbreak{}decoding/\allowbreak{}runners/\allowbreak{}README.\allowbreak{}md}. Convert a trace with:
 
 \begin{lstlisting}
 ./txt2bin -i example.goal -o example.bin --format self-describing --report-schema

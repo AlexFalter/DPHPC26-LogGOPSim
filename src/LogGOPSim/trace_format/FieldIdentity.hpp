@@ -12,8 +12,11 @@ namespace traceschema {
 // These values are binary format IDs. Never renumber existing fields.
 enum class FieldId : std::uint32_t {
     Type = 1, Peer = 2, Size = 3, Tag = 4, Cpu = 5, Nic = 6,
-    DependencyCount = 7, CompletionCount = 8, CompletionIndex = 9,
-    StartCount = 10, StartIndex = 11
+    DependencyCount = 7,
+    // Nodes released when this node finishes (GOAL "requires") and when it starts ("irequires"):
+    // how many there are and where their list begins in the rank's dependency array.
+    FinishDependentsCount = 8, FinishDependentsIndex = 9,
+    StartDependentsCount = 10, StartDependentsIndex = 11
 };
 
 // Operation codes shared by GOAL producers and consumers.
@@ -33,10 +36,10 @@ inline constexpr std::array standard_fields{
     StandardFieldDefinition{FieldId::Tag, "tag"},
     StandardFieldDefinition{FieldId::Cpu, "cpu"},
     StandardFieldDefinition{FieldId::Nic, "nic"},
-    StandardFieldDefinition{FieldId::CompletionCount, "nDep"},
-    StandardFieldDefinition{FieldId::CompletionIndex, "depIx"},
-    StandardFieldDefinition{FieldId::StartCount, "nSDep"},
-    StandardFieldDefinition{FieldId::StartIndex, "sDepIx"}};
+    StandardFieldDefinition{FieldId::FinishDependentsCount, "nDep"},
+    StandardFieldDefinition{FieldId::FinishDependentsIndex, "depIx"},
+    StandardFieldDefinition{FieldId::StartDependentsCount, "nSDep"},
+    StandardFieldDefinition{FieldId::StartDependentsIndex, "sDepIx"}};
 
 using FieldIdentity = std::variant<FieldId, std::string>;
 namespace schema_helpers {

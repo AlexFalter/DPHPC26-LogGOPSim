@@ -1,0 +1,38 @@
+% The PlanRunner interface and its implementations, in the style of schema-agreement.tex.
+\begin{tikzpicture}[
+  common/.style={box,fill=blue!8,text width=82mm,align=left,inner sep=3mm},
+  runner/.style={box,fill=green!12,text width=40mm,minimum height=15mm,font=\small},
+  source/.style={box,fill=orange!20,text width=24mm},
+  inherits/.style={-{Triangle[open,length=3mm,width=3mm]},thick}]
+% Class boxes: a header with the name, a body with one item per line.
+\node[draw=black!65,fill=blue!20,minimum width=46mm,minimum height=8mm,font=\small\bfseries] (decoderhead) at (0,0.9) {Decoder};
+\node[draw=black!65,fill=blue!6,text width=41mm,anchor=north,align=left,font=\small,inner sep=2.5mm] (decoderbody) at (decoderhead.south) {
+  resolves the fields\\
+  builds the \texttt{DecodePlan}\\
+  picks one runner};
+\node[fit=(decoderhead)(decoderbody),inner sep=0pt] (decoder) {};
+\node[draw=black!65,fill=blue!20,minimum width=98mm,minimum height=8mm,font=\small\bfseries] (basehead) at (8.9,0.9) {PlanRunner};
+\node[draw=black!65,fill=blue!6,text width=93mm,anchor=north,font=\small,inner sep=2.5mm] (basebody) at (basehead.south) {
+  \begin{tabular}{@{}ll@{}}
+  \texttt{plan}   & the \texttt{DecodePlan} \\
+  \texttt{decode(record)} & shared: safe reads near the end of the file \\
+  \texttt{run(record)}    & implemented by each runner
+  \end{tabular}};
+\node[fit=(basehead)(basebody),inner sep=0pt] (base) {};
+\draw[arrow] (decoder) -- node[above,font=\small] {uses one} (base);
+\foreach \x/\cls/\names [count=\k] in {
+    1.7/InterpretedRunner/plan,
+    6.3/CompiledRunner/{jit, orc},
+    10.9/TemplatedNodeRunner/templated\_node,
+    15.5/TemplatedSchemaRunner/templated\_schema} {
+  \node[runner] (r\k) at (\x,-3.8) {\textbf{\cls}\\\texttt{\names}};
+  \draw[thick] (r\k.north) -- (\x,-2.3);
+}
+% One inheritance arrow for all runners, as in UML.
+\draw[thick] (1.7,-2.3) -- (15.5,-2.3);
+\draw[inherits] (8.9,-2.3) -- node[right,font=\small] {implement the shared interface} (base.south);
+\node[source] (cc) at (4.8,-6.3) {C compiler\\\footnotesize\texttt{jit}, cached};
+\node[source] (llvm) at (7.9,-6.3) {LLVM ORC\\\footnotesize\texttt{orc}, in memory};
+\draw[arrow] (cc.north) -- (cc.north |- r2.south);
+\draw[arrow] (llvm.north) -- (llvm.north |- r2.south);
+\end{tikzpicture}

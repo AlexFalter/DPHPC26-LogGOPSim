@@ -1,0 +1,22 @@
+% Backward compatibility: one TraceReader picks the reader for the file's format; both take the
+% adapter's field bindings and fill the same node struct.
+\begin{tikzpicture}[
+  reader/.style={box,fill=green!12,text width=50mm,minimum height=17mm},
+  file/.style={inputbox,text width=34mm,minimum height=17mm},
+  adapter/.style={box,fill=blue!8,text width=52mm,align=left,inner sep=3mm}]
+\node[file] (legacy) at (0,0) {\textbf{Legacy file}\\magic 4223\\fixed 39-byte\\records};
+\node[file] (sd) at (0,-2.6) {\textbf{Self-describing file}\\binary header};
+\node[reader] (lr) at (5.6,0) {\textbf{LegacyTraceReader}\\fixed positions of the\\six standard fields};
+\node[reader] (sr) at (5.6,-2.6) {\textbf{SelfDescribingTraceReader}\\header + decode plan,\\standard and custom fields};
+\draw[arrow] (legacy) -- (lr);
+\draw[arrow] (sd) -- (sr);
+\begin{scope}[on background layer]
+  \node[draw=black!50,dashed,rounded corners=4pt,fill=black!3,inner sep=3mm,
+        fit=(lr)(sr),label={[font=\small\bfseries]above:TraceReader: chosen by magic number}] (tr) {};
+\end{scope}
+\node[adapter] (ad) at (12.6,-1.3) {
+  \textbf{Adapter}: same bindings,\\same node struct\\[4pt]
+  \small\texttt{is\_legacy()}: bind only\\\small standard fields\\[4pt]
+  \small ATLAHS, legacy:\\\small\quad\texttt{nic} $\rightarrow$ GPU, peer GPU\\\small\quad\texttt{cpu} $\rightarrow$ stream\\\small\quad tag matching};
+\draw[arrow] (tr.east |- ad.west) -- (ad.west);
+\end{tikzpicture}

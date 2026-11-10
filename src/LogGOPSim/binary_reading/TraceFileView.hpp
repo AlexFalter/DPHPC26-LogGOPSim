@@ -2,7 +2,7 @@
 #define LOGGOPSIM_TRACEFILEVIEW_HPP
 
 #include "trace_format/BinaryFormat.hpp"
-#include "trace_format/NodeIndexView.hpp"
+#include "binary_reading/DependencyListView.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -22,7 +22,17 @@ public:
     [[nodiscard]] std::uint32_t get_root_count(std::uint32_t rank) const;
     [[nodiscard]] std::uint32_t read_root(std::uint32_t rank, std::uint32_t index) const;
     [[nodiscard]] std::span<std::byte> get_node_record_bytes(std::uint32_t rank, std::uint32_t index) const;
-    [[nodiscard]] NodeIndexView read_dependents(
+    // Mapped bytes from the start of a record to the end of the file; fast decoders may read
+    // past the record itself.
+    [[nodiscard]] std::size_t get_readable_bytes(std::span<const std::byte> record) const {
+        return static_cast<std::size_t>(file_end_ - record.data());
+    }
+    // Graph setup checks every appendix index once. Dependency storage must
+    // remain unchanged afterwards; counter updates touch only node records.
+    void validate_dependency_indices();
+    // A slice of the rank's dependency list; entries are decoded when iterated. The whole list
+    // is checked once by validate_dependency_indices, which must be called first.
+    [[nodiscard]] DependencyListView get_dependents(
         std::uint32_t rank, std::uint64_t begin, std::uint64_t count) const;
 
 private:
@@ -34,15 +44,17 @@ private:
     };
 
     BinaryHeader header_;
+    std::size_t record_size_bytes_; // fixed by the layout; computed once
     std::vector<RankSections> ranks_;
+    const std::byte* file_end_;
+    bool dependency_indices_validated_ = false;
 
-    void initialize_ranks(std::span<std::byte> file);
+    void read_rank_table(std::span<std::byte> file);
     void validate_rank_entry(const RankTableEntry& entry, std::uint64_t minimum_offset,
                              std::size_t file_size) const;
-    [[nodiscard]] RankSections get_next_rank_sections(std::span<std::byte>& remaining,
-                                                      const RankTableEntry& entry) const;
-    [[nodiscard]] std::uint32_t read_index(std::span<const std::byte> bytes, std::uint32_t index,
-                                         std::uint32_t count, std::uint32_t node_count) const;
+    // Cuts the rank's node records, dependency list and roots off the front of remaining.
+    [[nodiscard]] RankSections take_rank_sections(std::span<std::byte>& remaining,
+                                                  const RankTableEntry& entry) const;
 };
 
 } // namespace traceschema

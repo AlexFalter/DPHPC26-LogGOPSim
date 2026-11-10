@@ -1,0 +1,23 @@
+\begin{tikzpicture}[
+  cell/.style={draw=black!65,minimum height=7mm,font=\small,inner sep=2pt},
+  other/.style={cell,minimum width=9mm,fill=black!6},
+  entry/.style={cell,minimum width=16mm,fill=blue!12,line width=0.9pt},
+  bit/.style={cell,minimum width=6mm,fill=orange!25,line width=0.9pt,font=\small\ttfamily}]
+\node[font=\small\bfseries,anchor=east] at (-0.2,0) {Header};
+\node[other,anchor=west] (h1) at (0,0) {};
+\node[entry,right=0mm of h1] (d0) {1};
+\node[entry,right=0mm of d0] (d1) {1000000};
+\node[other,right=0mm of d1] (h2) {};
+\node[font=\scriptsize,below=0.5mm of d0] {[0]};
+\node[font=\scriptsize,below=0.5mm of d1] {[1]};
+\node[font=\scriptsize,above=0.5mm of d0] {dictionary};
+\node[font=\small\bfseries,anchor=east] at (-0.2,-1.9) {Record};
+\node[other,anchor=west] (r1) at (0,-1.9) {};
+\node[other,right=0mm of r1] (r2) {};
+\node[other,right=0mm of r2] (r3) {};
+\node[bit,right=0mm of r3] (f1) {1};
+\node[font=\scriptsize,above=0.5mm of f1.north] {index = 1 (1 bit)};
+\node[outputbox,text width=40mm,right=10mm of h2.east,yshift=-9.5mm] (value) {value = dictionary[index]\\dictionary[1] = \textbf{1000000}};
+\draw[arrow] (d1.north) -- ++(0,2.5mm) -| (value.north);
+\draw[arrow] (f1.east) -| (value.south);
+\end{tikzpicture}

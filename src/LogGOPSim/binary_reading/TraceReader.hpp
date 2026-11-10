@@ -1,46 +1,55 @@
 #ifndef LOGGOPSIM_TRACEREADER_HPP
 #define LOGGOPSIM_TRACEREADER_HPP
 
-#include "binary_reading/TraceFileView.hpp"
-#include "binary_reading/DecodePlan.hpp"
-#include "binary_reading/JitDecoder.hpp"
-#include "binary_reading/NodeDecoder.hpp"
-#include "simulators/BaseDeserializedGraphNode.hpp"
-#include "binary_reading/FieldBindings.hpp"
+#include "binary_reading/LegacyTraceReader.hpp"
+#include "binary_reading/SelfDescribingTraceReader.hpp"
 
-#include <any>
 #include <concepts>
-#include <functional>
-#include <type_traits>
-#include <initializer_list>
 #include <cstddef>
 #include <cstdint>
-#include <optional>
+#include <functional>
+#include <initializer_list>
 #include <span>
-#include <stdexcept>
+#include <string_view>
+#include <type_traits>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace traceschema {
 
-// Views mapped file storage; the caller keeps that mapping alive and writable.
-// Returned graph nodes borrow dependency lists from the mapping too.
-// Resolves only the fields requested by this consumer, whether standard or custom.
+enum class TraceFormat { Legacy, SelfDescribing };
+
+// The format named by the file's magic number. Throws for files invalidated by a simulation run
+// with --save-mem and for unknown formats.
+[[nodiscard]] TraceFormat detect_trace_format(std::span<const std::byte> file);
+
+// Reads a trace in either format through the same field bindings: the format is detected from
+// the magic number, and the reader for it is created once. Legacy files hold only the standard
+// fields; is_legacy() lets a consumer bind just those. Views mapped storage; the caller keeps it
+// alive and writable.
 class TraceReader {
+    // Defined first: the forwarding functions below deduce their return types from it. The
+    // constructor always emplaces a reader, so the monostate is never visited.
+    template<class Function>
+    decltype(auto) visit(Function&& function) const {
+        if (const auto* legacy = std::get_if<LegacyTraceReader>(&reader_)) return function(*legacy);
+        return function(std::get<SelfDescribingTraceReader>(reader_));
+    }
+    template<class Function>
+    decltype(auto) visit(Function&& function) {
+        if (auto* legacy = std::get_if<LegacyTraceReader>(&reader_)) return function(*legacy);
+        return function(std::get<SelfDescribingTraceReader>(reader_));
+    }
+
 public:
-    TraceReader(std::span<std::byte> file, const FieldRequirements& requirements);
     template<class Output>
     TraceReader(std::span<std::byte> file, std::vector<FieldBinding<Output>> bindings,
-                std::type_identity_t<std::function<void(const Output&)>> validate_node = {})
-        : TraceReader(file, get_node_requirements<Output>(bindings)) {
-        validate_field_bindings<Output>(bindings, get_selected_fields());
-        if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>) {
-            const auto& dependencies = get_dependency_bindings();
-            validate_field_bindings<DecodedDependencyFields>(dependencies, get_selected_fields().subspan(bindings.size()));
-            set_dependency_counter(FieldId::DependencyCount);
-        }
-        create_plan<Output>(bindings);
-        bindings_ = NodeOutputBindings<Output>{std::move(bindings), std::move(validate_node)};
+                std::type_identity_t<std::function<void(const Output&)>> validate_node = {}) {
+        if (detect_trace_format(file) == TraceFormat::Legacy)
+            reader_.emplace<LegacyTraceReader>(file, std::move(bindings), std::move(validate_node));
+        else
+            reader_.emplace<SelfDescribingTraceReader>(file, std::move(bindings), std::move(validate_node));
     }
 
     template<class Output>
@@ -48,148 +57,51 @@ public:
                 std::type_identity_t<std::function<void(const Output&)>> validate_node = {})
         : TraceReader(file, std::vector<FieldBinding<Output>>(bindings), std::move(validate_node)) {}
 
-    ~TraceReader() = default;
     TraceReader(const TraceReader&) = delete;
     TraceReader& operator=(const TraceReader&) = delete;
 
-    [[nodiscard]] std::uint32_t get_rank_count() const { return file_.get_rank_count(); }
-    [[nodiscard]] std::uint32_t get_node_count(std::uint32_t rank) const { return file_.get_node_count(rank); }
-    [[nodiscard]] std::uint32_t get_root_count(std::uint32_t rank) const { return file_.get_root_count(rank); }
-    [[nodiscard]] std::uint32_t read_root(std::uint32_t rank, std::uint32_t index) const {
-        return file_.read_root(rank, index);
+    [[nodiscard]] bool is_legacy() const { return std::holds_alternative<LegacyTraceReader>(reader_); }
+
+    [[nodiscard]] std::uint32_t get_rank_count() const {
+        return visit([](const auto& reader) { return reader.get_rank_count(); });
     }
-    [[nodiscard]] std::span<const FieldStorageInfo> get_selected_fields() const { return decoder_.get_selected_fields(); }
-    // Values follow requirement order; the caller may reuse an output buffer.
-    [[nodiscard]] std::vector<FieldValue> read_fields(std::uint32_t rank, std::uint32_t index) const;
-    void read_fields_into(std::uint32_t rank, std::uint32_t index, std::span<FieldValue> output) const;
+    [[nodiscard]] std::uint32_t get_node_count(std::uint32_t rank) const {
+        return visit([&](const auto& reader) { return reader.get_node_count(rank); });
+    }
+    [[nodiscard]] std::uint32_t get_root_count(std::uint32_t rank) const {
+        return visit([&](const auto& reader) { return reader.get_root_count(rank); });
+    }
+    [[nodiscard]] std::uint32_t read_root(std::uint32_t rank, std::uint32_t index) const {
+        return visit([&](const auto& reader) { return reader.read_root(rank, index); });
+    }
+    // The plan runner decoding a self-describing file, or "legacy".
+    [[nodiscard]] std::string_view get_runner_name() const {
+        return visit([](const auto& reader) { return reader.get_runner_name(); });
+    }
+
     template<class Output>
     [[nodiscard]] Output read_node(std::uint32_t rank, std::uint32_t index) const {
-        Output output{};
-        read_node_into(rank, index, output);
-        return output;
+        return visit([&](const auto& reader) { return reader.template read_node<Output>(rank, index); });
     }
-
-    template<class Output>
-    void read_node_into(std::uint32_t rank, std::uint32_t index, Output& output) const {
-        const auto& bindings = get_node_output_bindings<Output>();
-        const auto record = file_.get_node_record_bytes(rank, index);
-        DecodedDependencyFields graph{};
-        std::byte* const targets[] = {reinterpret_cast<std::byte*>(&output), reinterpret_cast<std::byte*>(&graph)};
-        if (!plan_ || static_cast<std::size_t>(file_end_ - record.data()) < plan_->get_load_extent() ||
-            !(jit_ ? jit_(record.data(), targets) : plan_->decode(record.data(), targets)))
-            graph = decode_selected_fields(record, bindings, output);
-        if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>)
-            populate_graph_node(output, graph, rank, index);
-        if (bindings.validate_output) bindings.validate_output(output);
-    }
-
-    // Preserve the concrete node type while loading and validating roots once.
     template<std::derived_from<BaseDeserializedGraphNode> Node>
     [[nodiscard]] std::vector<Node> read_root_nodes(std::uint32_t rank) const {
-        const auto root_count = get_root_count(rank);
-        std::vector<Node> nodes;
-        nodes.reserve(root_count);
-        std::uint32_t previous_root = 0;
-        for (std::uint32_t index = 0; index < root_count; ++index) {
-            const auto root = read_root(rank, index);
-            if (index != 0 && root <= previous_root)
-                throw std::invalid_argument("Root indices must be ordered and distinct");
-            Node node = read_node<Node>(rank, root);
-            if (node.DependenciesCnt != 0)
-                throw std::invalid_argument("Root node must have zero dependencies");
-            nodes.push_back(std::move(node));
-            previous_root = root;
-        }
-        return nodes;
+        return visit([&](const auto& reader) { return reader.template read_root_nodes<Node>(rank); });
     }
-
-    // Configure once before mutation; the unsigned counter must represent zero and have no wildcard.
-    void set_dependency_counter(FieldIdentity field);
-    std::uint64_t decrement_dependency_count(std::uint32_t rank, std::uint32_t index);
-    [[nodiscard]] std::uint64_t get_resource_count(FieldIdentity field) const;
+    // The dependency list released by this event, without decoding the node.
+    [[nodiscard]] DependencyListView read_dependents(
+        std::uint32_t rank, std::uint32_t index, DependencyEvent event) const {
+        return visit([&](const auto& reader) { return reader.read_dependents(rank, index, event); });
+    }
+    std::uint64_t decrement_dependency_count(std::uint32_t rank, std::uint32_t index) {
+        return visit([&](auto& reader) { return reader.decrement_dependency_count(rank, index); });
+    }
+    [[nodiscard]] std::uint64_t get_resource_count(const FieldIdentity& field) const {
+        return visit([&](const auto& reader) { return reader.get_resource_count(field); });
+    }
 
 private:
-    struct DecodedDependencyFields {
-        std::uint32_t dependency_count = 0;
-        std::uint32_t completion_count = 0;
-        std::uint32_t completion_begin = 0;
-        std::uint32_t start_count = 0;
-        std::uint32_t start_begin = 0;
-    };
-
-    template<class Output>
-    struct NodeOutputBindings {
-        std::vector<FieldBinding<Output>> fields;
-        std::function<void(const Output&)> validate_output;
-    };
-
-    template<class Output>
-    [[nodiscard]] static FieldRequirements get_node_requirements(
-        std::span<const FieldBinding<Output>> bindings) {
-        auto requirements = get_field_requirements<Output>(bindings);
-        if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>) {
-            const auto dependencies = get_field_requirements<DecodedDependencyFields>(get_dependency_bindings());
-            requirements.insert(requirements.end(), dependencies.begin(), dependencies.end());
-        }
-        return requirements;
-    }
-
-    template<class Output>
-    [[nodiscard]] const NodeOutputBindings<Output>& get_node_output_bindings() const {
-        const auto* bindings = std::any_cast<NodeOutputBindings<Output>>(&bindings_);
-        if (!bindings) throw std::invalid_argument("Reader has no bindings for this output type");
-        return *bindings;
-    }
-
-    template<class Output>
-    [[nodiscard]] DecodedDependencyFields decode_selected_fields(
-        std::span<const std::byte> record, const NodeOutputBindings<Output>& bindings,
-        Output& output) const {
-        DecodedDependencyFields graph{};
-        decoder_.decode_fields(record, [&](std::size_t position, const FieldStorageInfo&, FieldValue value) {
-            if (position < bindings.fields.size()) {
-                bindings.fields[position].assign(output, value);
-            } else if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>) {
-                get_dependency_bindings()[position - bindings.fields.size()].assign(graph, value);
-            }
-        });
-        return graph;
-    }
-
-    template<class Output>
-    void create_plan(std::span<const FieldBinding<Output>> bindings) {
-        if (get_decoder_kind() == DecoderKind::Generic) return;
-        std::vector<FieldDestination> destinations;
-        const auto add = [&]<class Target>(std::uint8_t target, std::span<const FieldBinding<Target>> targets) {
-            for (const auto& binding : targets)
-                destinations.push_back({target, binding.destination_offset, binding.destination_size,
-                    binding.wildcard_destination ? integer_to_bits(*binding.wildcard_destination) : 0});
-        };
-        add(std::uint8_t{0}, bindings);
-        if constexpr (std::derived_from<Output, BaseDeserializedGraphNode>)
-            add(std::uint8_t{1}, std::span<const FieldBinding<DecodedDependencyFields>>(get_dependency_bindings()));
-        plan_ = DecodePlan::create(get_selected_fields(), destinations);
-        if (plan_ && get_decoder_kind() == DecoderKind::Jit) jit_ = load_jit_decoder(*plan_);
-    }
-
-    enum class DecoderKind { Generic, Plan, Jit };
-    // LOGGOPSIM_DECODER=generic|plan|jit, default generic.
-    [[nodiscard]] static DecoderKind get_decoder_kind();
-    [[nodiscard]] static const std::vector<FieldBinding<DecodedDependencyFields>>& get_dependency_bindings();
-    void populate_graph_node(BaseDeserializedGraphNode& node, const DecodedDependencyFields& fields,
-                             std::uint32_t rank, std::uint32_t index) const;
-
-    // Retains the binding output type so reads cannot assign into an unrelated struct.
-    std::any bindings_;
-    TraceFileView file_;
-    NodeDecoder decoder_;
-    std::optional<FieldStorageInfo> dependency_counter_;
-    std::optional<DecodePlan> plan_;
-    JitDecodeFunction jit_ = nullptr;
-    std::optional<DecodePlan::Step> counter_step_;
-    const std::byte* file_end_;
-
-    [[nodiscard]] const FieldStorageInfo& require_unsigned_field(const FieldIdentity& field) const;
+    // Neither reader is movable, so both are built in place.
+    std::variant<std::monostate, SelfDescribingTraceReader, LegacyTraceReader> reader_;
 };
 
 } // namespace traceschema

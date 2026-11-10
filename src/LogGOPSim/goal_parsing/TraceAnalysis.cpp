@@ -1,4 +1,5 @@
 #include "goal_parsing/TraceAnalysis.hpp"
+#include "goal_parsing/Goal.hpp"
 #include "trace_format/BinaryIO.hpp"
 #include "goal_parsing/CustomFields.hpp"
 
@@ -8,6 +9,24 @@
 #include <stdexcept>
 
 namespace traceschema {
+
+void TraceAnalysis::observe_rank(const Goal& goal) {
+    using traceschema::FieldId;
+    uint64_t roots = 0, edges = 0;
+    for (const auto* node : goal.GetNodes()) {
+        observe_custom_values(node->custom_values);
+        for (const auto& definition : traceschema::standard_fields) {
+            const auto id = definition.id;
+            if (node->Type == std::to_underlying(traceschema::OperationType::Calculation) && (id == FieldId::Peer || id == FieldId::Tag)) continue;
+            const auto value = traceschema::get_node_field_value(*node, id, edges);
+            if (std::holds_alternative<traceschema::Wildcard>(value)) observe_wildcard(id);
+            else observe(id, std::get<std::uint64_t>(value));
+        }
+        if (node->is_root()) ++roots;
+        edges += node->finish_dependents.size() + node->start_dependents.size();
+    }
+    finish_rank(goal.GetNodes().size(), roots, edges);
+}
 
 TraceAnalysis::TraceAnalysis(std::vector<FieldValueInfo> custom_fields)
     : custom_fields_(std::move(custom_fields)) {

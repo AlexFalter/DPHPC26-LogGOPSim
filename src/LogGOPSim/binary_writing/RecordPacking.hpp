@@ -18,9 +18,8 @@ class RecordPacker {
 public:
     explicit RecordPacker(RecordLayout schema);
 
-    // Packing clears padding and writes exactly one complete record.
-    [[nodiscard]] std::vector<std::byte> pack(const RecordValues& values) const;
-    void pack_into(std::span<const FieldValue> values, std::span<std::byte> destination) const;
+    // Packing clears padding and writes exactly one complete record into destination.
+    void pack(std::span<const FieldValue> values, std::span<std::byte> destination) const;
     [[nodiscard]] const RecordLayout& get_layout() const { return schema_; }
 
 private:

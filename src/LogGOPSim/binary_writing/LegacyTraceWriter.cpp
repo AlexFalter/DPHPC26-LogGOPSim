@@ -1,6 +1,8 @@
 #include "binary_writing/LegacyTraceWriter.hpp"
 #include "goal_parsing/Goal.hpp"
 #include "trace_format/BinaryFormat.hpp"
+#include "trace_format/LegacyFormat.hpp"
+#include "trace_format/BinaryIO.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -15,19 +17,16 @@ namespace {
 
 // Legacy files store consecutive native-endian integers without struct padding.
 template <class Integer> void append_native(char *&position, Integer value) {
-    std::memcpy(position, &value, sizeof(value));
+    write_native(reinterpret_cast<std::byte*>(position), value);
     position += sizeof(value);
 }
 
-constexpr std::uint64_t legacy_record_bytes = 39;
-constexpr std::uint64_t legacy_prefix_bytes =
-    sizeof(std::uint64_t) + sizeof(std::uint32_t) + 2 * sizeof(std::uint8_t);
 
 } // namespace
 
 LegacyTraceWriter::LegacyTraceWriter(const char *filename, std::uint32_t rank_count)
     : fd_(open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)), rank_count_(rank_count),
-      file_size_(legacy_prefix_bytes + std::uint64_t{rank_count} * 2 * sizeof(std::uint64_t)) {
+      file_size_(legacy_format::prefix_bytes + std::uint64_t{rank_count} * legacy_format::rank_table_entry_bytes) {
     if (fd_ < 0)
         throw std::runtime_error("Cannot open legacy output file");
 }
@@ -47,8 +46,8 @@ void LegacyTraceWriter::write_rank(const Goal &graph) {
     const auto &nodes = graph.GetNodes();
     const auto root_count = graph.GetRootCount();
     const auto begin = file_size_;
-    file_size_ += 2 * sizeof(std::uint32_t) + std::uint64_t{root_count} * sizeof(std::uint32_t) +
-                  nodes.size() * legacy_record_bytes +
+    file_size_ += legacy_format::rank_prefix_bytes + std::uint64_t{root_count} * sizeof(std::uint32_t) +
+                  nodes.size() * legacy_format::record_bytes +
                   std::uint64_t{graph.GetDependencyCount()} * sizeof(std::uint32_t);
     if (ftruncate(fd_, file_size_) != 0)
         throw std::runtime_error("Cannot resize legacy output file");
@@ -62,33 +61,37 @@ void LegacyTraceWriter::write_rank(const Goal &graph) {
     append_native(position, root_count);
     for (const auto *node : nodes)
         if (node->is_root())
-            append_native(position, node->offset);
+            append_native(position, node->node_index);
 
     std::uint32_t dependency_index = 0;
     for (const auto *node : nodes) {
-        append_native(position, node->DependenciesCnt);
-        append_native(position, node->Type);
-        append_native(position, node->Peer);
-        append_native(position, node->Size);
-        append_native(position, node->Tag);
-        append_native(position, node->Proc);
-        append_native(position, node->Nic);
-        const auto completion_count = static_cast<std::uint32_t>(node->DependOnMe.size());
-        const auto start_count = static_cast<std::uint32_t>(node->StartDependOnMe.size());
-        append_native(position, completion_count);
-        append_native(position, dependency_index);
-        dependency_index += completion_count;
-        append_native(position, start_count);
-        append_native(position, dependency_index);
+        const auto store = [&](std::size_t offset, auto value) {
+            write_native(reinterpret_cast<std::byte*>(position) + offset, value);
+        };
+        store(legacy_format::dependency_count_offset, node->dependency_count);
+        store(legacy_format::type_offset, node->Type);
+        store(legacy_format::peer_offset, node->Peer);
+        store(legacy_format::size_offset, node->Size);
+        store(legacy_format::tag_offset, node->Tag);
+        store(legacy_format::cpu_field_offset, node->Proc);
+        store(legacy_format::nic_field_offset, node->Nic);
+        const auto finish_count = static_cast<std::uint32_t>(node->finish_dependents.size());
+        const auto start_count = static_cast<std::uint32_t>(node->start_dependents.size());
+        store(legacy_format::finish_count_offset, finish_count);
+        store(legacy_format::finish_begin_offset, dependency_index);
+        dependency_index += finish_count;
+        store(legacy_format::start_count_offset, start_count);
+        store(legacy_format::start_begin_offset, dependency_index);
         dependency_index += start_count;
+        position += legacy_format::record_bytes;
         max_cpu_ = std::max(max_cpu_, node->Proc);
         max_nic_ = std::max(max_nic_, node->Nic);
     }
     for (const auto *node : nodes) {
-        for (const auto *dependent : node->DependOnMe)
-            append_native(position, dependent->offset);
-        for (const auto *dependent : node->StartDependOnMe)
-            append_native(position, dependent->offset);
+        for (const auto *dependent : node->finish_dependents)
+            append_native(position, dependent->node_index);
+        for (const auto *dependent : node->start_dependents)
+            append_native(position, dependent->node_index);
     }
 
     position = mapping;
@@ -96,7 +99,7 @@ void LegacyTraceWriter::write_rank(const Goal &graph) {
     append_native(position, rank_count_);
     append_native(position, max_cpu_);
     append_native(position, max_nic_);
-    position += std::uint64_t{ranks_written_} * 2 * sizeof(std::uint64_t);
+    position += std::uint64_t{ranks_written_} * legacy_format::rank_table_entry_bytes;
     // Legacy rank-table offsets are relative to the bytes after the magic.
     append_native(position, begin - sizeof(std::uint64_t));
     append_native(position, file_size_ - sizeof(std::uint64_t));

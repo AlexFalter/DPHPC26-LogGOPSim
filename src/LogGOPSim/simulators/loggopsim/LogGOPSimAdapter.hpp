@@ -20,6 +20,8 @@ namespace traceschema {
 class LogGOPSimAdapter final : public SimulatorAdapter<LogGOPSimNode> {
 public:
     explicit LogGOPSimAdapter(std::span<std::byte> file);
+    explicit LogGOPSimAdapter(std::shared_ptr<MappedTraceFile> file);
+    explicit LogGOPSimAdapter(const char* filename, bool shared = false);
 };
 
 } // namespace traceschema

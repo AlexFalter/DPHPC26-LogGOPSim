@@ -1,5 +1,4 @@
 #include "goal_parsing/GoalReader.hpp"
-#include "binary_writing/RankPacking.hpp"
 #include "goal_parsing/TraceAnalysis.hpp"
 #include "goal_parsing/CustomFields.hpp"
 #include "binary_writing/TraceWriter.hpp"
@@ -17,24 +16,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
-static void collect_graph_statistics(const Goal& goal, traceschema::TraceAnalysis& schema_statistics) {
-    using traceschema::FieldId;
-    uint64_t roots = 0, edges = 0;
-    for (const auto* node : goal.GetNodes()) {
-        schema_statistics.observe_custom_values(node->custom_values);
-        for (const auto& definition : traceschema::standard_fields) {
-            const auto id = definition.id;
-            if (node->Type == std::to_underlying(traceschema::OperationType::Calculation) && (id == FieldId::Peer || id == FieldId::Tag)) continue;
-            const auto value = traceschema::get_node_field_value(*node, id, edges);
-            if (std::holds_alternative<traceschema::Wildcard>(value)) schema_statistics.observe_wildcard(id);
-            else schema_statistics.observe(id, std::get<std::uint64_t>(value));
-        }
-        if (node->is_root()) ++roots;
-        edges += node->DependOnMe.size() + node->StartDependOnMe.size();
-    }
-    schema_statistics.finish_rank(goal.GetNodes().size(), roots, edges);
-}
 
 static void report_progress(std::uint32_t completed, std::uint32_t total,
                             std::string_view phase, int& last_progress) {
@@ -85,7 +66,7 @@ int main(int argc, char** argv) try {
     std::unique_ptr<traceschema::LegacyTraceWriter> legacy_writer;
     process_ranks(reader, args.progress_given, self_describing ? "analysed" : "converted",
         [&](Goal& graph) {
-            collect_graph_statistics(graph, statistics);
+            statistics.observe_rank(graph);
             if (!self_describing) {
                 if (!legacy_writer)
                     legacy_writer = std::make_unique<traceschema::LegacyTraceWriter>(

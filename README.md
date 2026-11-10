@@ -112,8 +112,42 @@ Tests
 
 From the build directory, `ctest` runs all tests, `ctest -L unit` only the fast
 unit tests and `ctest -L integration` the end-to-end conversion and simulation
-checks. The optional ATLAHS integration is built and tested with
-`-DBUILD_ATLAHS=ON`; see `src/LogGOPSim/simulators/atlahs/README.md`.
+checks. The optional ATLAHS integration defaults to `OFF`. Enable it with
+`-DBUILD_ATLAHS=ON`; the normal build then includes its backend and tests; see `src/LogGOPSim/simulators/atlahs/README.md`.
+
+- `tests/unit/`: GoogleTest tests of the C++ code, which CMake fetches unless version 1.15
+  or newer is installed. `ctest` lists each test case, so `ctest -R 'TraceReaderTest\.'`
+  runs one suite; each program also runs on its own, for example
+  `./test_decode_plan --gtest_filter='*orc*'`. Shared helpers are in `TestHelpers.hpp`.
+- `tests/integration/`: pytest tests that run the built programs (converter, LogGOPSim and
+  ATLAHS's NDP simulator) and compare their output; `ctest` runs one test per file. They
+  need pytest (`pip install -r tests/integration/requirements.txt`) in the interpreter of
+  CMake's `TEST_PYTHON`; without it, CMake does not register them. From the repository
+  root, `python3 -m pytest tests/integration` runs them against `build/`, and
+  `-k eager` selects single cases. Fixtures and helpers are in `conftest.py` and
+  `helpers.py`.
+- `tests/data/`: custom-field declarations, saved reference results and the list of
+  recorded ATLAHS traces, used by both.
+
+The generator/converter/simulator smoke checks and MPI wrapper checks run in
+fresh temporary directories. Missing core programs fail. ATLAHS-specific unit and integration tests are
+disabled unless `BUILD_ATLAHS=ON`; direct pytest runs also honor this build
+setting, even if old backend binaries remain. Enabled CTest runs require the
+ATLAHS inputs and executable.
+The runner correctness checks verify the selected decoder and compare complete
+simulations with the legacy format. They do not measure speed; that belongs in
+`bench/`. `LOGGOPSIM_TRACE_DECODER=1` prints the actual decoder to stderr.
+
+Benchmarks
+==========
+
+`bench/` holds the decoding benchmarks (Google Benchmark), a profiling script and the
+end-to-end decode-share measurement; see [`bench/README.md`](bench/README.md). In short:
+
+```sh
+cmake --build build --target bench_traces decode_bench
+build/bench/decode_bench --benchmark_filter='^ReadNodes/'
+```
 
 Project report
 ==============
@@ -138,7 +172,7 @@ Further documentation
 * `doc/binary_header.md`: the self-describing binary format.
 * `src/LogGOPSim/simulators/README.md`: connecting a simulator to the binary reader.
 * `src/LogGOPSim/simulators/atlahs/README.md`: the ATLAHS integration.
-* `tests/reference/README.md`: the saved reference results.
+* `tests/data/reference/README.md`: the saved reference results.
 
 Behaviour changes compared with upstream LogGOPSim
 ==================================================

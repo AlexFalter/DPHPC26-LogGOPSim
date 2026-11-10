@@ -8,6 +8,8 @@
 #include <ostream>
 #include <span>
 
+class Goal;
+
 namespace traceschema {
 
 enum class ReportedLayoutUsage { ProposedOnly, UsedInOutput };
@@ -15,6 +17,7 @@ enum class ReportedLayoutUsage { ProposedOnly, UsedInOutput };
 class TraceAnalysis {
 public:
     explicit TraceAnalysis(std::vector<FieldValueInfo> custom_fields = {});
+    void observe_rank(const Goal& goal);
     void observe_custom_values(std::span<const FieldValue> values);
     void observe(FieldId field, std::uint64_t value);
     void observe_wildcard(FieldId field);

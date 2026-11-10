@@ -1,0 +1,12 @@
+\begin{tikzpicture}[
+  gpu/.style={draw=black!65,rounded corners=2pt,minimum width=9mm,minimum height=7mm,font=\small,fill=blue!8},
+  host/.style={draw=black!40,rounded corners=4pt,inner sep=3mm}]
+\foreach \i in {0,...,3} {
+  \node[gpu] (a\i) at (0,-\i*0.95) {GPU \i};
+  \node[gpu] (b\i) at (3.6,-\i*0.95) {GPU \i};
+}
+\node[host,fit=(a0)(a3),label=above:{\small Host A}] {};
+\node[host,fit=(b0)(b3),label=above:{\small Host B}] {};
+\draw[arrow,green!50!black] (a0.east) -- node[pos=0.5,below,sloped,font=\scriptsize]{intended} (b2.west);
+\draw[arrow,red!70!black,dashed] (a0.east) -- node[above,font=\scriptsize]{upstream} (b0.west);
+\end{tikzpicture}
