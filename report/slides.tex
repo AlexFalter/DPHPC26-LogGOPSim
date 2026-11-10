@@ -75,6 +75,7 @@
 \item \textbf{Task:} the problem, our goals, who did what, structure of our implementation.
 \item \textbf{Self-describing format:} file layout, encodings, conversion.
 \item \textbf{Parallel conversion:} the first pass on OpenMP threads.
+\item \textbf{Lazy decoding:} decode each node once, never write the schedule.
 \item \textbf{Reading and validation:} simulator adapters, errors before the simulation starts.
 \item \textbf{Case study: ATLAHS:} explicit GPU and message fields, two scheduler fixes.
 \item \textbf{Fast decoding:} why it matters, one decode plan, five runners.
@@ -130,7 +131,7 @@ Benchmarking & Smaller and faster than legacy? & preliminary results; full study
 \textbf{Name} & \textbf{Work} \\
 \midrule
 Joshua Durrant & Full benchmarking study (upcoming) \\
-Alexander Falter & OpenMP-parallel first conversion pass (parallel GOAL reader, mergeable statistics, \texttt{-{}-threads}), its differential tests and benchmark \\
+Alexander Falter & OpenMP-parallel first conversion pass (parallel GOAL reader, mergeable statistics, \texttt{-{}-threads}), its differential tests and benchmark; legacy writer without remapping; lazy decoding in LogGOPSim (\texttt{-{}-lazy-decoding}) \\
 Samuel Garcin & Decode replay benchmark, decode plan (optimized interpreter), C JIT with cache, in-process JIT with LLVM ORC, differential test against the generic decoder \\
 Mykhaylo Gershman & Self-describing format and converter, bit packing (including 0-bit constant fields), custom fields, validating reader and simulator adapters, LogGOPSim restructuring, ATLAHS integration, runner architecture and registry, templated runners, test suite (GoogleTest, pytest), benchmark suite and profiler, report \\
 \bottomrule
@@ -384,6 +385,75 @@ allreduce\_ring\_2048 & legacy & 14.9 & 13.7 & 7.7 & \textbf{6.7} \\
 \end{itemize}
 {\scriptsize\color{black!60}\par
 Median of 3--5 interleaved runs, same machine as before. n/a: the new format reads its input twice, so it can't come from a pipe.}
+\end{frame}
+
+\section{Lazy decoding}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Lazy decoding\par}
+\vspace{4mm}
+{\large Alexander Falter\par}
+\vspace{3mm}
+{\small\color{black!60}decode when executed $\cdot$ never write the schedule\par}
+\vfill
+\end{frame}
+
+\begin{frame}{Lazy decoding in the simulator}
+\small
+Profiling showed the reader keeping a decoded copy of every ready node, and copying pages of the mapped schedule to update dependency counts. \texttt{LogGOPSim -{}-lazy-decoding} avoids both; the default is unchanged.
+\vspace{2mm}
+
+\centering
+\footnotesize
+\begin{tabular}{L{0.25\linewidth}L{0.31\linewidth}L{0.33\linewidth}}
+\toprule
+ & \textbf{Default (eager)} & \textbf{\texttt{-{}-lazy-decoding}} \\
+\midrule
+Ready list entry & decoded node, 80 bytes & node index, 4 bytes \\
+Node decoded & when it becomes ready & once, when the simulator takes it \\
+Dependency counts & decremented in the mapped file; written pages are copied & per-rank array, 4 bytes per node, read from the file on first use \\
+Schedule file & written (privately, or in place with \texttt{-{}-save-mem}) & never written \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\small
+\begin{itemize}
+\item Both formats, every decoder (\texttt{LOGGOPSIM\_DECODER=jit} too); not combinable with \texttt{-{}-save-mem}.
+\item Same simulation: the full \texttt{-v} event log is identical in both modes (dissemination, ResNet, ring; 14.7M--72.8M lines; both formats).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Lazy decoding: time and memory}
+\small
+Complete simulations, default (eager) $\to$ \texttt{-{}-lazy-decoding}.
+\vspace{1mm}
+
+\centering
+\scriptsize
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Trace} & \textbf{Format, decoder} & \multicolumn{2}{c}{\textbf{Time, s}} & \multicolumn{2}{c}{\textbf{Peak memory, MB}} \\
+\midrule
+dissem\_524288 (19.9M nodes) & new, \texttt{plan} & 19.2 $\to$ 17.9 & $-6\%$ & 2220 $\to$ 1540 & $\mathbf{-31\%}$ \\
+ & new, \texttt{jit} & 18.3 $\to$ 17.7 & $-3\%$ & 2220 $\to$ 1540 & $-31\%$ \\
+ & legacy & 19.3 $\to$ 17.8 & $-8\%$ & 2921 $\to$ 2241 & $-23\%$ \\
+ring\_2048 (16.8M nodes) & new, \texttt{plan} & 7.45 $\to$ 6.95 & $-7\%$ & 1647 $\to$ 1103 & $\mathbf{-33\%}$ \\
+ & new, \texttt{jit} & 7.06 $\to$ 6.62 & $-6\%$ & 1647 $\to$ 1103 & $-33\%$ \\
+ & legacy & 7.23 $\to$ 6.58 & $-9\%$ & 2228 $\to$ 1684 & $-24\%$ \\
+resnet\_8192 (2.3M nodes) & new, \texttt{plan} & 5.86 $\to$ 5.74 & $-2\%$ & 216 $\to$ 153 & $\mathbf{-29\%}$ \\
+ & new, \texttt{jit} & 5.68 $\to$ 5.46 & $-4\%$ & 216 $\to$ 153 & $-29\%$ \\
+ & legacy & 6.20 $\to$ 5.51 & $-11\%$ & 290 $\to$ 227 & $-22\%$ \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{2mm}
+\small
+\begin{itemize}
+\item Memory: 63--680\,MB less, from dropping decoded copies of ready nodes and copied pages of the file.
+\item Time: 2--11\% faster. In lazy mode the new format with \texttt{jit} is within 1\% of legacy.
+\end{itemize}
+{\scriptsize\color{black!60}\par
+Median of 3 interleaved runs, WSL2 with 8 vCPUs, g++-13 \texttt{-O2}; peak RSS from \texttt{/usr/bin/time}. Peak memory includes the simulator's own event queues.}
 \end{frame}
 
 \section{Reading and validation}
