@@ -22,6 +22,9 @@ public:
     void observe(FieldId field, std::uint64_t value);
     void observe_wildcard(FieldId field);
     void finish_rank(std::uint64_t nodes, std::uint64_t roots, std::uint64_t edges);
+    // Adds statistics collected separately (e.g. by another thread) over other ranks.
+    // The result does not depend on the order in which partial statistics are merged.
+    void merge(const TraceAnalysis& other);
     [[nodiscard]] std::uint32_t get_node_index_bits() const;
     [[nodiscard]] RecordLayout create_schema(
         std::uint64_t num_ranks) const;

@@ -9,3 +9,4 @@ option "progress"   p "Print progress information while parsing the schedule" fl
 option "format" - "Binary output format" values="legacy","self-describing" default="legacy" string optional
 option "report-schema" - "Print observed ranges and the selected packed schema (a proposal for legacy output)" flag off
 option "custom-fields" - "TOML file declaring custom fields (default: config/custom_fields.toml in the source tree; no custom fields if that file is absent)" string typestr="filename" optional
+option "threads"    t "Threads for the first (statistics) pass; 0 uses OMP_NUM_THREADS or all cores. Pipes are read sequentially" int default="0" optional

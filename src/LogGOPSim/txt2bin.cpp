@@ -1,4 +1,5 @@
 #include "goal_parsing/GoalReader.hpp"
+#include "goal_parsing/ParallelGoalReader.hpp"
 #include "goal_parsing/TraceAnalysis.hpp"
 #include "goal_parsing/CustomFields.hpp"
 #include "binary_writing/TraceWriter.hpp"
@@ -39,6 +40,50 @@ static void process_ranks(GoalReader& reader, bool show_progress, std::string_vi
     }
 }
 
+// First pass: field statistics for the schema; legacy output is written in the same pass.
+// Regular files are parsed in parallel (one rank per task, per-thread statistics merged
+// at the end); other inputs such as pipes use the streamed reader. Returns num_ranks.
+static std::uint32_t run_first_pass(const gengetopt_args_info& args, bool self_describing,
+                                    const std::vector<traceschema::FieldValueInfo>& custom_fields,
+                                    traceschema::TraceAnalysis& statistics) {
+    const std::string_view phase = self_describing ? "analysed" : "converted";
+    std::unique_ptr<traceschema::LegacyTraceWriter> legacy_writer;
+    const auto write_legacy = [&](const Goal& graph, std::uint32_t num_ranks) {
+        if (self_describing) return;
+        if (!legacy_writer)
+            legacy_writer = std::make_unique<traceschema::LegacyTraceWriter>(args.output_arg, num_ranks);
+        legacy_writer->write_rank(graph);
+    };
+    std::uint32_t num_ranks = 0;
+    if (ParallelGoalReader::supports(args.input_arg)) {
+        ParallelGoalReader reader(args.input_arg, custom_fields);
+        num_ranks = reader.get_num_ranks();
+        std::vector<traceschema::TraceAnalysis> partial(
+            ParallelGoalReader::get_thread_count(args.threads_arg), statistics);
+        int last_progress = 0;
+        std::uint32_t finished = 0;
+        reader.read_all(args.threads_arg, {
+            .analyse = [&](int thread, const Goal& graph) { partial[thread].observe_rank(graph); },
+            .finish = [&](Goal& graph) {
+                write_legacy(graph, num_ranks);
+                if (args.progress_given) report_progress(++finished, num_ranks, phase, last_progress);
+            },
+            // Legacy ranks are written sequentially, so they must arrive in order.
+            .finish_in_rank_order = !self_describing,
+        });
+        for (const auto& part : partial) statistics.merge(part);
+    } else {
+        GoalReader reader(args.input_arg, custom_fields);
+        process_ranks(reader, args.progress_given, phase, [&](Goal& graph) {
+            statistics.observe_rank(graph);
+            write_legacy(graph, reader.get_num_ranks());
+        });
+        num_ranks = reader.get_num_ranks();
+    }
+    if (legacy_writer) legacy_writer->finish();
+    return num_ranks;
+}
+
 // An explicitly requested file must exist; the default file is optional, so an installed
 // converter without the source tree simply has no custom fields.
 static std::vector<traceschema::FieldValueInfo> load_custom_fields(const char* requested_path) {
@@ -61,29 +106,18 @@ int main(int argc, char** argv) try {
     const auto custom_fields = load_custom_fields(args.custom_fields_given ? args.custom_fields_arg : nullptr);
     if (!self_describing && !custom_fields.empty())
         std::fprintf(stderr, "Custom values are parsed and reported; legacy output does not store them.\n");
-    GoalReader reader(args.input_arg, custom_fields);
+    if (args.threads_arg < 0) throw std::invalid_argument("--threads must not be negative");
     traceschema::TraceAnalysis statistics(custom_fields);
-    std::unique_ptr<traceschema::LegacyTraceWriter> legacy_writer;
-    process_ranks(reader, args.progress_given, self_describing ? "analysed" : "converted",
-        [&](Goal& graph) {
-            statistics.observe_rank(graph);
-            if (!self_describing) {
-                if (!legacy_writer)
-                    legacy_writer = std::make_unique<traceschema::LegacyTraceWriter>(
-                        args.output_arg, reader.get_num_ranks());
-                legacy_writer->write_rank(graph);
-            }
-        });
-    if (legacy_writer) legacy_writer->finish();
-    const auto schema = statistics.create_schema(reader.get_num_ranks());
+    const auto num_ranks = run_first_pass(args, self_describing, custom_fields, statistics);
+    const auto schema = statistics.create_schema(num_ranks);
     if (self_describing) {
         GoalReader writing_reader(args.input_arg, custom_fields);
         std::ofstream output(args.output_arg, std::ios::binary | std::ios::trunc);
         if (!output) throw std::invalid_argument("Cannot open binary output file");
-        traceschema::TraceWriter writer(output, schema, reader.get_num_ranks(),
+        traceschema::TraceWriter writer(output, schema, num_ranks,
                                         statistics.get_node_index_bits(), custom_fields);
         process_ranks(writing_reader, args.progress_given, "written", [&](const Goal& graph) {
-            if (writing_reader.get_num_ranks() != reader.get_num_ranks())
+            if (writing_reader.get_num_ranks() != num_ranks)
                 throw std::invalid_argument("Rank count changed between input passes");
             writer.write_rank(graph);
         });

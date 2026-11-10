@@ -2,6 +2,7 @@
 #include "goal_parsing/Goal.hpp"
 #include "trace_format/BinaryIO.hpp"
 #include "goal_parsing/CustomFields.hpp"
+#include "binary_writing/RankPacking.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -70,6 +71,47 @@ void TraceAnalysis::finish_rank(std::uint64_t nodes, std::uint64_t roots, std::u
     max_nodes_ = std::max(max_nodes_, nodes);
     max_roots_ = std::max(max_roots_, roots);
     max_edges_ = std::max(max_edges_, edges);
+}
+
+template<class Range>
+static void merge_range(std::optional<Range>& into, const std::optional<Range>& other) {
+    if (!other) return;
+    if (!into) {
+        into = other;
+        return;
+    }
+    into->minimum = std::min(into->minimum, other->minimum);
+    into->maximum = std::max(into->maximum, other->maximum);
+}
+
+void TraceAnalysis::merge(const TraceAnalysis& other) {
+    if (other.custom_fields_.size() != custom_fields_.size())
+        throw std::invalid_argument("Merged statistics declare different custom fields");
+    for (std::size_t index = 0; index < field_count; ++index) {
+        merge_range(fields_[index].range, other.fields_[index].range);
+        fields_[index].has_wildcard |= other.fields_[index].has_wildcard;
+    }
+    for (std::size_t index = 0; index < custom_fields_.size(); ++index) {
+        auto& range = custom_fields_[index].value_range;
+        const auto& other_range = other.custom_fields_[index].value_range;
+        if (!other_range) continue;
+        if (!range) {
+            range = other_range;
+            continue;
+        }
+        std::visit([&]<class Bounds>(Bounds& bounds) {
+            const auto* other_bounds = std::get_if<Bounds>(&*other_range);
+            if (!other_bounds) throw std::invalid_argument("Observed value range type mismatch");
+            bounds.minimum = std::min(bounds.minimum, other_bounds->minimum);
+            bounds.maximum = std::max(bounds.maximum, other_bounds->maximum);
+        }, *range);
+    }
+    add_checked(ranks_, other.ranks_);
+    add_checked(nodes_, other.nodes_);
+    add_checked(edges_, other.edges_);
+    max_nodes_ = std::max(max_nodes_, other.max_nodes_);
+    max_roots_ = std::max(max_roots_, other.max_roots_);
+    max_edges_ = std::max(max_edges_, other.max_edges_);
 }
 
 std::uint32_t TraceAnalysis::get_node_index_bits() const {
