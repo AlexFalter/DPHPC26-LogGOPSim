@@ -692,26 +692,48 @@ TEST_F(TraceReaderTest, DecoderWritesSelectedFieldsAndWildcards) {
     EXPECT_THROW(decoder.decode_into(record.first(record_size - 1), 0, targets), std::invalid_argument);
 }
 
-// Both trace formats use the same dependency-release and readiness methods.
+// Both trace formats and both schedule modes use the same dependency-release and readiness methods.
 TEST_F(TraceReaderTest, ScheduleReleasesDependents) {
+    for (const auto mode : {ScheduleMode::Eager, ScheduleMode::Lazy}) {
+        SCOPED_TRACE(mode == ScheduleMode::Lazy ? "lazy" : "eager");
+        auto bytes = original;
+        LogGOPSimAdapter reader(bytes);
+        RankSchedule schedule(reader, 0, mode);
+        std::vector<LogGOPSimNode> ready;
+        schedule.GetExecutableNodes_DSN(ready);
+        ASSERT_EQ(ready.size(), 1u);
+        EXPECT_EQ(ready.front().node_index, 0u);
+        schedule.MarkNodeAsStarted(0);
+        schedule.GetExecutableNodes_DSN(ready);
+        EXPECT_TRUE(ready.empty()) << "the start dependency released the receive early";
+        schedule.MarkNodeAsDone(0);
+        schedule.GetExecutableNodes_DSN(ready);
+        ASSERT_EQ(ready.size(), 1u);
+        EXPECT_EQ(ready.front().node_index, 1u) << "finishing the calc releases the send";
+        schedule.MarkNodeAsDone(1);
+        schedule.GetExecutableNodes_DSN(ready);
+        ASSERT_EQ(ready.size(), 1u);
+        EXPECT_EQ(ready.front().node_index, 2u) << "both dependencies release the receive";
+        EXPECT_EQ(bytes == original, mode == ScheduleMode::Lazy) << "only eager mode writes counters";
+    }
+}
+
+// Lazy mode keeps counts in memory: the file is read-only and counts start from the stored value.
+TEST_F(TraceReaderTest, LazyScheduleKeepsCountsInMemory) {
     auto bytes = original;
     LogGOPSimAdapter reader(bytes);
-    RankSchedule schedule(reader, 0);
-    std::vector<LogGOPSimNode> ready;
-    schedule.GetExecutableNodes_DSN(ready);
-    ASSERT_EQ(ready.size(), 1u);
-    EXPECT_EQ(ready.front().node_index, 0u);
+    EXPECT_EQ(reader.read_dependency_count(0, 2), 2u);
+    RankSchedule schedule(reader, 0, ScheduleMode::Lazy);
+    RankSchedule::nodelist_t events;
+    schedule.GetExecutableNodes(&events);
+    ASSERT_EQ(events.size(), 1u);
+    EXPECT_EQ(events.front().type, OP_LOCOP);
     schedule.MarkNodeAsStarted(0);
-    schedule.GetExecutableNodes_DSN(ready);
-    EXPECT_TRUE(ready.empty()) << "the start dependency released the receive early";
     schedule.MarkNodeAsDone(0);
-    schedule.GetExecutableNodes_DSN(ready);
-    ASSERT_EQ(ready.size(), 1u);
-    EXPECT_EQ(ready.front().node_index, 1u) << "finishing the calc releases the send";
     schedule.MarkNodeAsDone(1);
-    schedule.GetExecutableNodes_DSN(ready);
-    ASSERT_EQ(ready.size(), 1u);
-    EXPECT_EQ(ready.front().node_index, 2u) << "both dependencies release the receive";
+    EXPECT_EQ(reader.read_dependency_count(0, 2), 2u) << "the stored count was changed";
+    EXPECT_THROW(schedule.MarkNodeAsDone(1), std::invalid_argument) << "a released node was released again";
+    EXPECT_EQ(bytes, original);
 }
 
 // Both scheduler interfaces can drain ready nodes without allocating each batch.

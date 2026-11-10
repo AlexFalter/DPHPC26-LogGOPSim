@@ -105,6 +105,7 @@ public:
     // Configure once before mutation; the unsigned counter must represent zero and have no wildcard.
     void set_dependency_counter(FieldIdentity field);
     std::uint64_t decrement_dependency_count(std::uint32_t rank, std::uint32_t index);
+    [[nodiscard]] std::uint64_t read_dependency_count(std::uint32_t rank, std::uint32_t index) const;
     [[nodiscard]] std::uint64_t get_resource_count(FieldIdentity field) const;
 
 private:

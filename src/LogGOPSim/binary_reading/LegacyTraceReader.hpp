@@ -78,6 +78,9 @@ public:
         write_native(bytes.data(), count - 1);
         return count - 1;
     }
+    [[nodiscard]] std::uint32_t read_dependency_count(std::uint32_t index) const {
+        return read_native<std::uint32_t>(record(index).data());
+    }
 
 private:
     std::uint32_t node_count_ = 0, root_count_ = 0;
@@ -152,6 +155,9 @@ public:
     }
     std::uint64_t decrement_dependency_count(std::uint32_t rank, std::uint32_t index) {
         return get_rank(rank).decrement_dependency_count(index);
+    }
+    [[nodiscard]] std::uint64_t read_dependency_count(std::uint32_t rank, std::uint32_t index) const {
+        return get_rank(rank).read_dependency_count(index);
     }
     // The header stores the largest CPU and NIC; no other resource is described.
     [[nodiscard]] std::uint64_t get_resource_count(FieldIdentity field) const {

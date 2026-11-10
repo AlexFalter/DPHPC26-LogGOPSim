@@ -77,4 +77,13 @@ std::uint64_t DependencyGraph::decrement(std::uint32_t rank, std::uint32_t index
     return *count;
 }
 
+std::uint64_t DependencyGraph::read_count(std::uint32_t rank, std::uint32_t index) const {
+    const auto record = file_.get_node_record_bytes(rank, index);
+    const auto count = bit_packing::read_bits(std::span(record.data(), file_.get_readable_bytes(record)),
+                                              count_field_.bit_offset, count_field_.bit_width);
+    if (count > count_field_.offset_encoding.maximum_offset)
+        throw std::invalid_argument("Dependency counter is invalid");
+    return count;
+}
+
 } // namespace traceschema

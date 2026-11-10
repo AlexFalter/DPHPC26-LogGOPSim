@@ -66,6 +66,9 @@ public:
     std::uint64_t decrement_dependency_count(std::uint32_t rank, std::uint32_t index) {
         return reader_.decrement_dependency_count(rank, index);
     }
+    [[nodiscard]] std::uint64_t read_dependency_count(std::uint32_t rank, std::uint32_t index) const {
+        return reader_.read_dependency_count(rank, index);
+    }
     // Mark destructive shared input as consumed before simulation mutates its counters.
     // Borrowed buffers and private mappings must never be invalidated through this operation.
     void invalidate_shared_input() {

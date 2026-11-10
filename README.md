@@ -102,6 +102,10 @@ The simulator detects both formats automatically:
 ./LogGOPSim -f example.sd.bin
 ```
 
+`--lazy-decoding` keeps ready nodes as indices and dependency counts in memory instead of
+in the mapped schedule: each node is decoded once, when it is executed, and the file is never
+written. It produces the same simulation and cannot be combined with `--save-mem`.
+
 ### Parallel first pass
 
 The first pass (parsing and field statistics, plus writing for legacy output) runs on

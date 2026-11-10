@@ -73,7 +73,9 @@ TEST(LegacyReader, ReadsAndUpdatesTheOriginalLayout) {
     EXPECT_TRUE(std::ranges::equal(roots[0].finish_dependents, std::array{std::uint32_t{1}}));
     EXPECT_TRUE(reader.read_dependents(0, 0, DependencyEvent::Start).empty());
     EXPECT_EQ(reader.read_node<Node>(0, 1).dependency_count, 1u);
+    EXPECT_EQ(reader.read_dependency_count(0, 1), 1u);
     EXPECT_EQ(reader.decrement_dependency_count(0, 1), 0u);
+    EXPECT_EQ(reader.read_dependency_count(0, 1), 0u);
     EXPECT_THROW(reader.decrement_dependency_count(0, 1), std::invalid_argument);
     EXPECT_EQ(reader.read_node<Node>(0, 1).dependency_count, 0u);
 }

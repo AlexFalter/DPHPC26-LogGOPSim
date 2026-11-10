@@ -95,6 +95,10 @@ public:
     std::uint64_t decrement_dependency_count(std::uint32_t rank, std::uint32_t index) {
         return visit([&](auto& reader) { return reader.decrement_dependency_count(rank, index); });
     }
+    // The stored dependency count, without changing the file.
+    [[nodiscard]] std::uint64_t read_dependency_count(std::uint32_t rank, std::uint32_t index) const {
+        return visit([&](const auto& reader) { return reader.read_dependency_count(rank, index); });
+    }
     [[nodiscard]] std::uint64_t get_resource_count(const FieldIdentity& field) const {
         return visit([&](const auto& reader) { return reader.get_resource_count(field); });
     }
