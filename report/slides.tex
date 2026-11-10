@@ -74,6 +74,7 @@
 \begin{enumerate}
 \item \textbf{Task:} the problem, our goals, who did what, structure of our implementation.
 \item \textbf{Self-describing format:} file layout, encodings, conversion.
+\item \textbf{Parallel conversion:} the first pass on OpenMP threads.
 \item \textbf{Reading and validation:} simulator adapters, errors before the simulation starts.
 \item \textbf{Case study: ATLAHS:} explicit GPU and message fields, two scheduler fixes.
 \item \textbf{Fast decoding:} why it matters, one decode plan, five runners.
@@ -129,7 +130,7 @@ Benchmarking & Smaller and faster than legacy? & preliminary results; full study
 \textbf{Name} & \textbf{Work} \\
 \midrule
 Joshua Durrant & Full benchmarking study (upcoming) \\
-Alexander Falter & OpenMP parallelization and optimizations (upcoming) \\
+Alexander Falter & OpenMP-parallel first conversion pass (parallel GOAL reader, mergeable statistics, \texttt{-{}-threads}), its differential tests and benchmark \\
 Samuel Garcin & Decode replay benchmark, decode plan (optimized interpreter), C JIT with cache, in-process JIT with LLVM ORC, differential test against the generic decoder \\
 Mykhaylo Gershman & Self-describing format and converter, bit packing (including 0-bit constant fields), custom fields, validating reader and simulator adapters, LogGOPSim restructuring, ATLAHS integration, runner architecture and registry, templated runners, test suite (GoogleTest, pytest), benchmark suite and profiler, report \\
 \bottomrule
@@ -292,6 +293,97 @@ l2: calc 1000 gpu_id 3
 \end{itemize}
 \end{column}
 \end{columns}
+\end{frame}
+
+\section{Parallel conversion}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Parallel conversion\par}
+\vspace{4mm}
+{\large Alexander Falter\par}
+\vspace{3mm}
+{\small\color{black!60}OpenMP first pass $\cdot$ same output as sequential $\cdot$ speedup\par}
+\vfill
+\end{frame}
+
+\begin{frame}{Pass 1 in parallel: one rank per task}
+{\centering\resizebox{0.78\linewidth}{!}{\input{diagrams/parallel-first-pass.tex}}\par}
+\vspace{1mm}
+\footnotesize
+\begin{itemize}
+\item Ranks are independent in GOAL. The mapped input is cut after each rank's closing brace (not inside comments).
+\item Each block is parsed by the unchanged re2c scanner, reading from memory instead of a \texttt{FILE*}.
+\item Per-thread statistics: merging minima, maxima, counts and wildcard flags doesn't depend on order.
+\item Legacy output is written in pass 1, so ranks reach the writer in rank order.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Same result as the sequential pass}
+\small
+\begin{itemize}
+\item \textbf{Identical output:} same bytes in both formats, same \texttt{-{}-report-schema} report.
+\item \textbf{Identical errors:} if several ranks are invalid, the error of the lowest rank is reported, with the line number in the whole file and the same diagnostic text.
+\item \textbf{Same limits:} one rank's graph per thread at a time; pipes fall back to the sequential reader. \texttt{txt2bin -{}-threads N} sets the thread count.
+\item \textbf{One difference:} a second \texttt{num\_ranks} with a different value is rejected instead of applying to later ranks.
+\end{itemize}
+\vspace{2mm}
+\highlight{\textbf{Tests:} 9 GoogleTest cases compare graphs, statistics and error messages with the sequential reader at 1, 2, 3 and 8 threads, in and out of rank order: CRLF, braces in comments, custom fields, syntax and structural errors.}
+\end{frame}
+
+\begin{frame}{Pass 1 speedup}
+\small
+Pass 1 alone (\texttt{first\_pass\_bench}): parse every rank and collect the statistics, \textbf{seconds}.
+\vspace{2mm}
+
+\centering
+\footnotesize
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Trace} & \textbf{GOAL text} & \textbf{Sequential} & \textbf{1 thread} & \textbf{2} & \textbf{4} & \textbf{8} & \textbf{Speedup} \\
+\midrule
+dissemination\_65536 & 83 MB & 2.79 & 1.72 & 0.92 & 0.60 & 0.60 & \textbf{4.6$\times$} \\
+allreduce\_ring\_2048 & 666 MB & 22.1 & 18.6 & 11.8 & 10.0 & 8.6 & \textbf{2.6$\times$} \\
+alltoall\_4096 & 1.09 GB & 38.1 & 28.8 & 15.3 & 11.8 & 10.7 & \textbf{3.6$\times$} \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\small
+\begin{itemize}
+\item Even on one thread the mapped reader is faster than the sequential \texttt{FILE*} reader.
+\item Two threads nearly halve the time; beyond four threads it flattens. The cause is not measured yet.
+\item Statistics are identical at every thread count (same hash of the report).
+\end{itemize}
+{\scriptsize\color{black!60}\par
+Speedup: 8 threads against the sequential reader. Median of 3 runs, warm page cache, WSL2 with 8 vCPUs, g++-13 \texttt{-O2}. The machine was noisy: repeated runs of one configuration differed by up to 75\% (sequential reader on dissemination).}
+\end{frame}
+
+\begin{frame}{Complete conversion}
+\small
+Complete \texttt{txt2bin} run, \textbf{seconds}. Sequential: input through a pipe.
+\vspace{2mm}
+
+\centering
+\footnotesize
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Trace} & \textbf{Output} & \textbf{Sequential} & \textbf{1 thread} & \textbf{4 threads} & \textbf{8 threads} \\
+\midrule
+dissemination\_65536 & legacy & 1.60 & \textbf{1.18} & 2.95 & 5.37 \\
+ & new format & n/a & 2.71 & & \textbf{1.86} \\
+allreduce\_ring\_2048 & legacy & 14.9 & 13.7 & 7.7 & \textbf{6.7} \\
+ & new format & n/a & 26.1 & & \textbf{20.0} \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{3mm}
+\small
+\begin{itemize}
+\item New format: 1.3--1.5$\times$ overall, since pass 2 is still sequential.
+\item Legacy scales on ring (2.0$\times$) but not on dissemination: its 65,536 small ranks reach the writer one at a time.
+\item The legacy writer now appends each rank instead of remapping the file: 2.79\,s $\to$ 1.18\,s on one thread.
+\end{itemize}
+{\scriptsize\color{black!60}\par
+Median of 3--5 interleaved runs, same machine as before. n/a: the new format reads its input twice, so it can't come from a pipe.}
 \end{frame}
 
 \section{Reading and validation}
@@ -605,7 +697,7 @@ ATLAHS Llama run & 6\,500 & n/a & 19\,500 \\
 \small
 \begin{itemize}
 \item New format: faster than the original on most traces despite two passes.
-\item Our legacy writer remaps the file per rank: up to 6$\times$ slower; to be fixed.
+\item Our legacy writer remapped the file per rank (up to 6$\times$ slower); now fixed.
 \end{itemize}
 {\scriptsize\color{black!60}\par
 Median of 5 interleaved runs. Legacy converters end with a system-wide \texttt{sync()} ($\approx$50\,ms). n/a: legacy cannot hold the custom fields (ours also rejects the Llama run's ${>}$32-bit tags). ATLAHS: one run.}
@@ -786,7 +878,7 @@ Median of 21 runs, configurations interleaved in a seeded random order. Original
 \begin{itemize}
 \item Euler study (Joshua): Linux/x86-64, cold file caches and peak memory.
 \item Larger recorded workloads and custom-field-heavy traces.
-\item Parallelization experiments (Alexander), keeping cross-format and cross-runner checks.
+\item Parallelization (Alexander): pass 2 and the legacy writer, keeping cross-format and cross-runner checks.
 \end{itemize}
 \end{column}
 \end{columns}

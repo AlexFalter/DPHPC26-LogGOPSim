@@ -77,7 +77,7 @@ This still writes the legacy binary. After conversion, it prints observed field
 ranges, wildcard presence, value bases, suggested widths/bit offsets, and the
 proposed padded node record size. Numeric values are proposed as unsigned offsets
 from each field’s minimum; a field with the same value on every node uses no bits. Statistics are gathered in the normal pass, keeping one rank's graph
-in memory. The proposed size excludes headers and dependency-index arrays.
+per thread in memory. The proposed size excludes headers and dependency-index arrays.
 Values exceeding legacy storage widths produce errors instead of truncating.
 A failed conversion may leave a partial output file; do not use it.
 
@@ -89,8 +89,8 @@ Writing the self-describing format
 ```
 
 This reads the input twice: first to infer field ranges and widths, then to write
-the header, rank table, packed records, dependencies and roots. Each pass keeps
-one rank's graph at a time. Custom fields are loaded automatically from
+the header, rank table, packed records, dependencies and roots. The first pass keeps
+one rank's graph per thread (see below), the second one rank's graph at a time. Custom fields are loaded automatically from
 `config/custom_fields.toml`; declare their names/types there and supply their
 values on each GOAL operation. Their ranges are inferred from those values.
 Use `--custom-fields <file>` to read the declarations from another file. If the
@@ -101,6 +101,21 @@ The simulator detects both formats automatically:
 ```sh
 ./LogGOPSim -f example.sd.bin
 ```
+
+### Parallel first pass
+
+The first pass (parsing and field statistics, plus writing for legacy output) runs on
+several OpenMP threads. The input is memory-mapped and split after each rank block's
+closing brace; each thread parses whole ranks and keeps its own statistics, which are
+merged at the end. Legacy ranks are still written in rank order. Output bytes, reports
+and error messages are identical to a sequential pass; when several ranks are invalid,
+the error of the lowest rank is reported. Use `--threads N` (or `OMP_NUM_THREADS`) to
+choose the thread count; inputs that cannot be mapped, such as pipes, are read
+sequentially. Each thread holds one rank's graph at a time. Unlike the sequential reader,
+the parallel one rejects a second `num_ranks` declaration with a different value.
+
+`first_pass_bench GOAL_FILE THREADS REPETITIONS` times this pass alone; `THREADS=0`
+selects the sequential reader for comparison.
 
 Omit `--format` or use `--format legacy` to retain the original output format. Legacy output omits custom
 values and prints a warning when they are declared. Keep the input unchanged

@@ -109,11 +109,21 @@ add_custom_command(
   DEPENDS LogGOPSim/goal_parsing/GoalReader.re
   COMMENT "Generating GOAL reader"
   VERBATIM)
-add_library(goal_reader STATIC ${CMAKE_CURRENT_BINARY_DIR}/GoalReader.cpp)
+add_library(goal_reader STATIC ${CMAKE_CURRENT_BINARY_DIR}/GoalReader.cpp
+  LogGOPSim/goal_parsing/ParallelGoalReader.cpp)
 target_include_directories(goal_reader PUBLIC ${PROJECT_SOURCE_DIR}/LogGOPSim)
 target_link_libraries(goal_reader PUBLIC trace_schema)
+# The converter's first pass parses rank blocks in parallel; without OpenMP it runs serially.
+find_package(OpenMP COMPONENTS CXX)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(goal_reader PUBLIC OpenMP::OpenMP_CXX)
+else()
+  message(WARNING "OpenMP not found: txt2bin's first pass will run on one thread")
+endif()
 add_executable(txt2bin LogGOPSim/txt2bin.cpp LogGOPSim/txt2bin_cmdline.c)
 target_link_libraries(txt2bin PRIVATE goal_reader)
+add_executable(first_pass_bench LogGOPSim/first_pass_bench.cpp)
+target_link_libraries(first_pass_bench PRIVATE goal_reader)
 target_compile_definitions(txt2bin PRIVATE
   DEFAULT_CUSTOM_FIELDS_CONFIG_PATH="${PROJECT_SOURCE_DIR}/../config/custom_fields.toml")
 

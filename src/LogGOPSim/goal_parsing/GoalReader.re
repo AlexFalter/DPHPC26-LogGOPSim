@@ -12,6 +12,10 @@
 #include <inttypes.h>
 
 #include "goal_parsing/GoalReader.hpp"
+#include "goal_parsing/GoalBlockParser.hpp"
+
+#include <algorithm>
+#include <cstdarg>
 
 typedef unsigned int uint;
 typedef unsigned char uchar;
@@ -24,12 +28,18 @@ typedef unsigned char uchar;
 #define	YYMARKER	s->ptr
 #define	YYFILL(n)	{cursor = fill(s, cursor);}
 
+// Reads from a FILE* in BSIZE chunks (GoalReader), or from one rank block that is
+// already in memory (fd == nullptr, eof set up front; see parse_rank_block).
 typedef struct Scanner {
     FILE*		fd;
     uchar		*bot, *tok, *ptr, *cur, *lim, *top, *eof;
     uint		line;
-    std::vector<traceschema::FieldValueInfo> custom_fields;
-    std::unordered_map<std::string, std::size_t> custom_indices;
+    const goal_parsing::CustomFieldTable* fields;
+    // Input before `bot` in memory mode; only counted for line numbers in errors.
+    std::string_view preceding_text;
+    // GoalReader prints syntax diagnostics immediately; the parallel reader prints only
+    // the diagnostic of the error it reports.
+    bool print_diagnostics;
 	int			rank;
 	uint32_t 	num_ranks;
 	Goal*		schedule;
@@ -125,7 +135,7 @@ static void process_item(Scanner* s, Item* item) {
     for (std::size_t index = 0; index < item->custom_values.size(); ++index) {
         if (!item->custom_values[index])
             throw std::invalid_argument("Missing custom field '" +
-                std::get<std::string>(s->custom_fields[index].field) + "' on operation '" + item->label1 + "'");
+                std::get<std::string>(s->fields->get_fields()[index].field) + "' on operation '" + item->label1 + "'");
         op->custom_values.push_back(*item->custom_values[index]);
     }
     if (!item->label1.empty() && !s->idtbl.emplace(item->label1, op).second)
@@ -149,13 +159,22 @@ static void set_attribute(Scanner* scanner, Item& item, std::string_view text) {
     else if (name == "tag" && item.type != LoclOp)
         item.tag = text == "-1" ? Node::any_tag : parse_unsigned();
     else {
-        const auto found = scanner->custom_indices.find(name);
-        if (found == scanner->custom_indices.end())
+        const auto* found = scanner->fields->find(name);
+        if (!found)
             throw std::invalid_argument("Unknown operation attribute '" + name + "'");
-        const auto index = found->second;
+        const auto index = *found;
         item.custom_values[index] = traceschema::schema_helpers::parse_field_value(
-            scanner->custom_fields[index].type, text, name);
+            scanner->fields->get_fields()[index].type, text, name);
     }
+}
+
+static void append_diagnostic(std::string& output, const char* format, ...) {
+    char buffer[256];
+    va_list arguments;
+    va_start(arguments, format);
+    const int length = vsnprintf(buffer, sizeof buffer, format, arguments);
+    va_end(arguments);
+    if (length > 0) output.append(buffer, std::min<std::size_t>(length, sizeof buffer - 1));
 }
 
 static uchar* fill(Scanner* s, uchar* cursor) {
@@ -207,7 +226,7 @@ s_0:
 	state = 0;
 
 	item = Item{};
-    item.custom_values.resize(s->custom_fields.size());
+    item.custom_values.resize(s->fields->get_fields().size());
 
 /*!re2c
 	re2c:indent:top = 2;
@@ -421,8 +440,13 @@ s_24:
 */
 
 s_err:
+	{
+	// Lines before this block (parallel reader) are counted only when reporting an error.
+	const auto line = s->line + static_cast<uint>(
+		std::count(s->preceding_text.begin(), s->preceding_text.end(), '\n'));
+	std::string diagnostic;
 
-	fprintf(stderr, "Error in line %i:\n", s->line);
+	append_diagnostic(diagnostic, "Error in line %u:\n", line);
 
 	uchar* nlbef = s->bot;
 	uchar* nlaft = s->lim;
@@ -445,90 +469,87 @@ s_err:
 		}
 	}
 
-	for (uchar* c = nlbef+1; c<nlaft; c++) {
-		fprintf(stderr, "%c", *c);
-	}
-	fprintf(stderr, "\n");
-
-	for (int cnt=0; cnt<cursor-nlbef-1; cnt++) {
-		fprintf(stderr, " ");
-	}
-	fprintf(stderr, "^\n");
+	if (nlaft > nlbef + 1) diagnostic.append(reinterpret_cast<const char*>(nlbef + 1), nlaft - nlbef - 1);
+	diagnostic += '\n';
+	if (cursor > nlbef + 1) diagnostic.append(cursor - nlbef - 1, ' ');
+	diagnostic += "^\n";
 
 	switch(state) {
 		case 0:
-			fprintf(stderr,"Expected: \"rank\", \"num_ranks\", \"calc\", \"send\", \"recv\", an identifier, \"}\" or \"\\n\"\n");
+			append_diagnostic(diagnostic, "Expected: \"rank\", \"num_ranks\", \"calc\", \"send\", \"recv\", an identifier, \"}\" or \"\\n\"\n");
 			break;
 		case 1:
-			fprintf(stderr,"Expected: \":\", \"requires\" or \"irequires\"\n");
+			append_diagnostic(diagnostic, "Expected: \":\", \"requires\" or \"irequires\"\n");
 			break;
 		case 2:
-			fprintf(stderr,"Expected: an integer\n");
+			append_diagnostic(diagnostic, "Expected: an integer\n");
 			break;
 		case 3:
-			fprintf(stderr,"Expected: an integer\n");
+			append_diagnostic(diagnostic, "Expected: an integer\n");
 			break;
 		case 4:
-			fprintf(stderr,"Expected: \"calc\", \"send\" or \"recv\"\n");
+			append_diagnostic(diagnostic, "Expected: \"calc\", \"send\" or \"recv\"\n");
 			break;
 		case 5:
-			fprintf(stderr,"Expected: an identifier\n");
+			append_diagnostic(diagnostic, "Expected: an identifier\n");
 			break;
 		case 6:
-			fprintf(stderr,"Expected: \"\\n\"\n");
+			append_diagnostic(diagnostic, "Expected: \"\\n\"\n");
 			break;
 		case 7:
-			fprintf(stderr,"Expected: an attribute name or \"\\n\"\n");
+			append_diagnostic(diagnostic, "Expected: an attribute name or \"\\n\"\n");
 			break;
 		case 8:
-			fprintf(stderr,"Expected: an integer\n");
+			append_diagnostic(diagnostic, "Expected: an integer\n");
 			break;
 		case 10:
-			fprintf(stderr,"Expected: \"b\"\n");
+			append_diagnostic(diagnostic, "Expected: \"b\"\n");
 			break;
 		case 11:
-			if (item.type == SendOp) fprintf(stderr,"Expected: \"to\"\n");
-			else if (item.type == RecvOp) fprintf(stderr,"Expected: \"from\"\n");
-			else fprintf(stderr,"Expected: \"to\" or \"from\"\n");
+			if (item.type == SendOp) append_diagnostic(diagnostic, "Expected: \"to\"\n");
+			else if (item.type == RecvOp) append_diagnostic(diagnostic, "Expected: \"from\"\n");
+			else append_diagnostic(diagnostic, "Expected: \"to\" or \"from\"\n");
 			break;
 		case 12:
-			fprintf(stderr,"Expected: an integer\n");
+			append_diagnostic(diagnostic, "Expected: an integer\n");
 			break;
 		case 13:
-			fprintf(stderr,"Expected: \"tag\", \"cpu\", \"nic\" or \"\\n\"\n");
+			append_diagnostic(diagnostic, "Expected: \"tag\", \"cpu\", \"nic\" or \"\\n\"\n");
 			break;
 		case 20:
-			fprintf(stderr,"Expected: an integer\n");
+			append_diagnostic(diagnostic, "Expected: an integer\n");
 			break;
 		case 21:
-			fprintf(stderr,"Expected: \"{\"\n");
+			append_diagnostic(diagnostic, "Expected: \"{\"\n");
 			break;
 		case 22:
-			fprintf(stderr,"Expected: an integer\n");
+			append_diagnostic(diagnostic, "Expected: an integer\n");
 			break;
 	}
 
 	if (*(cursor-1) == '\n') {
-		fprintf(stderr, "Instead the schedule contained: \"\\n\"\n");
+		append_diagnostic(diagnostic, "Instead the schedule contained: \"\\n\"\n");
 	}
 	else {
-		fprintf(stderr, "Instead the schedule contained: \"%c\"\n", *(cursor-1));
+		append_diagnostic(diagnostic, "Instead the schedule contained: \"%c\"\n", *(cursor-1));
 	}
 
-	throw std::invalid_argument("Invalid GOAL syntax at line " + std::to_string(s->line));
+	if (s->print_diagnostics) fputs(diagnostic.c_str(), stderr);
+	throw goal_parsing::GoalSyntaxError("Invalid GOAL syntax at line " + std::to_string(line), std::move(diagnostic));
+	}
 
 }
 }
 
 struct GoalReader::State {
+    goal_parsing::CustomFieldTable fields;
     Scanner scanner{};
     std::uint32_t next_rank = 0;
 
-    explicit State(const std::string& path, std::vector<traceschema::FieldValueInfo> custom_fields) {
-        traceschema::validate_custom_fields(custom_fields);
-        scanner.custom_fields = std::move(custom_fields);
-        for (std::size_t index = 0; index < scanner.custom_fields.size(); ++index)
-            scanner.custom_indices.emplace(std::get<std::string>(scanner.custom_fields[index].field), index);
+    explicit State(const std::string& path, std::vector<traceschema::FieldValueInfo> custom_fields)
+        : fields(std::move(custom_fields)) {
+        scanner.fields = &fields;
+        scanner.print_diagnostics = true;
         scanner.bot = static_cast<uchar*>(malloc(BSIZE + 1));
         if (!scanner.bot) throw std::bad_alloc();
         scanner.fd = fopen(path.c_str(), "r");
@@ -571,3 +592,38 @@ std::unique_ptr<Goal> GoalReader::read_rank() {
 std::uint32_t GoalReader::get_num_ranks() const {
     return state_->scanner.num_ranks;
 }
+
+namespace goal_parsing {
+
+CustomFieldTable::CustomFieldTable(std::vector<traceschema::FieldValueInfo> fields)
+    : fields_(std::move(fields)) {
+    traceschema::validate_custom_fields(fields_);
+    for (std::size_t index = 0; index < fields_.size(); ++index)
+        indices_.emplace(std::get<std::string>(fields_[index].field), index);
+}
+
+const std::size_t* CustomFieldTable::find(const std::string& name) const {
+    const auto found = indices_.find(name);
+    return found == indices_.end() ? nullptr : &found->second;
+}
+
+ParsedRankBlock parse_rank_block(const CustomFieldTable& fields, std::string_view text,
+                                 std::uint32_t num_ranks, std::string_view preceding_text) {
+    Scanner scanner{};
+    // The scanner never writes in memory mode: eof is known, so fill() does not refill.
+    auto* begin = reinterpret_cast<uchar*>(const_cast<char*>(text.data()));
+    scanner.bot = scanner.tok = scanner.ptr = scanner.cur = begin;
+    scanner.lim = scanner.top = scanner.eof = begin + text.size();
+    scanner.line = 1;
+    scanner.fields = &fields;
+    scanner.preceding_text = preceding_text;
+    scanner.print_diagnostics = false;
+    scanner.rank = -1;
+    scanner.num_ranks = num_ranks;
+    auto graph = std::make_unique<Goal>();
+    scanner.schedule = graph.get();
+    const auto rank = scan(&scanner);
+    return {std::move(graph), rank, scanner.num_ranks};
+}
+
+} // namespace goal_parsing

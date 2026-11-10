@@ -1,0 +1,22 @@
+\begin{tikzpicture}[node distance=6mm and 9mm]
+% The memory-mapped GOAL text, split after each rank block's closing brace.
+\foreach \r/\y in {0/0,1/-1,2/-2,3/-3} {
+  \node[inputbox,minimum width=26mm,minimum height=6mm,font=\scriptsize\ttfamily] (r\r) at (0,\y*0.72)
+    {rank \r\ \{ \dots\ \}};
+}
+\node[font=\scriptsize,above=1mm of r0,align=center] {memory-mapped GOAL text,\\split after each \texttt{\}}};
+% Threads parse whole ranks with the sequential scanner and keep their own statistics.
+\node[processbox,text width=30mm,minimum height=11mm,right=14mm of r0.south east,anchor=west] (t0)
+  {\textbf{Thread 0}\\parse rank $\to$ statistics};
+\node[processbox,text width=30mm,minimum height=11mm,right=14mm of r2.south east,anchor=west] (t1)
+  {\textbf{Thread $k$}\\parse rank $\to$ statistics};
+\foreach \r/\t in {r0/t0,r1/t1,r2/t0,r3/t1} \draw[arrow] (\r.east)--(\t.west);
+% Partial statistics are merged; legacy ranks are written in rank order.
+\node[processbox,text width=36mm,minimum height=11mm,right=of t0] (m)
+  {Merge min/max,\\counts, wildcards};
+\node[outputbox,text width=24mm,minimum height=11mm,right=of m] (l) {File-wide\\layout};
+\node[outputbox,text width=27mm,minimum height=11mm,right=of t1] (w)
+  {Legacy writer\\(in rank order)};
+\draw[arrow] (t0)--(m); \draw[arrow] (t1.north east)--(m.south west); \draw[arrow] (m)--(l);
+\draw[message] (t0.south east)--(w.north west); \draw[message] (t1)--(w);
+\end{tikzpicture}
