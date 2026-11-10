@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <condition_variable>
 #include <cstdio>
 #include <exception>
 #include <limits>
@@ -220,11 +221,27 @@ void ParallelGoalReader::read_all(int threads, const RankCallbacks& callbacks) {
 
     const int team = get_thread_count(threads);
     if (callbacks.finish_in_rank_order) {
-        #pragma omp parallel for ordered schedule(dynamic, 1) num_threads(team)
+        // Each rank waits until the previous one is finished. Waiting threads sleep: with
+        // `omp ordered` they spin, and when every core runs a thread the spinning starves the
+        // thread that writes. Ranks are handed out in order, so the previous rank is always
+        // already being processed by another thread.
+        std::mutex order_mutex;
+        std::condition_variable order_changed;
+        std::int64_t next_to_finish = 0;
+        #pragma omp parallel for schedule(dynamic, 1) num_threads(team)
         for (std::int64_t rank = 0; rank < count; ++rank) {
             auto graph = parse(static_cast<std::uint32_t>(rank));
-            #pragma omp ordered
+            {
+                std::unique_lock lock(order_mutex);
+                order_changed.wait(lock, [&] { return next_to_finish == rank; });
+            }
+            // Only this rank can pass the wait until next_to_finish advances.
             finish(static_cast<std::uint32_t>(rank), graph.get());
+            {
+                const std::lock_guard lock(order_mutex);
+                ++next_to_finish;
+            }
+            order_changed.notify_all();
         }
     } else {
         #pragma omp parallel for schedule(dynamic, 1) num_threads(team)
