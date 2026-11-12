@@ -1,0 +1,19 @@
+% The pipeline with the four design steps, numbered in presentation order.
+\begin{tikzpicture}[
+  stepbadge/.style={circle,fill=gold,text=white,font=\small\bfseries,inner sep=0pt,minimum size=6mm},
+  steplabel/.style={font=\small,align=center,text width=30mm}]
+\node[inputbox,text width=22mm] (t) at (0,0) {GOAL text};
+\node[processbox,text width=22mm] (c) at (3.9,0) {Converter\\\footnotesize\texttt{txt2bin}};
+\node[outputbox,text width=22mm] (f) at (7.8,0) {Binary file};
+\node[processbox,text width=22mm] (r) at (11.7,0) {Reader};
+\node[outputbox,text width=22mm] (s) at (15.6,0) {Simulator\\\footnotesize LogGOPSim};
+\foreach \a/\b in {t/c,c/f,f/r,r/s} \draw[arrow] (\a)--(\b);
+\foreach \target/\n/\label in {
+    f/1/{Self-describing\\format\\[1mm]{\scriptsize\color{black!60}the header describes\\every field}},
+    r/2/{JIT\\decoding\\[1mm]{\scriptsize\color{black!60}a decoder compiled\\for each file}},
+    c/3/{Parallel\\conversion\\[1mm]{\scriptsize\color{black!60}ranks parsed\\on all cores}},
+    s/4/{Lazy\\decoding\\[1mm]{\scriptsize\color{black!60}decode a node\\when it runs}}} {
+  \node[stepbadge,below=5mm of \target] (n\n) {\n};
+  \node[steplabel,below=1mm of n\n] {\label};
+}
+\end{tikzpicture}

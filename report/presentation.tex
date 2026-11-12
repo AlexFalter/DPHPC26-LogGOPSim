@@ -1,0 +1,330 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{array,booktabs}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}
+
+% Same TikZ styles as slides.tex, so the report's diagrams render unchanged.
+\tikzset{box/.style={draw=black!65,rounded corners=3pt,minimum height=9mm,
+ align=center,font=\small,inner sep=5pt},
+ inputbox/.style={box,fill=blue!10},processbox/.style={box,fill=green!12},
+ outputbox/.style={box,fill=orange!20},arrow/.style={-{Stealth[length=2mm]},thick},
+ message/.style={arrow,dashed,draw=orange!85!black}}
+\tikzset{card/.style={draw=black!25,fill=#1,rounded corners=4pt,minimum width=44mm,minimum height=30mm,align=center,inner sep=5pt}}
+\newcommand{\secnum}[1]{}
+\newcommand{\diagram}[1]{\resizebox{\linewidth}{!}{\input{diagrams/#1.tex}}}
+
+\definecolor{navy}{HTML}{1B2340}
+\definecolor{gold}{HTML}{D4A537}
+\definecolor{cream}{HTML}{F6EDCF}
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{title}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamercolor{item}{fg=gold!85!black}
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{\hfill\scriptsize\color{black!50}
+ DPHPC 2026 · Self-describing GOAL traces\quad\insertframenumber\hspace*{4mm}\vspace*{2mm}}
+\setbeamertemplate{itemize items}[circle]
+
+\lstset{basicstyle=\ttfamily\scriptsize,columns=fullflexible,keepspaces=true,
+ breaklines=true,showstringspaces=false,frame=single,rulecolor=\color{black!18},
+ backgroundcolor=\color{black!3},xleftmargin=3pt,xrightmargin=3pt}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\highlight}[1]{\colorbox{cream}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}}
+\newcommand{\source}[1]{{\scriptsize\color{black!55}\par\vspace{2mm}#1\par}}
+% Section divider: step number, name, one line on what it does.
+\newcommand{\stepframe}[3]{%
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Large\bfseries Step #1\par}
+\vspace{2mm}
+{\usebeamercolor[fg]{title}\Huge\bfseries #2\par}
+\vspace{4mm}
+{\color{black!60}#3\par}
+\vfill
+\end{frame}}
+
+\title{Self-describing GOAL traces for LogGOPSim}
+\subtitle{DPHPC 2026 progress presentation}
+\author{Joshua Durrant, Alexander Falter, Samuel Garcin, Mykhaylo Gershman}
+\date{Supervised by Timo Schneider \\ 17.11.26}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ---------------------------------------------------------------- old design
+
+\begin{frame}{LogGOPSim today}
+\small
+LogGOPSim predicts how long an MPI program runs. Input: per rank, a graph of sends, receives and computations. Output: the predicted runtime.
+\vspace{5mm}
+
+{\centering\diagram{original-overview}\par}
+\vspace{5mm}
+\begin{itemize}
+\item \texttt{txt2bin} converts the text schedule once; each simulation then reads the binary file.
+\item The reader is built into LogGOPSim and knows the record layout by heart.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The problem: a fixed 39-byte record}
+\diagram{legacy-record}
+\vspace{4mm}
+\begin{itemize}
+\item \textbf{Wasteful:} every field at full width, whatever values occur. Most traces need 2--4 bytes per node.
+\item \textbf{Closed:} no room for extra information. ATLAHS hides the GPU in \texttt{nic} and packs five numbers into the tag; a wrong guess gives wrong results silently.
+\item \textbf{Hard-wired:} each simulator needs its own copy of the byte offsets.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Our design in four steps}
+\centering\vfill
+\diagram{design-steps}
+\vfill
+\end{frame}
+
+% ---------------------------------------------------------------- step 1
+
+\stepframe{1}{Self-describing format}{The file says what is in it}
+
+\begin{frame}{A header that describes every field}
+\diagram{file-sections}
+\vspace{4mm}
+\begin{itemize}
+\item Each field gets only the bits its values need. The header stores a base, records store the offset: a constant field takes \textbf{0 bits}.
+\item \textbf{Custom fields} (declared in TOML) are treated like standard ones; each simulator binds only the fields it needs.
+\item Checked at load time: a missing field or a value that doesn't fit is an error, not a wrong result.
+\item Legacy files stay readable through the same reader.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Custom fields in practice: ATLAHS}
+\begin{lstlisting}
+before: l2: send 1024b to 1 tag 3050012001 cpu 0 nic 2
+after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
+            chunk_id 3 channel_id 5 sequence_id 12 message_kind 0 communicator_id 1
+\end{lstlisting}
+\vspace{4mm}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+\item Eight explicit fields instead of guesses.
+\item Fixed two htsim bugs: messages sent to the wrong GPU, and different messages sharing a tag.
+\end{itemize}
+\end{column}
+\begin{column}{0.4\textwidth}
+\highlight{\centering Recorded Llama run, 5.7M operations:\\[1mm]{\Large\bfseries 54\% smaller}\\ with all eight extra fields}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- step 2
+
+\stepframe{2}{JIT decoding}{A flexible format must not be slower to read}
+
+\begin{frame}[fragile]{Compile a decoder for each file}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\begin{lstlisting}
+int decode(const u8* r, u8* const* t) {
+  u64 w, c;
+  // peer: 16 bits at bit 3
+  memcpy(&w, r + 0x0, 8);
+  c = (w >> 0x3) & 0xffff;
+  store32(t[0] + 0x3c, c);
+  // size: 0 bits, constant 1024
+  store64(t[0] + 0x40, 0x400);
+  // ... further fields
+  return 1;
+}
+\end{lstlisting}
+{\scriptsize\color{black!55}Generated C for bcast\_64k, abridged.\par}
+\end{column}
+\begin{column}{0.5\textwidth}
+\small
+\begin{itemize}
+\item Bit positions are known only when the file is opened. A generic decoder took up to \textbf{47\%} of the simulation time.
+\item Once per file: build a decode plan from the header and the simulator's fields, then generate code in which every position and mask is a constant.
+\item \texttt{jit}: compiled with \texttt{cc}, cached on disk. \texttt{orc}: compiled in memory with LLVM.
+\item Fallback: the plan interpreter.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- step 3
+
+\stepframe{3}{Parallel conversion}{Parse ranks on all cores}
+
+\begin{frame}{The converter's first pass, in parallel}
+\vspace{2mm}
+{\centering\resizebox{0.8\linewidth}{!}{\input{diagrams/parallel-first-pass.tex}}\par}
+\vspace{5mm}
+\begin{itemize}
+\item The new format needs every field's range before writing, so \texttt{txt2bin} parses the text twice.
+\item Ranks are independent: the mapped text is cut after each rank and parsed on OpenMP threads.
+\item Per-thread statistics merge in any order: same bytes, same errors as the sequential pass. \texttt{txt2bin -{}-threads N}.
+\end{itemize}
+\end{frame}
+
+% ---------------------------------------------------------------- step 4
+
+\stepframe{4}{Lazy decoding}{Decode a node only when the simulator runs it}
+
+\begin{frame}{Decode once, never write the file}
+\centering
+\small
+\begin{tabular}{L{0.24\linewidth}L{0.32\linewidth}L{0.34\linewidth}}
+\toprule
+ & \textbf{Before} & \textbf{\texttt{-{}-lazy-decoding}} \\
+\midrule
+Ready node & decoded copy, 80 bytes & index, 4 bytes \\
+Decoded & when it becomes ready & once, when it runs \\
+Dependency counts & written into the mapped file; every written page is copied & array in memory, 4 bytes per node \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{6mm}
+\begin{itemize}
+\item Same simulation: the full event log is identical.
+\item Works with both formats and every decoder.
+\end{itemize}
+\end{frame}
+
+% ---------------------------------------------------------------- benchmarks
+
+\section{Benchmarks}
+
+\begin{frame}{Files are 53--93\% smaller}
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Trace} & \textbf{Bytes per node} & \textbf{File size} & \textbf{Smaller} \\
+\midrule
+bcast\_64k & 39 $\to$ 4 & 6.9 $\to$ 1.9 MiB & 73\% \\
+dissem\_16k & 39 $\to$ 4 & 19.2 $\to$ 2.4 MiB & 88\% \\
+alltoall\_256 & 39 $\to$ 2 & 5.4 MiB $\to$ 404 KiB & 93\% \\
+wide\_64k (random 64-bit values) & 39 $\to$ 15 & 6.9 $\to$ 3.2 MiB & 53\% \\
+ATLAHS Llama run (+8 fields) & 39 $\to$ 17 & 240.6 $\to$ 111.4 MiB & 54\% \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{6mm}
+\highlight{Narrow and constant fields shrink most; even random 64-bit values save half.}
+\end{frame}
+
+\begin{frame}{Simulations are faster than the original}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Trace} & \textbf{Original} & \textbf{Ours, legacy file} & \textbf{Ours, new + \texttt{jit}} & \textbf{\texttt{jit} vs.\ original} \\
+\midrule
+bcast\_64k & 48.4 & 43.9 & 43.7 & $-10\%$ \\
+dissem\_16k & 146.4 & 122.7 & 110.8 & $-24\%$ \\
+ring\_256 & 39.8 & 32.8 & 32.9 & $-17\%$ \\
+alltoall\_256 & 1950 & 2004 & 1996 & $+2\%$ \\
+wide\_64k & crashes & 78.4 & 79.5 & \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{5mm}
+\begin{itemize}
+\item Complete LogGOPSim runs in ms, identical results. alltoall is dominated by message matching.
+\item Decoding alone: \texttt{jit} is about 2$\times$ faster than the interpreter and within 6\% of code compiled ahead of time.
+\end{itemize}
+\source{Apple M3 Pro, median of 21 interleaved runs. Original: last upstream commit (76451de).}
+\end{frame}
+
+\begin{frame}{Parallel conversion and lazy decoding}
+\begin{columns}[T]
+\begin{column}{0.47\textwidth}
+\centering\textbf{Converter pass 1, seconds}\par\vspace{2mm}
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Trace} & \textbf{Seq.} & \textbf{8 threads} & \\
+\midrule
+dissem\_65536 & 2.79 & 0.60 & \textbf{4.6$\times$} \\
+ring\_2048 & 22.1 & 8.6 & \textbf{2.6$\times$} \\
+alltoall\_4096 & 38.1 & 10.7 & \textbf{3.6$\times$} \\
+\bottomrule
+\end{tabular}
+\end{column}
+\begin{column}{0.5\textwidth}
+\centering\textbf{Peak memory of a simulation, MB}\par\vspace{2mm}
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Trace} & \textbf{Before} & \textbf{Lazy} & \\
+\midrule
+dissem\_524288 & 2220 & 1540 & \textbf{$-31\%$} \\
+ring\_2048 & 1647 & 1103 & \textbf{$-33\%$} \\
+resnet\_8192 & 216 & 153 & \textbf{$-29\%$} \\
+\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+\vspace{6mm}
+\begin{itemize}
+\item Two threads nearly halve pass 1; beyond four it flattens. Pass 2 is still sequential.
+\item Lazy decoding is also 2--11\% faster.
+\end{itemize}
+\source{WSL2 with 8 vCPUs, median of 3 runs. Lazy: new format, \texttt{plan} decoder; peak RSS.}
+\end{frame}
+
+% ---------------------------------------------------------------- outlook
+
+\section{Outlook}
+
+\begin{frame}{Outlook}
+\begin{columns}[T]
+\begin{column}{0.47\textwidth}
+\textbf{Next optimisations}
+\begin{itemize}
+\item Parallelise pass 2 and the legacy writer.
+\item Dictionary encoding for few, far-apart values.
+\item Choose the decoder automatically from trace size and startup cost.
+\item Full benchmark study on Euler.
+\end{itemize}
+\end{column}
+\begin{column}{0.49\textwidth}
+\textbf{Conversion on the GPU (CUDA)}
+\begin{itemize}
+\item Ranks and nodes are independent: one GPU thread per node instead of one CPU thread per rank.
+\item Field statistics are min/max reductions; packing records is independent per node.
+\item GPU memory bandwidth for streaming very large traces.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- team
+
+\begin{frame}{Who did what}
+\small
+\begin{tabular}{L{0.25\linewidth}L{0.68\linewidth}}
+\toprule
+\textbf{Name} & \textbf{Work} \\
+\midrule
+Joshua Durrant & Full benchmarking study (upcoming) \\
+Alexander Falter & Parallel conversion (OpenMP first pass, \texttt{-{}-threads}, tests, benchmark); faster legacy writer; lazy decoding \\
+Samuel Garcin & Decode plan, C JIT with cache, LLVM ORC JIT, decode benchmark, differential tests \\
+Mykhaylo Gershman & Self-describing format and converter, custom fields, validating reader and adapters, ATLAHS integration, runner architecture, test and benchmark suites, report \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\Huge\bfseries Questions?\par}
+\vfill
+\end{frame}
+
+\end{document}
