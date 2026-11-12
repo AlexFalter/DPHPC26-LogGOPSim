@@ -1,0 +1,26 @@
+% The original LogGOPSim (upstream 76451de), at the same positions as design-overview.tex.
+\begin{tikzpicture}
+\node[inputbox,text width=24mm] (t) at (0,0) {GOAL text\\\texttt{.goal}};
+\node[processbox,text width=25mm] (p) at (4.1,0) {Parser\\\footnotesize re2c scanner};
+\node[processbox,text width=26mm] (w) at (9.3,0) {Writer\\\footnotesize legacy format};
+\node[font=\small] (joint) at (6.7,-1.1) {One pass: parse and write one rank at a time};
+\begin{scope}[on background layer]
+\node[draw=black!35,fill=black!2,rounded corners=5pt,inner sep=4mm,
+  fit=(p)(w)(joint)] {};
+\end{scope}
+\node[outputbox,text width=22mm] (f) at (13,0) {Binary file\\\footnotesize 39-byte records};
+\node[processbox,text width=20mm] (r) at (16.4,0) {Reader\\\footnotesize\texttt{Parser.hpp}};
+\node[processbox,text width=29mm] (a) at (20.1,0) {\texttt{SerializedGraph}\\\footnotesize fixed byte offsets};
+\node[outputbox,text width=26mm] (s) at (23.8,0) {Simulator\\\footnotesize LogGOPSim};
+\draw[arrow] (t)--(p);
+\draw[arrow] (p)--(w);
+\draw[arrow] (w)--(f);
+\draw[arrow] (f)--(r);
+\draw[arrow] (r)--(a);
+\draw[arrow] (a)--(s);
+% Same braces as design-overview.tex, so both diagrams scale alike.
+\draw[decorate,decoration={brace,mirror,amplitude=6pt},thick,black!60]
+  (-1.3,-2.1) -- node[below=8pt,font=\small,align=center] {\textbf{Writing:} \texttt{txt2bin}, once per schedule} (12.9,-2.1);
+\draw[decorate,decoration={brace,mirror,amplitude=6pt},thick,black!60]
+  (13.1,-2.1) -- node[below=8pt,font=\small,align=center] {\textbf{Reading:} LogGOPSim, once per run} (25.3,-2.1);
+\end{tikzpicture}

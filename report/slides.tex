@@ -72,7 +72,7 @@
 
 \begin{frame}{Outline}
 \begin{enumerate}
-\item \textbf{Task:} the problem, our goals, who did what, structure of our implementation.
+\item \textbf{Task:} the problem, our goals, who did what, the original structure and ours.
 \item \textbf{Self-describing format:} file layout, encodings, conversion.
 \item \textbf{Parallel conversion:} the first pass on OpenMP threads.
 \item \textbf{Lazy decoding:} decode each node once, never write the schedule.
@@ -134,6 +134,26 @@ Joshua Durrant & Full benchmarking study (upcoming) \\
 Alexander Falter & OpenMP-parallel first conversion pass (parallel GOAL reader, mergeable statistics, \texttt{-{}-threads}), its differential tests and benchmark; legacy writer without remapping; lazy decoding in LogGOPSim (\texttt{-{}-lazy-decoding}) \\
 Samuel Garcin & Decode replay benchmark, decode plan (optimized interpreter), C JIT with cache, in-process JIT with LLVM ORC, differential test against the generic decoder \\
 Mykhaylo Gershman & Self-describing format and converter, bit packing (including 0-bit constant fields), custom fields, validating reader and simulator adapters, LogGOPSim restructuring, ATLAHS integration, runner architecture and registry, templated runners, test suite (GoogleTest, pytest), benchmark suite and profiler, report \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Before our fork: the original LogGOPSim}
+\small
+The last upstream commit before this project (\texttt{76451de}, December 2023):
+\vspace{2mm}
+
+{\centering\diagram{original-overview}\par}
+\vspace{3mm}
+\footnotesize
+\begin{tabular}{L{0.13\linewidth}L{0.36\linewidth}L{0.41\linewidth}}
+\toprule
+ & \textbf{Original} & \textbf{Ours} \\
+\midrule
+Format & fixed 39-byte record per node & self-describing: packed and custom fields; legacy still readable \\
+Conversion & one pass, rank by rank & pass 1 infers the layout (in parallel), pass 2 writes \\
+Reading & decoding hard-coded in LogGOPSim & one validating reader; adapters for LogGOPSim and htsim; five decode runners \\
+Simulation & node decoded when ready, started and finished; counters written into the file & \texttt{-{}-lazy-decoding}: decoded once, counters in memory \\
 \bottomrule
 \end{tabular}
 \end{frame}
