@@ -16,6 +16,8 @@
 \tikzset{card/.style={draw=black!25,fill=#1,rounded corners=4pt,minimum width=44mm,minimum height=30mm,align=center,inner sep=5pt}}
 \newcommand{\secnum}[1]{}
 \newcommand{\diagram}[1]{\resizebox{\linewidth}{!}{\input{diagrams/#1.tex}}}
+% Shared encoding figure (diagrams/offset-encoding.tex).
+\newcommand{\encodingfig}[1]{\begingroup\def\encodingextra{#1}\input{diagrams/offset-encoding.tex}\endgroup}
 
 \definecolor{navy}{HTML}{1B2340}
 \definecolor{gold}{HTML}{D4A537}
@@ -37,15 +39,19 @@
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcommand{\highlight}[1]{\colorbox{cream}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}}
 \newcommand{\source}[1]{{\scriptsize\color{black!55}\par\vspace{2mm}#1\par}}
-% Section divider: step number, name, one line on what it does.
+% Step title slide: the four-step pipeline with this step highlighted, and the question it answers.
 \newcommand{\stepframe}[3]{%
 \begin{frame}
-\centering\vfill
-{\usebeamercolor[fg]{title}\Large\bfseries Step #1\par}
-\vspace{2mm}
-{\usebeamercolor[fg]{title}\Huge\bfseries #2\par}
-\vspace{4mm}
+\vfill
+{\centering
+{\usebeamercolor[fg]{title}\large\bfseries Step #1\par}
+\vspace{1mm}
+{\usebeamercolor[fg]{title}\huge\bfseries #2\par}
+\vspace{3mm}
 {\color{black!60}#3\par}
+\vspace{9mm}
+\def\activestep{#1}%
+\resizebox{0.85\linewidth}{!}{\input{diagrams/design-steps.tex}}\par}
 \vfill
 \end{frame}}
 
@@ -60,7 +66,7 @@
 \titlepage
 \end{frame}
 
-% ---------------------------------------------------------------- old design
+% ================================================================ old design
 
 \begin{frame}{LogGOPSim today}
 \small
@@ -73,6 +79,24 @@ LogGOPSim predicts how long an MPI program runs. Input: per rank, a graph of sen
 \item \texttt{txt2bin} converts the text schedule once; each simulation then reads the binary file.
 \item The reader is built into LogGOPSim and knows the record layout by heart.
 \end{itemize}
+\end{frame}
+
+\begin{frame}{A schedule is a dependency graph}
+\begin{columns}[c]
+\begin{column}{0.45\textwidth}
+\centering\resizebox{\linewidth}{!}{\input{diagrams/local-dependencies.tex}}
+\end{column}
+\begin{column}{0.52\textwidth}
+\small
+\begin{itemize}
+\item Each rank is a graph of \texttt{calc}, \texttt{send} and \texttt{recv} nodes.
+\item A node's \textbf{counter} says how many nodes it still waits for. Roots start at 0.
+\item The simulator runs ready nodes with LogGOPS costs ($L$, $o$, $g$, $G$), then decrements the counters of their dependents.
+\item A dependent whose counter reaches 0 becomes ready.
+\item Output: the time at which each rank finishes.
+\end{itemize}
+\end{column}
+\end{columns}
 \end{frame}
 
 \begin{frame}{The problem: a fixed 39-byte record}
@@ -89,35 +113,57 @@ LogGOPSim predicts how long an MPI program runs. Input: per rank, a graph of sen
 \centering\vfill
 \diagram{design-steps}
 \vfill
+\par\raggedright
+\highlight{Step 1 solves the problem. Steps 2--4 make sure the new format costs nothing: reading, converting and simulating get faster, not slower.}
 \end{frame}
 
-% ---------------------------------------------------------------- step 1
+% ================================================================ step 1
 
 \stepframe{1}{Self-describing format}{The file says what is in it}
 
-\begin{frame}{A header that describes every field}
+\begin{frame}{The file describes itself}
 \diagram{file-sections}
 \vspace{4mm}
 \begin{itemize}
-\item Each field gets only the bits its values need. The header stores a base, records store the offset: a constant field takes \textbf{0 bits}.
-\item \textbf{Custom fields} (declared in TOML) are treated like standard ones; each simulator binds only the fields it needs.
-\item Checked at load time: a missing field or a value that doesn't fit is an error, not a wrong result.
-\item Legacy files stay readable through the same reader.
+\item The \textbf{schema header} lists every field: name, type, bit position, width, base. A reader needs no built-in knowledge of the layout.
+\item All records of a file share one layout, so node $i$ of a rank is at \mbox{\texttt{rank\_start + i $\times$ record\_size}}, without scanning.
+\item A new magic number tells the formats apart: legacy files stay readable through the same reader.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Custom fields in practice: ATLAHS}
+\begin{frame}{Each field gets only the bits it needs}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\centering\resizebox{\linewidth}{!}{\encodingfig{}}
+\end{column}
+\begin{column}{0.47\textwidth}
+\small
+\begin{itemize}
+\item Width from the field's largest value.
+\item \textbf{Offset encoding:} the header stores the smallest value (the base), records store the offset.
+\item A constant field takes \textbf{0 bits}: its value lives only in the header.
+\item bcast\_64k: 39 $\to$ 4 bytes per node.
+\end{itemize}
+\end{column}
+\end{columns}
+\vspace{6mm}
+\highlight{\textbf{In the grand picture:} the layout depends on every value in the trace. The converter must see all values before writing (Step 3), and the reader must interpret the layout (Step 2).}
+\end{frame}
+
+\begin{frame}[fragile]{Custom fields: the ATLAHS case}
 \begin{lstlisting}
 before: l2: send 1024b to 1 tag 3050012001 cpu 0 nic 2
 after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
             chunk_id 3 channel_id 5 sequence_id 12 message_kind 0 communicator_id 1
 \end{lstlisting}
-\vspace{4mm}
+\vspace{3mm}
 \begin{columns}[T]
-\begin{column}{0.55\textwidth}
+\begin{column}{0.56\textwidth}
+\small
 \begin{itemize}
-\item Eight explicit fields instead of guesses.
-\item Fixed two htsim bugs: messages sent to the wrong GPU, and different messages sharing a tag.
+\item Custom fields are declared in TOML and treated like standard ones.
+\item Each simulator binds only the fields it needs; a missing field or a value too large for its member fails at load time.
+\item Explicit fields exposed and fixed two htsim bugs: messages sent to the wrong GPU, and different messages sharing a tag.
 \end{itemize}
 \end{column}
 \begin{column}{0.4\textwidth}
@@ -126,11 +172,36 @@ after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
 \end{columns}
 \end{frame}
 
-% ---------------------------------------------------------------- step 2
+% ================================================================ step 2
 
 \stepframe{2}{JIT decoding}{A flexible format must not be slower to read}
 
-\begin{frame}[fragile]{Compile a decoder for each file}
+\begin{frame}{Flexibility has a cost at read time}
+\centering\vfill
+\begin{tikzpicture}
+\node[card=blue!8] at (0,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 40\%}\\[2mm]\small bcast\_64k};
+\node[card=orange!15] at (48mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 47\%}\\[2mm]\small dissem\_16k};
+\node[card=black!5] at (96mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 2\%}\\[2mm]\small alltoall\_256\\\scriptsize message matching dominates};
+\end{tikzpicture}
+\vfill
+\par\raggedright
+\begin{itemize}
+\item Share of the simulation time spent decoding, with the first, generic decoder.
+\item Bit positions are known only when the file is opened, so it interpreted the header for every field of every node: look up position, shift, mask, add base, check range.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Build the decoder once, run it for every node}
+\centering\resizebox{!}{0.5\textheight}{\input{diagrams/node-read-call.tex}}
+\par\raggedright\vspace{3mm}
+\small
+\begin{itemize}
+\item \textbf{Once, when the file is opened:} take the fields the simulator binds, build a \textbf{decode plan} (one step per field: offset, shift, mask, base, destination), pick a runner.
+\item \textbf{For every node:} the runner turns the record's bits into the simulator's node struct.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Compiled runners hard-code the layout}
 \begin{columns}[T]
 \begin{column}{0.46\textwidth}
 \begin{lstlisting}
@@ -151,54 +222,137 @@ int decode(const u8* r, u8* const* t) {
 \begin{column}{0.5\textwidth}
 \small
 \begin{itemize}
-\item Bit positions are known only when the file is opened. A generic decoder took up to \textbf{47\%} of the simulation time.
-\item Once per file: build a decode plan from the header and the simulator's fields, then generate code in which every position and mask is a constant.
-\item \texttt{jit}: compiled with \texttt{cc}, cached on disk. \texttt{orc}: compiled in memory with LLVM.
-\item Fallback: the plan interpreter.
+\item Every position and mask is a constant: no loop, no lookup.
+\item \texttt{jit}: compiled with \texttt{cc}, cached on disk (about 340\,ms the first time).
+\item \texttt{orc}: the same function in memory with LLVM (about 2.5\,ms).
+\item \texttt{plan}: interpreter, the default and fallback.
+\item Only numbers from the header go into the code, so a trace can't inject code.
+\end{itemize}
+\vspace{2mm}
+\highlight{\texttt{jit}: 12--17\,ns per node, 2$\times$ the interpreter, within 6\% of code compiled ahead of time.}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ================================================================ step 3
+
+\stepframe{3}{Parallel conversion}{Converting is now two passes; make them use all cores}
+
+\begin{frame}{Why conversion reads the input twice}
+\diagram{conversion-overview}
+\vspace{4mm}
+\begin{itemize}
+\item The layout must be fixed before the first record is written: if tags 0--7 fit in 3 bits but a later rank uses tag 1000, earlier records can't be widened.
+\item \textbf{Pass 1} only collects statistics: each field's minimum and maximum, wildcards, counts.
+\item \textbf{Pass 2} parses again and packs each rank with the final layout.
+\item One rank's graph in memory at a time, so memory stays bounded.
+\end{itemize}
+\vspace{2mm}
+\highlight{Pass 1 was one sequential scan through a \texttt{FILE*}: 22--38\,s on our largest traces.}
+\end{frame}
+
+\begin{frame}{Pass 1 in parallel: one rank per task}
+\vspace{2mm}
+{\centering\resizebox{0.8\linewidth}{!}{\input{diagrams/parallel-first-pass.tex}}\par}
+\vspace{5mm}
+\begin{itemize}
+\item In GOAL, ranks are independent blocks. The memory-mapped text is cut after each rank's closing brace (skipping comments).
+\item OpenMP threads parse whole ranks with the unchanged scanner and keep their own statistics.
+\item Minimum, maximum and counts merge in any order, so the result doesn't depend on the thread count. \texttt{txt2bin -{}-threads N}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Same result as before, and what it took}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{Identical to the sequential pass}
+\small
+\begin{itemize}
+\item Same output bytes in both formats.
+\item Same errors: the lowest invalid rank is reported, with its line number in the whole file.
+\item 9 differential tests at 1, 2, 3 and 8 threads.
+\item Pipes can't be mapped: they use the sequential reader.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\textbf{Two bottlenecks found on the way}
+\small
+\begin{itemize}
+\item The legacy writer remapped the whole output file for every rank. With threads, each unmap got expensive: 45\,s instead of 4\,s. Now each rank is appended with \texttt{pwrite}.
+\item Threads waiting in \texttt{omp ordered} spin and starved the writer: 15\,s instead of under 1\,s. Now they sleep on a condition variable.
 \end{itemize}
 \end{column}
 \end{columns}
 \end{frame}
 
-% ---------------------------------------------------------------- step 3
-
-\stepframe{3}{Parallel conversion}{Parse ranks on all cores}
-
-\begin{frame}{The converter's first pass, in parallel}
-\vspace{2mm}
-{\centering\resizebox{0.8\linewidth}{!}{\input{diagrams/parallel-first-pass.tex}}\par}
-\vspace{5mm}
-\begin{itemize}
-\item The new format needs every field's range before writing, so \texttt{txt2bin} parses the text twice.
-\item Ranks are independent: the mapped text is cut after each rank and parsed on OpenMP threads.
-\item Per-thread statistics merge in any order: same bytes, same errors as the sequential pass. \texttt{txt2bin -{}-threads N}.
-\end{itemize}
-\end{frame}
-
-% ---------------------------------------------------------------- step 4
+% ================================================================ step 4
 
 \stepframe{4}{Lazy decoding}{Decode a node only when the simulator runs it}
 
-\begin{frame}{Decode once, never write the file}
-\centering
+\begin{frame}{Where the simulator spends memory}
+\centering\diagram{lazy-flow}
+\par\raggedright\vspace{5mm}
 \small
-\begin{tabular}{L{0.24\linewidth}L{0.32\linewidth}L{0.34\linewidth}}
-\toprule
- & \textbf{Before} & \textbf{\texttt{-{}-lazy-decoding}} \\
-\midrule
-Ready node & decoded copy, 80 bytes & index, 4 bytes \\
-Decoded & when it becomes ready & once, when it runs \\
-Dependency counts & written into the mapped file; every written page is copied & array in memory, 4 bytes per node \\
-\bottomrule
-\end{tabular}
-\par\raggedright\vspace{6mm}
 \begin{itemize}
-\item Same simulation: the full event log is identical.
-\item Works with both formats and every decoder.
+\item \textbf{Before:} counters are decremented in the memory-mapped file. The mapping is private, so the file stays reusable, but every page written is copied: a long run copies most of the file.
+\item \textbf{Lazy:} counters move to a small array, ready nodes are indices, and each node is decoded once, when it runs.
 \end{itemize}
 \end{frame}
 
-% ---------------------------------------------------------------- benchmarks
+\begin{frame}[fragile]{Implementation}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{lstlisting}[language=C++]
+// A node finished: release its dependents.
+for (auto i : dependents) {
+  auto& c = counters_[i];  // remaining + 1
+  if (c == 0)              // first use
+    c = reader.read_dependency_count(rank, i) + 1;
+  if (--c == 1)            // none left
+    ready_.push_back(i);   // 4-byte index
+}
+
+// The simulator takes the ready nodes: decode now.
+for (auto i : ready_)
+  out.push_back(reader.read_node(rank, i));
+\end{lstlisting}
+{\scriptsize\color{black!55}From \texttt{SimulationSchedule.hpp}, simplified.\par}
+\end{column}
+\begin{column}{0.37\textwidth}
+\small
+\begin{itemize}
+\item Counters are read from the file only on their first decrement: no extra pass over the file at startup.
+\item 0 means ``not read yet'', so the stored value is the remaining count plus one.
+\item Works for both formats and every decoder, through the same reader.
+\item Opt-in flag \texttt{-{}-lazy-decoding}; the default is unchanged.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Same simulation, fewer copies}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{Correctness}
+\small
+\begin{itemize}
+\item The full \texttt{-v} event log is identical in both modes: every operation at the same simulated time.
+\item Checked on dissemination, ResNet and ring traces (14.7M--72.8M log lines), both formats.
+\item The trace file is never written, so it can be shared by concurrent runs.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\textbf{Trade-offs}
+\small
+\begin{itemize}
+\item The counter array is 4\,B per node, allocated at startup: 1 billion nodes need 4\,GB, still far less than the page copies it replaces.
+\item Not combinable with \texttt{-{}-save-mem}, which exists only to write counters back to the file.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ================================================================ benchmarks
 
 \section{Benchmarks}
 
@@ -279,7 +433,7 @@ resnet\_8192 & 216 & 153 & \textbf{$-29\%$} \\
 \source{WSL2 with 8 vCPUs, median of 3 runs. Lazy: new format, \texttt{plan} decoder; peak RSS.}
 \end{frame}
 
-% ---------------------------------------------------------------- outlook
+% ================================================================ outlook
 
 \section{Outlook}
 
@@ -305,7 +459,7 @@ resnet\_8192 & 216 & 153 & \textbf{$-29\%$} \\
 \end{columns}
 \end{frame}
 
-% ---------------------------------------------------------------- team
+% ================================================================ team
 
 \begin{frame}{Who did what}
 \small
