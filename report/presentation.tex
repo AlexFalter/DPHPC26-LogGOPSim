@@ -177,17 +177,21 @@ after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
 \stepframe{2}{JIT decoding}{A flexible format must not be slower to read}
 
 \begin{frame}{Flexibility has a cost at read time}
-\centering\vfill
-\begin{tikzpicture}
-\node[card=blue!8] at (0,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 40\%}\\[2mm]\small bcast\_64k};
-\node[card=orange!15] at (48mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 47\%}\\[2mm]\small dissem\_16k};
-\node[card=black!5] at (96mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 2\%}\\[2mm]\small alltoall\_256\\\scriptsize message matching dominates};
-\end{tikzpicture}
-\vfill
-\par\raggedright
+\centering
+\begin{tabular}{lr}
+\toprule
+\textbf{Trace} & \textbf{Time spent decoding} \\
+\midrule
+bcast\_64k & 40\% \\
+dissem\_16k & 47\% \\
+alltoall\_256 & 2\% \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{6mm}
 \begin{itemize}
-\item Share of the simulation time spent decoding, with the first, generic decoder.
-\item Bit positions are known only when the file is opened, so it interpreted the header for every field of every node: look up position, shift, mask, add base, check range.
+\item This is the share of the simulation time spent decoding with the first, generic decoder.
+\item Bit positions are only known when the file is opened. For every field of every node, the generic decoder read the field's metadata, passed the value through a \texttt{std::variant} and called an assignment function.
+\item alltoall\_256 spends almost all its time matching messages.
 \end{itemize}
 \end{frame}
 
@@ -196,8 +200,8 @@ after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
 \par\raggedright\vspace{3mm}
 \small
 \begin{itemize}
-\item \textbf{Once, when the file is opened:} take the fields the simulator binds, build a \textbf{decode plan} (one step per field: offset, shift, mask, base, destination), pick a runner.
-\item \textbf{For every node:} the runner turns the record's bits into the simulator's node struct.
+\item When the file is opened, the reader takes the fields the simulator binds and builds a \textbf{decode plan} with one step per field (offset, shift, mask, base, range, destination). Then it picks a runner.
+\item For every node, the runner turns the record's bits into the simulator's node struct.
 \end{itemize}
 \end{frame}
 
@@ -217,19 +221,19 @@ int decode(const u8* r, u8* const* t) {
   return 1;
 }
 \end{lstlisting}
-{\scriptsize\color{black!55}Generated C for bcast\_64k, abridged.\par}
+{\scriptsize\color{black!55}Generated C for bcast\_64k, simplified.\par}
 \end{column}
 \begin{column}{0.5\textwidth}
 \small
 \begin{itemize}
-\item Every position and mask is a constant: no loop, no lookup.
-\item \texttt{jit}: compiled with \texttt{cc}, cached on disk (about 340\,ms the first time).
-\item \texttt{orc}: the same function in memory with LLVM (about 2.5\,ms).
-\item \texttt{plan}: interpreter, the default and fallback.
+\item All positions and masks are constants, so there is no loop and no lookup.
+\item \texttt{jit} compiles it with \texttt{cc} and caches it. The first run takes about 340\,ms.
+\item \texttt{orc} builds it in memory with LLVM. Every run starts about 9\,ms later than \texttt{plan}, mostly to load LLVM.
+\item \texttt{plan} is the interpreter, the default and the fallback.
 \item Only numbers from the header go into the code, so a trace can't inject code.
 \end{itemize}
-\vspace{2mm}
-\highlight{\texttt{jit}: 12--17\,ns per node, 2$\times$ the interpreter, within 6\% of code compiled ahead of time.}
+\vspace{1mm}
+\highlight{When only decoding, \texttt{jit} takes 12--18\,ns per node, about 2$\times$ faster than the interpreter and within 6\% of code compiled ahead of time.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -379,7 +383,7 @@ ATLAHS Llama run (+8 fields) & 39 $\to$ 17 & 240.6 $\to$ 111.4 MiB & 54\% \\
 \small
 \begin{tabular}{lrrrr}
 \toprule
-\textbf{Trace} & \textbf{Original} & \textbf{Ours, legacy file} & \textbf{Ours, new + \texttt{jit}} & \textbf{\texttt{jit} vs.\ original} \\
+\textbf{Trace} & \textbf{Original} & \textbf{Ours, legacy file} & \shortstack[r]{\textbf{Ours, new +}\\\textbf{\texttt{jit} (cached)}} & \textbf{\texttt{jit} vs.\ original} \\
 \midrule
 bcast\_64k & 48.4 & 43.9 & 43.7 & $-10\%$ \\
 dissem\_16k & 146.4 & 122.7 & 110.8 & $-24\%$ \\
@@ -391,7 +395,7 @@ wide\_64k & crashes & 78.4 & 79.5 & \\
 \par\raggedright\vspace{5mm}
 \begin{itemize}
 \item Complete LogGOPSim runs in ms, identical results. alltoall is dominated by message matching.
-\item Decoding alone: \texttt{jit} is about 2$\times$ faster than the interpreter and within 6\% of code compiled ahead of time.
+\item With legacy files our version is already 9--18\% faster on bcast, dissem and ring, so most of the gain doesn't come from the JIT. The cached \texttt{jit} is at most 5\% faster than \texttt{plan}.
 \end{itemize}
 \source{Apple M3 Pro, median of 21 interleaved runs. Original: last upstream commit (76451de).}
 \end{frame}

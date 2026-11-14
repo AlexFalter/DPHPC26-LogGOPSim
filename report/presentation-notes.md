@@ -52,15 +52,19 @@ The thread through the talk: **Step 1 fixes the format; steps 2–4 make sure it
 **11. Flexibility has a cost at read time.**
 - With the first generic decoder, decoding was 40–47% of the simulation time on broadcast and dissemination.
 - alltoall shows 2% because message matching dominates there.
+- The generic decoder was slow because every field went through a `std::variant` and its own assignment function call.
 
 **12. Build the decoder once, run it for every node.**
 - Sequence diagram: setup once (map the file, check bindings), then repeated `read_node` calls.
 - The decode plan is the bridge: one step per field the simulator needs.
+- A differential test checks every runner against the exact decoder on random layouts and records.
 
 **13. Compiled runners hard-code the layout.**
 - In the generated code, every number is a literal, so the compiler emits a few shifts and masks.
-- `jit` costs about 340 ms the first time and is cached after that. `orc` compiles in memory in 2.5 ms but loads LLVM. The interpreter is the fallback.
-- Result: 2× faster than the interpreter and within 6% of code compiled ahead of time, so decoding is no longer the bottleneck.
+- `jit` costs about 340 ms the first time and is cached after that. On macOS most of this is loading the new library, not compiling it (64 ms compile and 255 ms first load in an earlier measurement).
+- `orc` compiles in memory in about 2.5 ms, but loading LLVM makes every run start about 9 ms later than `plan`. None of our benchmark traces is large enough for it to pay off in a complete run.
+- The interpreter is the fallback.
+- When only decoding, `jit` is about 2× faster than the interpreter and within 6% of code compiled ahead of time, so decoding is no longer the bottleneck.
 
 ## Step 3: Parallel conversion
 
@@ -103,6 +107,8 @@ The thread through the talk: **Step 1 fixes the format; steps 2–4 make sure it
 **23. Simulations are faster than the original.**
 - Complete runs, including startup, against the last upstream commit: 10–24% faster, identical results.
 - alltoall is dominated by matching. The original crashes on wide_64k.
+- The `jit` column uses a warm cache. A first run adds about 340 ms.
+- Most of the gain also shows with legacy files, so it doesn't come from the JIT. The cached `jit` saves at most 5% over `plan`.
 
 **24. Parallel conversion and lazy decoding.**
 - Pass 1 is 2.6–4.6× faster with 8 threads and flattens beyond 4 (cause not measured yet). Pass 2 is still sequential, so a full conversion gains 1.3–1.5×.
