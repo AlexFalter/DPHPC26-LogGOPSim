@@ -1,24 +1,41 @@
+% \adapterextra draws on top of the finished figure; it does nothing unless the including
+% document defines it.
+\providecommand{\adapterextra}{}
+% Both adapters inherit the shared interface; each fills its own node struct, which inherits the
+% shared base node, and the scheduler only sees that struct.
 \begin{tikzpicture}[
-  common/.style={box,fill=blue!8,text width=74mm,align=left,inner sep=3mm},
-  adapter/.style={box,fill=green!12,text width=48mm,minimum height=18mm},
-  inherits/.style={-{Triangle[open,length=3mm,width=3mm]},thick}]
-\node[inputbox,text width=31mm] (file) at (0,0) {One binary,\\either format};
-\node[common] (base) at (7.6,0) {
+  common/.style={box,fill=blue!8,text width=98mm,align=left,inner sep=3mm},
+  adapter/.style={box,fill=green!12,text width=40mm,minimum height=14mm},
+  nodestruct/.style={box,fill=yellow!18,draw=black!55,minimum height=11mm,font=\small},
+  inherits/.style={-{Triangle[open,length=3mm,width=3mm]},thick},
+  flow/.style={font=\small}]
+\node[inputbox,text width=28mm] (file) at (-2.2,0) {One binary,\\either format};
+\node[common] (base) at (7.3,0) {
   \textbf{SimulatorAdapter<Node>}\\
   Shared \texttt{TraceReader}: validation + decoding\\[3pt]
   \texttt{read\_node(rank, index)} $\rightarrow$ \texttt{Node}\\
   \texttt{read\_root\_nodes(rank)}\\
   \texttt{decrement\_dependency\_count(rank, index)}};
 \draw[arrow] (file) -- node[above,font=\small] {file data} (base);
-\node[adapter] (log) at (3.6,-3.5) {\textbf{LogGOPSimAdapter}\\\texttt{Node = LogGOPSimNode}\\LogGOPSim field bindings};
-\node[adapter] (atlas) at (10.4,-3.5) {\textbf{AtlahsAdapter}\\\texttt{Node = AtlahsNode}\\ATLAHS field bindings};
-\draw[inherits] (log.north) -- (log.north |- base.south);
-\draw[inherits] (atlas.north) -- (atlas.north |- base.south);
-\node[font=\small,fill=white] at (7,-2.1) {inherit the shared interface};
-\node[outputbox,text width=42mm] (ls) at (3.6,-5.7) {LogGOPSim scheduler};
-\node[outputbox,text width=42mm] (as) at (10.4,-5.7) {ATLAHS htsim scheduler};
-\draw[arrow] ([xshift=-9mm]ls.north) -- node[left,font=\small] {request} ([xshift=-9mm]log.south);
-\draw[arrow] ([xshift=9mm]log.south) -- node[right,font=\small] {node} ([xshift=9mm]ls.north);
-\draw[arrow] ([xshift=-9mm]as.north) -- node[left,font=\small] {request} ([xshift=-9mm]atlas.south);
-\draw[arrow] ([xshift=9mm]atlas.south) -- node[right,font=\small] {node} ([xshift=9mm]as.north);
+\node[adapter] (log) at (2.4,-3.5) {\textbf{LogGOPSimAdapter}\\LogGOPSim field bindings};
+\node[adapter] (atlas) at (12.2,-3.5) {\textbf{AtlahsAdapter}\\ATLAHS field bindings};
+\draw[inherits] (log.north) -- node[left,flow] {inherits} (log.north |- base.south);
+\draw[inherits] (atlas.north) -- node[right,flow] {inherits} (atlas.north |- base.south);
+% The shared base node and the node struct each adapter fills.
+\node[nodestruct,fill=yellow!35,text width=24mm] (basenode) at (7.3,-6.0) {\textbf{Base node}\\\scriptsize fields every\\\scriptsize simulation needs};
+\draw[arrow,dashed] (base.south -| basenode) -- node[right,flow] {defines} (basenode);
+\node[nodestruct,text width=30mm] (ln) at (2.4,-6.0) {\textbf{\texttt{LogGOPSimNode}}};
+\node[nodestruct,text width=30mm] (an) at (12.2,-6.0) {\textbf{\texttt{AtlahsNode}}};
+\draw[inherits] (ln) -- node[above,flow,font=\scriptsize,align=center] {extends with\\the fields\\it needs} (basenode);
+\draw[inherits] (an) -- node[above,flow,font=\scriptsize,align=center] {extends with\\the fields\\it needs} (basenode);
+\draw[arrow] (log) -- node[right,flow] {fills} (ln);
+\draw[arrow] (atlas) -- node[left,flow] {fills} (an);
+\node[outputbox,text width=38mm] (ls) at (2.4,-8.7) {LogGOPSim scheduler};
+\node[outputbox,text width=38mm] (as) at (12.2,-8.7) {ATLAHS htsim scheduler};
+\draw[arrow] (ln) -- node[right,flow] {reads} (ls);
+\draw[arrow] (an) -- node[left,flow] {reads} (as);
+% The scheduler asks its adapter for the next node.
+\draw[arrow,dashed] (ls.west) -- ++(-5mm,0) |- node[pos=0.25,left,flow] {request} (log.west);
+\draw[arrow,dashed] (as.east) -- ++(5mm,0) |- node[pos=0.25,right,flow] {request} (atlas.east);
+\adapterextra
 \end{tikzpicture}

@@ -2,6 +2,10 @@
 % rank-table entry (bottom) zoomed in. Values in the zoomed rows are an example.
 % \ifranktable draws the rank table; the report sets it, the slides leave it out because the
 % rank table works as in the legacy format.
+% \magicmark{...} formats the word "magic" in the prefix and \headerextra draws on top of the
+% finished figure; both do nothing unless the including document defines them.
+\providecommand{\magicmark}[1]{#1}
+\providecommand{\headerextra}{}
 \begin{tikzpicture}[
   cell/.style={draw=black!65,minimum height=11mm,inner sep=1pt,align=center,font=\small},
   detail/.style={draw=black!65,minimum height=15mm,inner sep=1pt,align=center,font=\small},
@@ -12,7 +16,7 @@
 % Middle row: the start of the file.
 % Without the rank table, centre the header row under the enlarged descriptor.
 \ifranktable\def\headerx{0mm}\else\def\headerx{36mm}\fi
-\node[cell,fill=green!15,minimum width=34mm,anchor=west] (prefix) at (\headerx,0) {Fixed prefix\\{\scriptsize\color{black!60}magic, version, \dots; 43 B}};
+\node[cell,fill=green!15,minimum width=34mm,anchor=west] (prefix) at (\headerx,0) {Fixed prefix\\{\scriptsize\color{black!60}\magicmark{magic}, version, \dots; 43 B}};
 \node[cell,fill=blue!8,minimum width=19mm,right=0mm of prefix] (f1) {Field 1};
 \node[cell,fill=blue!25,line width=1pt,minimum width=19mm,right=0mm of f1] (f2) {Field 2};
 \node[cell,fill=blue!8,minimum width=12mm,right=0mm of f2] (fd) {\dots};
@@ -29,15 +33,16 @@
 
 % Top row: one field descriptor, 32 bytes plus the name of a custom field.
 \begin{scope}[yshift=30mm]
-\node[detail,fill=green!15,minimum width=19mm,anchor=west] (k) at (0,0) {Kind\\[-1pt]{\footnotesize\ttfamily 0}{\scriptsize\ standard}\\[-1pt]{\scriptsize\color{black!60}1 B}};
-\node[detail,fill=green!15,minimum width=19mm,right=0mm of k] (ty) {Type\\[-1pt]{\footnotesize\ttfamily 1}{\scriptsize\ unsigned}\\[-1pt]{\scriptsize\color{black!60}1 B}};
-\node[detail,fill=blue!8,minimum width=15mm,right=0mm of ty] (w) {Width\\[-1pt]{\footnotesize\ttfamily 3}\\[-1pt]{\scriptsize\color{black!60}1 B}};
-\node[detail,fill=blue!8,minimum width=18mm,right=0mm of w] (wc) {Wildcard\\[-1pt]{\footnotesize\ttfamily 0}\\[-1pt]{\scriptsize\color{black!60}1 B}};
-\node[detail,fill=blue!8,minimum width=19mm,right=0mm of wc] (bo) {Bit offset\\[-1pt]{\footnotesize\ttfamily 23}\\[-1pt]{\scriptsize\color{black!60}8 B}};
-\node[detail,fill=blue!8,minimum width=15mm,right=0mm of bo] (b) {Base\\[-1pt]{\footnotesize\ttfamily 0}\\[-1pt]{\scriptsize\color{black!60}8 B}};
-\node[detail,fill=blue!8,minimum width=21mm,right=0mm of b] (mo) {Max. offset\\[-1pt]{\footnotesize\ttfamily 7}\\[-1pt]{\scriptsize\color{black!60}8 B}};
-\node[detail,fill=orange!20,minimum width=27mm,right=0mm of mo] (id) {ID / name length\\[-1pt]{\footnotesize\ttfamily 4}{\scriptsize\ = tag}\\[-1pt]{\scriptsize\color{black!60}4 B}};
-\node[detail,fill=orange!20,minimum width=21mm,right=0mm of id] (nm) {Name\\[-1pt]{\scriptsize custom only}\\[-1pt]{\scriptsize\color{black!60}variable}};
+\node[detail,fill=green!15,minimum width=19mm,anchor=west] (k) at (0,0) {Kind\\[-1pt]{\footnotesize\ttfamily 0}{\scriptsize\ = standard}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=green!15,minimum width=19mm,right=0mm of k] (ty) {Value type\\[-1pt]{\footnotesize\ttfamily 1}{\scriptsize\ = unsigned}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=blue!8,minimum width=16mm,right=0mm of ty] (w) {Width\\[-1pt]{\footnotesize\ttfamily 3}{\scriptsize\ bits}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=blue!8,minimum width=21mm,right=0mm of w] (wc) {Wildcard\\[-1pt]{\footnotesize\ttfamily 0}{\scriptsize\ = no ANY}\\[-1pt]{\scriptsize\color{black!60}1 B}};
+\node[detail,fill=blue!8,minimum width=23mm,right=0mm of wc] (bo) {Position\\[-1pt]{\scriptsize bit }{\footnotesize\ttfamily 23}{\scriptsize\ of record}\\[-1pt]{\scriptsize\color{black!60}8 B}};
+\node[detail,fill=blue!8,minimum width=19mm,right=0mm of bo] (b) {Base\\[-1pt]{\scriptsize smallest }{\footnotesize\ttfamily 0}\\[-1pt]{\scriptsize\color{black!60}8 B}};
+\node[detail,fill=blue!8,minimum width=27mm,right=0mm of b] (mo) {Max. offset\\[-1pt]{\scriptsize largest $-$ base: }{\footnotesize\ttfamily 7}\\[-1pt]{\scriptsize\color{black!60}8 B}};
+\node[detail,fill=orange!20,minimum width=19mm,right=0mm of mo] (id) {Field ID\\[-1pt]{\footnotesize\ttfamily 4}{\scriptsize\ = tag}\\[-1pt]{\scriptsize\color{black!60}4 B}};
+% Only custom fields have a name, so the cell is greyed out.
+\node[detail,fill=black!4,draw=black!40,dashed,text=black!50,minimum width=21mm,right=0mm of id] (nm) {Name\\[-1pt]{\scriptsize custom only}\\[-1pt]{\scriptsize variable}};
 \node[anchor=south west,font=\small\bfseries] at ([yshift=1mm]k.north west) {Field descriptor \normalfont(example: \texttt{tag}, values 0--7 in 3 bits)};
 \end{scope}
 \draw[zoom] (f2.north west) -- (k.south west);
@@ -55,4 +60,5 @@
 \draw[zoom] (t1.south west) -- (ro.north west);
 \draw[zoom] (t1.south east) -- (rc.north east);
 \fi
+\headerextra
 \end{tikzpicture}

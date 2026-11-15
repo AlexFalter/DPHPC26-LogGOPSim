@@ -1,22 +1,28 @@
-% Backward compatibility: one TraceReader picks the reader for the file's format; both take the
-% adapter's field bindings and fill the same node struct.
+% Backward compatibility: both formats enter through one TraceReader, which reads the magic number
+% and dispatches to the matching reader; both readers take the adapter's field bindings and fill
+% the same node struct.
+% \compatpick{detailed}{compact}: the report shows the details; the presentation defines
+% \compatpick to take its second argument for a compact figure.
+\providecommand{\compatpick}[2]{#1}
 \begin{tikzpicture}[
-  reader/.style={box,fill=green!12,text width=50mm,minimum height=17mm},
-  file/.style={inputbox,text width=34mm,minimum height=17mm},
-  adapter/.style={box,fill=blue!8,text width=52mm,align=left,inner sep=3mm}]
-\node[file] (legacy) at (0,0) {\textbf{Legacy file}\\magic 4223\\fixed 39-byte\\records};
-\node[file] (sd) at (0,-2.6) {\textbf{Self-describing file}\\binary header};
-\node[reader] (lr) at (5.6,0) {\textbf{LegacyTraceReader}\\fixed positions of the\\six standard fields};
-\node[reader] (sr) at (5.6,-2.6) {\textbf{SelfDescribingTraceReader}\\header + decode plan,\\standard and custom fields};
-\draw[arrow] (legacy) -- (lr);
-\draw[arrow] (sd) -- (sr);
-\begin{scope}[on background layer]
-  \node[draw=black!50,dashed,rounded corners=4pt,fill=black!3,inner sep=3mm,
-        fit=(lr)(sr),label={[font=\small\bfseries]above:TraceReader: chosen by magic number}] (tr) {};
-\end{scope}
-\node[adapter] (ad) at (12.6,-1.3) {
+  reader/.style={box,fill=green!12,text width=50mm,minimum height=\compatpick{17mm}{11mm}},
+  file/.style={inputbox,text width=34mm,minimum height=\compatpick{17mm}{11mm}},
+  dispatch/.style={box,fill=green!25,text width=30mm,minimum height=\compatpick{17mm}{11mm}},
+  adapter/.style={box,fill=blue!8,text width=\compatpick{52mm}{30mm},align=\compatpick{left}{center},inner sep=3mm},
+  magic/.style={font=\scriptsize,fill=white,inner sep=1pt}]
+\node[file] (legacy) at (0,0) {\textbf{Legacy file}\\magic 4223\compatpick{\\fixed 39-byte\\records}{}};
+\node[file] (sd) at (0,\compatpick{-2.6}{-2}) {\textbf{Self-describing file}\\magic \texttt{GOALSD01}};
+\node[dispatch] (tr) at (4.9,\compatpick{-1.3}{-1}) {\textbf{TraceReader}\\reads the\\magic number};
+\node[reader] (lr) at (10.4,0) {\textbf{LegacyTraceReader}\compatpick{\\fixed positions of the\\six standard fields}{}};
+\node[reader] (sr) at (10.4,\compatpick{-2.6}{-2}) {\textbf{SelfDescribingTraceReader}\compatpick{\\header + decode plan,\\standard and custom fields}{}};
+\node[adapter] (ad) at (\compatpick{17.2}{16},\compatpick{-1.3}{-1}) {\compatpick{
   \textbf{Adapter}: same bindings,\\same node struct\\[4pt]
   \small\texttt{is\_legacy()}: bind only\\\small standard fields\\[4pt]
-  \small ATLAHS, legacy:\\\small\quad\texttt{nic} $\rightarrow$ GPU, peer GPU\\\small\quad\texttt{cpu} $\rightarrow$ stream\\\small\quad tag matching};
-\draw[arrow] (tr.east |- ad.west) -- (ad.west);
+  \small ATLAHS, legacy:\\\small\quad\texttt{nic} $\rightarrow$ GPU, peer GPU\\\small\quad\texttt{cpu} $\rightarrow$ stream\\\small\quad tag matching}{\textbf{Adapter}\\same bindings}};
+\draw[arrow] (legacy.east) -- (tr);
+\draw[arrow] (sd.east) -- (tr);
+\draw[arrow] (tr) -- node[magic,above,sloped]{4223} (lr.west);
+\draw[arrow] (tr) -- node[magic,below,sloped]{\texttt{GOALSD01}} (sr.west);
+\draw[arrow] (lr.east) -- (ad);
+\draw[arrow] (sr.east) -- (ad);
 \end{tikzpicture}

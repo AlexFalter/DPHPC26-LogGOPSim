@@ -1,0 +1,18 @@
+% The self-describing file, top to bottom: the new schema header, then the sections that keep the
+% old file format's structure (rank table and one payload per rank).
+\begin{tikzpicture}[
+  seg/.style={draw=black!45,fill=black!6,minimum width=50mm,minimum height=9mm,inner sep=2pt,
+              align=center,font=\small},
+  tagnote/.style={font=\small\bfseries,align=left,anchor=west}]
+\node[seg,draw=blue!60!black,very thick,fill=blue!14,minimum height=15mm,font=\normalsize] (h)
+  {\textbf{Schema header}\\\footnotesize magic number + every field};
+\node[seg,below=0mm of h] (t) {Rank table};
+\node[seg,below=0mm of t] (r0) {Rank 0};
+\node[seg,below=0mm of r0] (r1) {Rank 1};
+\node[seg,below=0mm of r1,minimum height=6mm] (dots) {\ldots};
+\node[seg,below=0mm of dots] (rn) {Rank $n-1$};
+\node[tagnote,text=gold!80!black] at ([xshift=4mm]h.east) {\Large New};
+\draw[decorate,decoration={brace,amplitude=5pt},black!55,thick]
+  ([xshift=3mm]t.north east) -- ([xshift=3mm]rn.south east)
+  node[midway,tagnote,xshift=4mm,text=black!60] {Old file\\format};
+\end{tikzpicture}

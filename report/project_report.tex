@@ -289,7 +289,7 @@ Alexander Falter is currently implementing a lighter first pass on the GPU. Keep
 \hypertarget{field-encoding}{}
 \subsubsection{Field encoding}
 
-\textbf{Choosing an encoding.} Sizing each field to its largest value already avoids the legacy format's fixed widths, but a field still costs the bits of its largest value, however little it varies. An encoding stores something smaller than the value itself. If a field is 1024 on every node, the plain value needs 11 bits per node; with offset encoding, 1024 is stored once in the header and each node needs 0 bits. If a field alternates between 1 and 1,000,000, the plain value needs 20 bits, and offset encoding does not help, because offsets still reach 999,999; with dictionary encoding, the header stores the list [1, 1000000] once and each node stores only its index, 1 bit. Offset encoding therefore suits values that lie close together, and dictionary encoding few values far apart. On a Schedgen binomial-tree reduction over 262,144 ranks, offset encoding alone shrinks the record from 39 to 5 bytes (Section 5.2). Combining both, by choosing the cheaper encoding for each field, would probably work best.
+\textbf{Choosing an encoding.} Sizing each field to its largest value already avoids the legacy format's fixed widths, but a field still costs the bits of its largest value, however little it varies. An encoding stores something smaller than the value itself. If a field is 1024 on every node, the plain value needs 11 bits per node; with offset encoding (also known as frame-of-reference encoding), 1024 is stored once in the header and each node needs 0 bits. If a field alternates between 1 and 1,000,000, the plain value needs 20 bits, and offset encoding does not help, because offsets still reach 999,999; with dictionary encoding, the header stores the list [1, 1000000] once and each node stores only its index, 1 bit. Offset encoding therefore suits values that lie close together, and dictionary encoding few values far apart. On a Schedgen binomial-tree reduction over 262,144 ranks, offset encoding alone shrinks the record from 39 to 5 bytes (Section 5.2). Combining both, by choosing the cheaper encoding for each field, would probably work best.
 
 Each field is stored as an offset from the smallest observed value. A field with minimum \texttt{m} and maximum \texttt{M} uses \texttt{bit\_\allowbreak{}length(M \(-\) m\allowbreak{})} bits, and the header stores the base \texttt{m}; a constant field therefore uses no bits at all. The reader reconstructs each value as base plus offset:
 
@@ -391,7 +391,7 @@ Each simulator creates its own adapter object. The adapter provides the connecti
 
 \begin{center}
 \resizebox{\linewidth}{!}{\input{diagrams/schema-agreement.tex}}
-\par\nopagebreak\small\itshape Both adapters inherit the same interface, specialized for their node type. Each simulator owns a separate adapter and reader instance.
+\par\nopagebreak\small\itshape Both adapters inherit the same interface. Each fills its own node struct, which extends the shared base node with the fields its simulator needs; the scheduler only sees that struct. Each simulator owns a separate adapter and reader instance.
 \end{center}
 
 The node type tells the adapter what to return; it is not a buffer containing every node. Both adapters use the same reader implementation. For file input, each adapter owns its reader and mapping, keeping the bytes alive until the reader is destroyed. The simulators are independent programs and can read a compatible binary concurrently using separate private mappings. Both must support its operations and message-matching convention; the explicit ATLAHS convention in Section 4 currently requires its backend.
@@ -517,6 +517,11 @@ We implemented all four approaches, the in-process JIT with LLVM ORC. All are bu
 \subsubsection{Decode plan and plan runners}
 
 When the reader is constructed, it builds a decode plan with one step per selected field: where the field's bits are (first byte, shift, mask, base, maximum offset) and where its value goes (output struct, member offset and size, value for ANY). The plan is only data. The \texttt{Decoder} resolves and validates the requested fields, builds the plan and selects a runner. The shared \texttt{PlanRunner::decode} uses that runner's fast \texttt{run} when its wide loads are safe, or bounded reads near the end of the mapping. Invalid records are rejected directly. The environment variable \texttt{LOGGOPSIM\_\allowbreak{}DECODER} selects the runner; the shared interface and implementations are shown above.
+
+\begin{center}
+\resizebox{\linewidth}{!}{\input{diagrams/decode-once.tex}}
+\par\nopagebreak\small\itshape The plan is built and a runner picked once per file; the runner then decodes every node.
+\end{center}
 
 The runners are:
 
@@ -1167,7 +1172,9 @@ The study above covers decoding on one laptop. The full benchmarking study is st
 
 \textbf{Cheaper conversion.} Both passes currently run the full parser and build complete graphs. Section 3.3 compares lighter passes with alternatives that avoid the second text parse. Implementing and comparing these designs for conversion time, peak memory and temporary storage remains future work.
 
-\textbf{Better compression.} Dictionary encoding, described in Section 3.3.1, remains a proposed alternative to offsets. Separately, the start-dependency position \texttt{sDepIx} always equals \texttt{depIx + nDep\allowbreak{}} and could be derived instead of stored.
+\textbf{Better compression.} Dictionary encoding, described in Section 3.3.1, remains a proposed alternative to offsets. We estimated its effect from the existing self-describing files by counting each field's distinct values and choosing, per field, the cheaper encoding including the dictionary's size in the header. On the synthetic benchmark traces it saves nothing: their fields are either constant, dense ranges that offsets already encode optimally, or unique per node. On the recorded Llama trace (5.7 million operations), message sizes take 2,961 distinct values: 12 bits as a dictionary index instead of 31 with offsets. Together with smaller gains on the dependency-list length and the communicator, the record shrinks from 17 to 13 bytes and the file by 19\%. In traces with many ranks, the rank table is the larger cost: it is 67\% of bcast\_64k's file, 20 bytes per rank. Its absolute offsets could be derived from the counts and the counts packed to their needed widths. Separately, the start-dependency position \texttt{sDepIx} always equals \texttt{depIx + nDep\allowbreak{}} and could be derived instead of stored.
+
+\textbf{Compressed execution.} Some fields are only compared, never used as numbers: a tag only has to match. A simulator could work on the stored codes directly instead of decoding them. Decoding is no longer the bottleneck, however: with the cached \texttt{jit} runner, complete simulations are within 2\% of \texttt{templated\_schema}, which hard-codes the layout (Section 5.3.2), so the expected gain is small.
 
 \textbf{Richer metadata.} The header does not yet describe units, which operations a field applies to, default values or provenance. A canonical schema hash would let decoders be cached by layout.
 

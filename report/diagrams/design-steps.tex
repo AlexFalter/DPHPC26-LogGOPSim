@@ -12,12 +12,12 @@
 \node[processbox,text width=22mm,stepstate=2] (r) at (11.7,0) {Reader};
 \node[outputbox,text width=22mm,stepstate=4] (s) at (15.6,0) {Simulator\\\footnotesize LogGOPSim};
 \foreach \a/\b in {t/c,c/f,f/r,r/s} \draw[arrow,stepstate=-1] (\a)--(\b);
-\foreach \target/\n/\label in {
+\foreach \target/\n/\steptext in {
     f/1/{Self-describing\\format\\[1mm]{\scriptsize\color{black!60}the header describes\\every field}},
     r/2/{JIT\\decoding\\[1mm]{\scriptsize\color{black!60}a decoder compiled\\for each file}},
     c/3/{Parallel\\conversion\\[1mm]{\scriptsize\color{black!60}ranks parsed\\on all cores}},
     s/4/{Lazy\\decoding\\[1mm]{\scriptsize\color{black!60}decode a node\\when it runs}}} {
   \node[stepbadge,below=5mm of \target,stepstate=\n] (n\n) {\n};
-  \node[steplabel,below=1mm of n\n,stepstate=\n,draw=none] {\label};
+  \node[steplabel,below=1mm of n\n,stepstate=\n,draw=none] {\steptext};
 }
 \end{tikzpicture}

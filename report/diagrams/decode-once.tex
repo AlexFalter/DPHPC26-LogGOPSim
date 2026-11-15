@@ -1,0 +1,37 @@
+% Decoding in two phases: once per file the decoder turns the header and the simulator's bindings
+% into a decode plan and picks one of the runners; for every node that runner applies the plan to
+% the record and fills the simulator's node struct.
+\begin{tikzpicture}[
+  stage/.style={box,text width=30mm,minimum height=12mm},
+  runnerbox/.style={box,fill=green!12,text width=50mm,minimum height=9mm,font=\small,align=left},
+  phase/.style={font=\small\bfseries},
+  band/.style={rounded corners=4pt,inner sep=3mm}]
+% Once, when the file is opened
+\node[inputbox,stage] (header) at (0,0.8) {Header\\\footnotesize field layout};
+\node[inputbox,stage] (bind) at (0,-0.8) {Simulator\\\footnotesize field bindings};
+\node[processbox,stage] (decoder) at (4.4,0) {Decoder};
+\node[outputbox,stage,text width=36mm] (plan) at (9.2,0) {Decode plan\\\footnotesize one step per field:\\offset, shift, mask, base};
+\draw[arrow] (header.east) -- (decoder);
+\draw[arrow] (bind.east) -- (decoder);
+\draw[arrow] (decoder) -- node[above,font=\scriptsize]{builds} (plan);
+% The runners; the decoder picks one per file.
+\node[runnerbox] (r1) at (15.6,-2.7) {\texttt{plan}\hfill{\scriptsize interpreter, default}};
+\node[runnerbox,below=1.5mm of r1] (r2) {\texttt{jit}, \texttt{orc}\hfill{\scriptsize compiled C / LLVM}};
+\node[runnerbox,below=1.5mm of r2] (r3) {\texttt{templated\_node}\hfill{\scriptsize per node type}};
+\node[runnerbox,below=1.5mm of r3,dashed,fill=black!4] (r4) {\texttt{templated\_schema}\hfill{\scriptsize lower bound}};
+% For every node
+\node[inputbox,stage] (record) at (9.2,-4.2) {Record\\\footnotesize packed bits};
+\node[outputbox,stage] (node) at (21.8,-4.2) {Node struct\\\footnotesize e.g.\ \texttt{AtlahsNode}};
+\node[draw=black!50,rounded corners=3pt,inner sep=2.5mm,fit=(r1)(r4),
+      label={[font=\small\bfseries]above:Runner: one of}] (runners) {};
+\coordinate (runnerstop) at ([yshift=6mm]runners.north);
+\begin{scope}[on background layer]
+  \node[band,fill=orange!6,fit=(record)(node)(runners)(runnerstop)] (each) {};
+  \node[band,fill=blue!4,fit=(header)(bind)(plan)] (once) {};
+\end{scope}
+\draw[arrow] (plan.east) -| node[above,pos=0.25,font=\scriptsize]{picks one} (runnerstop);
+\draw[arrow] (record.east) -- (record.east -| runners.west);
+\draw[arrow] (runners.east |- node) -- (node);
+\node[phase,anchor=south west] at (once.north west) {Once, when the file is opened};
+\node[phase,anchor=north west] at (each.south west) {For every node};
+\end{tikzpicture}

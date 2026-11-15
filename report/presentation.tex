@@ -14,10 +14,33 @@
  outputbox/.style={box,fill=orange!20},arrow/.style={-{Stealth[length=2mm]},thick},
  message/.style={arrow,dashed,draw=orange!85!black}}
 \tikzset{card/.style={draw=black!25,fill=#1,rounded corners=4pt,minimum width=44mm,minimum height=30mm,align=center,inner sep=5pt}}
+\newcommand{\compatpick}[2]{#2} % diagrams/backward-compat.tex: compact figure
+\newif\ifranktable % diagrams/header-details.tex: no rank table on the slides
+% diagrams/header-details.tex: point at the magic number in the fixed prefix.
+\newcommand{\magicmark}[1]{{\bfseries\color{gold!75!black}#1}}
+\newcommand{\headerextra}{%
+  \draw[gold!85!black,line width=1.6pt,rounded corners=1pt] (prefix.south west) rectangle (prefix.north east);
+  \node[anchor=east,align=right,font=\small\bfseries,text=gold!75!black] (magicnote) at ([xshift=-9mm]prefix.west) {Magic number};
+  \draw[arrow,gold!85!black] (magicnote.east) -- (prefix.west);
+  \draw[decorate,decoration={brace,amplitude=4pt},gold!85!black,thick] ([yshift=1.5mm]b.north west) -- ([yshift=1.5mm]mo.north east)
+    node[midway,above=4pt,font=\small\bfseries,text=gold!75!black] {offset encoding: next slides};}
 \newcommand{\secnum}[1]{}
 \newcommand{\diagram}[1]{\resizebox{\linewidth}{!}{\input{diagrams/#1.tex}}}
-% Shared encoding figure (diagrams/offset-encoding.tex).
+% Shared encoding figures (diagrams/offset-encoding.tex, diagrams/dictionary-encoding.tex).
 \newcommand{\encodingfig}[1]{\begingroup\def\encodingextra{#1}\input{diagrams/offset-encoding.tex}\endgroup}
+\newcommand{\dictfig}{\input{diagrams/dictionary-encoding.tex}}
+% A row of example values for the encoding slides.
+\newcommand{\vals}[1]{\foreach \v [count=\k] in {#1} \node[draw=black!65,fill=blue!8,minimum height=6mm,minimum width=14mm,font=\small,inner sep=2pt] at (\k*1.5,0) {\v};}
+
+\tikzset{runnercard/.style={draw=black!35,fill=#1,rounded corners=3pt,text width=44mm,align=left,
+  inner sep=2.5mm,minimum height=27mm,anchor=north}}
+% Contents of a runner card: name, role, how it decodes, strength, weakness.
+\newcommand{\runner}[5]{%
+  \scriptsize{\usebeamercolor[fg]{title}{\footnotesize\bfseries\ttfamily #1}}\\
+  {\itshape\color{black!65}#2}\\[1.5mm]
+  #3\\[1.5mm]
+  {\color{green!45!black}$+$} #4\\
+  {\color{red!60!black}$-$} #5\par}
 
 \definecolor{navy}{HTML}{1B2340}
 \definecolor{gold}{HTML}{D4A537}
@@ -37,6 +60,8 @@
  backgroundcolor=\color{black!3},xleftmargin=3pt,xrightmargin=3pt}
 
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+% A consequence of the line above, on its own line after a gold arrow.
+\newcommand{\thento}[1]{\par\vspace{1mm}\noindent\makebox[1.4em][l]{\color{gold!85!black}$\Rightarrow$}\parbox[t]{\dimexpr\linewidth-1.4em}{\raggedright #1}\par}
 \newcommand{\highlight}[1]{\colorbox{cream}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}}
 \newcommand{\source}[1]{{\scriptsize\color{black!55}\par\vspace{2mm}#1\par}}
 % Step title slide: the four-step pipeline with this step highlighted, and the question it answers.
@@ -109,6 +134,12 @@ LogGOPSim predicts how long an MPI program runs. Input: per rank, a graph of sen
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Structure of our implementation}
+\centering\vfill
+\diagram{design-overview}
+\vfill
+\end{frame}
+
 \begin{frame}{Our design in four steps}
 \centering\vfill
 \diagram{design-steps}
@@ -122,107 +153,178 @@ LogGOPSim predicts how long an MPI program runs. Input: per rank, a graph of sen
 \stepframe{1}{Self-describing format}{The file says what is in it}
 
 \begin{frame}{The file describes itself}
-\diagram{file-sections}
-\vspace{4mm}
-\begin{itemize}
-\item The \textbf{schema header} lists every field: name, type, bit position, width, base. A reader needs no built-in knowledge of the layout.
-\item All records of a file share one layout, so node $i$ of a rank is at \mbox{\texttt{rank\_start + i $\times$ record\_size}}, without scanning.
-\item A new magic number tells the formats apart: legacy files stay readable through the same reader.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Each field gets only the bits it needs}
 \begin{columns}[c]
-\begin{column}{0.5\textwidth}
-\centering\resizebox{\linewidth}{!}{\encodingfig{}}
+\begin{column}{0.4\textwidth}
+\centering\resizebox{\linewidth}{!}{\input{diagrams/file-strip.tex}}
 \end{column}
-\begin{column}{0.47\textwidth}
-\small
+\begin{column}{0.57\textwidth}
 \begin{itemize}
-\item Width from the field's largest value.
-\item \textbf{Offset encoding:} the header stores the smallest value (the base), records store the offset.
-\item A constant field takes \textbf{0 bits}: its value lives only in the header.
-\item bcast\_64k: 39 $\to$ 4 bytes per node.
+\item The \textbf{schema header} describes every field.
+\thento{A reader needs no built-in knowledge of the layout.}
 \end{itemize}
 \end{column}
 \end{columns}
-\vspace{6mm}
-\highlight{\textbf{In the grand picture:} the layout depends on every value in the trace. The converter must see all values before writing (Step 3), and the reader must interpret the layout (Step 2).}
 \end{frame}
 
-\begin{frame}{One reader for every simulator}
-\centering\resizebox{!}{0.48\textheight}{\input{diagrams/schema-agreement.tex}}
-\par\raggedright\vspace{3mm}
-\small
+\begin{frame}{The header describes every field}
+\centering\vfill
+\resizebox{\linewidth}{!}{\input{diagrams/header-details.tex}}
+\vfill
+\par\raggedright
 \begin{itemize}
-\item Each simulator declares its node struct and binds only the fields it needs. LogGOPSim binds six; unbound fields are skipped, so one file serves several simulators.
-\item Checked at load time from the header alone: if a field is missing, or holds 1000--1003 but is bound to a \texttt{uint8\_t}, the run stops before the first node instead of silently reading 234.
-\item The magic number selects the legacy or the self-describing reader. The simulators contain no format code.
+\item A new magic number tells the formats apart.
+\thento{Legacy files stay readable through the same reader.}
 \end{itemize}
+\vfill
 \end{frame}
 
-\begin{frame}[fragile]{Custom fields: the ATLAHS case}
-\begin{lstlisting}
-before: l2: send 1024b to 1 tag 3050012001 cpu 0 nic 2
-after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
-            chunk_id 3 channel_id 5 sequence_id 12 message_kind 0 communicator_id 1
-\end{lstlisting}
+\begin{frame}{Choosing an encoding for the fields}
+\begin{itemize}
+\item Each field already gets only as many bits as it needs.
+\item An \textbf{encoding} can save even more.
+\end{itemize}
+\vspace{4mm}
+\textbf{Example 1:} one value repeated
 \vspace{2mm}
-\begin{columns}[T]
-\begin{column}{0.33\textwidth}
-\begin{lstlisting}
-# config/custom_fields.toml
-[[fields]]
-name = "gpu_id"
-type = "unsigned"
 
-[[fields]]
-name = "peer_gpu_id"
-type = "unsigned"
-# ... six more
-\end{lstlisting}
-\end{column}
-\begin{column}{0.63\textwidth}
-\small
-\begin{itemize}
-\item Declared once in TOML (name and type), then treated like standard fields: the converter infers each range and encodes it the same way.
-\item Each simulator binds only the fields it needs; a missing field or a value too large for its member fails at load time.
-\item Explicit fields exposed two htsim bugs (next slide).
-\end{itemize}
+\begin{tikzpicture}[x=1cm]\vals{1024,1024,1024,1024}\end{tikzpicture}
 \vspace{1mm}
-\highlight{\centering Recorded Llama run, 5.7M operations: {\bfseries 54\% smaller} with all eight extra fields}
-\end{column}
-\end{columns}
+\thento{Plain value: \textbf{11 bits} per value, although every value is the same.}
+\end{frame}
+
+\begin{frame}{Offset encoding (frame-of-reference encoding)}
+\begin{itemize}
+\item The header stores the field's smallest value, the \textbf{base}; each record stores only the \textbf{offset} from it.
+\end{itemize}
+\vspace{4mm}
+\centering\encodingfig{}
+\par\raggedright
+\vspace{4mm}
+\textbf{Example 1:} base 1024, every offset is 0.
+\thento{\textbf{0 bits} per value instead of 11.}
+\end{frame}
+
+\begin{frame}{The encoding isn't perfect yet}
+\textbf{Example 2:} two values far apart
+\vspace{1mm}
+
+\begin{tikzpicture}[x=1cm]\vals{1,1000000,1,1000000}\end{tikzpicture}
+\thento{Offset encoding still needs \textbf{20 bits}.}
+\vspace{3mm}
+
+\textbf{Dictionary encoding (proposed):} the header stores each distinct value once; records store only an index.
+\vspace{1mm}
+
+{\centering\resizebox{!}{0.26\textheight}{\dictfig}\par}
+\vspace{1mm}
+\thento{Best: choose the cheaper encoding for each field. \textbf{Compressed execution} might speed things up further.}
+\end{frame}
+
+\begin{frame}{ATLAHS: hidden fields}
+\vspace{6mm}
+\diagram{legacy-gpu-record}
+\vspace{5mm}
+\begin{itemize}
+\item \textbf{Message identity is stuffed into the tag:} five numbers glued together as decimal digits.
+\item \textbf{Stream and GPU are stuffed into \texttt{cpu} and \texttt{nic}}, fields ATLAHS doesn't otherwise need.
+\end{itemize}
+\thento{Nothing in the file says so: htsim has to know, and a wrong guess gives wrong results without an error.}
 \end{frame}
 
 \begin{frame}{Explicit fields exposed two htsim bugs}
-{\centering\resizebox{0.7\linewidth}{!}{\input{diagrams/tag-collision.tex}}\par}
-\vspace{4mm}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
-\textbf{Different messages, same tag}
+\textbf{Different messages, same tag}\par\vspace{2mm}
+\parbox[c][0.38\textheight][c]{\linewidth}{\centering\resizebox{\linewidth}{!}{\input{diagrams/tag-collision.tex}}}
+\vspace{2mm}
 \small
 \begin{itemize}
-\item The tag glued five numbers together. A sequence number above 9999 shifts the rest: two messages, one tag.
 \item htsim could match a receive with the wrong send, silently.
 \item \textbf{Fix:} compare the five fields separately.
 \end{itemize}
 \end{column}
 \begin{column}{0.48\textwidth}
-\textbf{Messages went to the wrong GPU}
+\textbf{Messages went to the wrong GPU}\par\vspace{2mm}
+\parbox[c][0.38\textheight][c]{\linewidth}{\centering\resizebox{!}{0.36\textheight}{\input{diagrams/gpu-routing.tex}}}
+\vspace{2mm}
 \small
 \begin{itemize}
 \item Upstream used the sender's GPU at both ends: GPU 0 $\to$ GPU 2 arrived at GPU 0.
-\item The old trace had no place for the partner's GPU.
 \item \textbf{Fix:} send from \texttt{gpu\_id} to the new \texttt{peer\_gpu\_id}.
 \end{itemize}
 \end{column}
 \end{columns}
 \end{frame}
 
+\begin{frame}[fragile]{Standard and custom fields (example: ATLAHS)}
+\begin{columns}[T]
+\begin{column}{0.44\textwidth}
+\begin{lstlisting}
+# config/custom_fields.toml
+[[fields]]
+name = "gpu_id"
+type = "unsigned"
+# ... seven more
+\end{lstlisting}
+\end{column}
+\begin{column}{0.54\textwidth}
+\begin{itemize}
+\item \textbf{Custom fields} are declared in TOML.
+\item From then on they're treated exactly like standard fields.
+\end{itemize}
+\end{column}
+\end{columns}
+\vspace{5mm}
+\begin{lstlisting}
+before: l2: send 1024b to 1 tag 3050012001 cpu 0 nic 2
+after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
+            chunk_id 3 channel_id 5 sequence_id 12 message_kind 0 communicator_id 1
+\end{lstlisting}
+\end{frame}
+
 % ================================================================ step 2
 
 \stepframe{2}{JIT decoding}{A flexible format must not be slower to read}
+
+\begin{frame}{Backward compatibility: one reader, both formats}
+\vfill\centering\resizebox{0.9\linewidth}{!}{\input{diagrams/backward-compat.tex}}
+\vfill\par\raggedright
+\begin{itemize}
+\item Existing legacy files run unchanged: the reader detects the format by its magic number.
+\end{itemize}
+\vfill
+\end{frame}
+
+\begin{frame}{Reusable traces}
+\vfill
+{\centering\resizebox{0.95\linewidth}{!}{\begin{tikzpicture}[
+  sim/.style={box,fill=orange!20,text width=34mm,align=center},
+  adp/.style={box,fill=green!12,text width=40mm,align=center},
+  check/.style={font=\small,text=green!45!black}]
+\node[box,fill=blue!8,text width=28mm,minimum height=22mm,align=center] (trace) at (0,0)
+  {\textbf{One trace}\\[2pt]{\footnotesize header}\\{\footnotesize + records}};
+\node[adp] (la) at (6,1.3) {\textbf{LogGOPSimAdapter}\\\footnotesize checks its bindings\\against the header \textcolor{green!45!black}{\checkmark}};
+\node[adp,fill=red!12,draw=red!60!black] (aa) at (6,-1.3) {\textbf{AtlahsAdapter}\\\footnotesize no \texttt{gpu\_id} in the header\\\textcolor{red!70!black}{$\times$ throws an error}};
+\node[sim] (lgs) at (11.4,1.3) {\textbf{LogGOPSim}\\\footnotesize reads its 6 fields};
+\node[sim,fill=black!5,draw=black!35,text=black!45] (atl) at (11.4,-1.3) {\textbf{ATLAHS htsim}\\\footnotesize does not start};
+\draw[arrow] (trace.east) -- (la.west);
+\draw[arrow] (trace.east) -- (aa.west);
+\draw[arrow] (la) -- (lgs);
+\draw[arrow,dashed,red!60!black] (aa) -- (atl);
+\end{tikzpicture}}\par}
+\vfill
+\begin{itemize}
+\item One trace can be read by several simulators, even at the same time.
+\item Each simulator's adapter checks its bindings against the header when it is created. A missing or ill-fitting field is an error before the first node.
+\item Each simulator reads only the fields it needs.
+\end{itemize}
+\vfill
+\end{frame}
+
+\begin{frame}{One reader for every simulator}
+\vfill\centering\resizebox{!}{0.75\textheight}{\input{diagrams/schema-agreement.tex}}
+\vfill
+\end{frame}
 
 \begin{frame}{Flexibility has a cost at read time}
 \centering
@@ -244,12 +346,11 @@ alltoall\_256 & 2\% \\
 \end{frame}
 
 \begin{frame}{Build the decoder once, run it for every node}
-\centering\resizebox{!}{0.5\textheight}{\input{diagrams/node-read-call.tex}}
-\par\raggedright\vspace{3mm}
-\small
+\vfill\centering\resizebox{\linewidth}{!}{\input{diagrams/decode-once.tex}}
+\vfill\par\raggedright
 \begin{itemize}
-\item When the file is opened, the reader takes the fields the simulator binds and builds a \textbf{decode plan} with one step per field (offset, shift, mask, base, range, destination). Then it picks a runner.
-\item For every node, the runner turns the record's bits into the simulator's node struct.
+\item \textbf{Once:} the decoder combines the header and the simulator's bindings into a \textbf{decode plan} and picks a runner.
+\item \textbf{For every node:} the runner applies the plan to the record's bits and fills the node struct.
 \end{itemize}
 \end{frame}
 
