@@ -150,24 +150,72 @@ LogGOPSim predicts how long an MPI program runs. Input: per rank, a graph of sen
 \highlight{\textbf{In the grand picture:} the layout depends on every value in the trace. The converter must see all values before writing (Step 3), and the reader must interpret the layout (Step 2).}
 \end{frame}
 
+\begin{frame}{One reader for every simulator}
+\centering\resizebox{!}{0.48\textheight}{\input{diagrams/schema-agreement.tex}}
+\par\raggedright\vspace{3mm}
+\small
+\begin{itemize}
+\item Each simulator declares its node struct and binds only the fields it needs. LogGOPSim binds six; unbound fields are skipped, so one file serves several simulators.
+\item Checked at load time from the header alone: if a field is missing, or holds 1000--1003 but is bound to a \texttt{uint8\_t}, the run stops before the first node instead of silently reading 234.
+\item The magic number selects the legacy or the self-describing reader. The simulators contain no format code.
+\end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]{Custom fields: the ATLAHS case}
 \begin{lstlisting}
 before: l2: send 1024b to 1 tag 3050012001 cpu 0 nic 2
 after:  l2: send 1024b to 1 tag 0 cpu 0 nic 0 stream_id 0 gpu_id 2 peer_gpu_id 2
             chunk_id 3 channel_id 5 sequence_id 12 message_kind 0 communicator_id 1
 \end{lstlisting}
-\vspace{3mm}
+\vspace{2mm}
 \begin{columns}[T]
-\begin{column}{0.56\textwidth}
+\begin{column}{0.33\textwidth}
+\begin{lstlisting}
+# config/custom_fields.toml
+[[fields]]
+name = "gpu_id"
+type = "unsigned"
+
+[[fields]]
+name = "peer_gpu_id"
+type = "unsigned"
+# ... six more
+\end{lstlisting}
+\end{column}
+\begin{column}{0.63\textwidth}
 \small
 \begin{itemize}
-\item Custom fields are declared in TOML and treated like standard ones.
+\item Declared once in TOML (name and type), then treated like standard fields: the converter infers each range and encodes it the same way.
 \item Each simulator binds only the fields it needs; a missing field or a value too large for its member fails at load time.
-\item Explicit fields exposed and fixed two htsim bugs: messages sent to the wrong GPU, and different messages sharing a tag.
+\item Explicit fields exposed two htsim bugs (next slide).
+\end{itemize}
+\vspace{1mm}
+\highlight{\centering Recorded Llama run, 5.7M operations: {\bfseries 54\% smaller} with all eight extra fields}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Explicit fields exposed two htsim bugs}
+{\centering\resizebox{0.7\linewidth}{!}{\input{diagrams/tag-collision.tex}}\par}
+\vspace{4mm}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{Different messages, same tag}
+\small
+\begin{itemize}
+\item The tag glued five numbers together. A sequence number above 9999 shifts the rest: two messages, one tag.
+\item htsim could match a receive with the wrong send, silently.
+\item \textbf{Fix:} compare the five fields separately.
 \end{itemize}
 \end{column}
-\begin{column}{0.4\textwidth}
-\highlight{\centering Recorded Llama run, 5.7M operations:\\[1mm]{\Large\bfseries 54\% smaller}\\ with all eight extra fields}
+\begin{column}{0.48\textwidth}
+\textbf{Messages went to the wrong GPU}
+\small
+\begin{itemize}
+\item Upstream used the sender's GPU at both ends: GPU 0 $\to$ GPU 2 arrived at GPU 0.
+\item The old trace had no place for the partner's GPU.
+\item \textbf{Fix:} send from \texttt{gpu\_id} to the new \texttt{peer\_gpu\_id}.
+\end{itemize}
 \end{column}
 \end{columns}
 \end{frame}
@@ -351,6 +399,31 @@ for (auto i : ready_)
 \begin{itemize}
 \item The counter array is 4\,B per node, allocated at startup: 1 billion nodes need 4\,GB, still far less than the page copies it replaces.
 \item Not combinable with \texttt{-{}-save-mem}, which exists only to write counters back to the file.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ================================================================ correctness
+
+\begin{frame}{Same results as the original LogGOPSim}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{What we checked}
+\small
+\begin{itemize}
+\item 1,480 schedules $\times$ 4 network parameter sets: legacy output byte-identical to the original converter, same times in all 5,920 simulations, in both formats.
+\item Every decoder against the exact one: 300 random layouts, 2,000 records each.
+\item 2,000 corrupted files: rejected or simulated, never a crash. Clean under ASan and UBSan.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\textbf{Found: a bug in the original}
+\small
+\begin{itemize}
+\item An eager message arrives before a larger receive is posted. The receiver chose rendezvous by its own buffer size and completed the sender twice.
+\item The counter underflowed silently: 100,000 reported instead of 1,700.
+\item \textbf{Fix:} decide by the message's size, as the sender does.
 \end{itemize}
 \end{column}
 \end{columns}
