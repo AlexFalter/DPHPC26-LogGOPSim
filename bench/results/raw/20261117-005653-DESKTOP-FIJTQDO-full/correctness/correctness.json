@@ -1,0 +1,2092 @@
+{
+  "byte_identity_differences": [],
+  "created": "2026-11-17T00:11:04Z",
+  "duration_s": 849.0007607936859,
+  "failed_pairs": [],
+  "machine": "DESKTOP-FIJTQDO",
+  "ok": true,
+  "traces": {
+    "allreduce_rd-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "allreduce_ring-p256-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "allreduce_ring-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "alltoall-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "dp_nccl-p16-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "dp_nccl-p64-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "moe_alltoall-p32-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "pipeline_1f1b-p16-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 529,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "3dc8eb7d18420714835a3d304d4fafe57596e2546b40cbb4092416aa53513bdb",
+          "status": "pass",
+          "viz_sha256": "9430f38074b8b544b42fe1ca8bb081b42f2a4a994043fbf5c1713e83c990a0af"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 529,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "3dc8eb7d18420714835a3d304d4fafe57596e2546b40cbb4092416aa53513bdb",
+          "status": "pass",
+          "viz_sha256": "9430f38074b8b544b42fe1ca8bb081b42f2a4a994043fbf5c1713e83c990a0af"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 529,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "3dc8eb7d18420714835a3d304d4fafe57596e2546b40cbb4092416aa53513bdb",
+          "status": "pass",
+          "viz_sha256": "9430f38074b8b544b42fe1ca8bb081b42f2a4a994043fbf5c1713e83c990a0af"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 529,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "3dc8eb7d18420714835a3d304d4fafe57596e2546b40cbb4092416aa53513bdb",
+          "status": "pass",
+          "viz_sha256": "9430f38074b8b544b42fe1ca8bb081b42f2a4a994043fbf5c1713e83c990a0af"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 529,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "3dc8eb7d18420714835a3d304d4fafe57596e2546b40cbb4092416aa53513bdb",
+          "status": "pass",
+          "viz_sha256": "9430f38074b8b544b42fe1ca8bb081b42f2a4a994043fbf5c1713e83c990a0af"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "pipeline_1f1b-p64-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 3649,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "6b7ddf48373370e61268dc7b28fd35477a04a430f9cb218860ee3a19393c342b",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 3649,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "6b7ddf48373370e61268dc7b28fd35477a04a430f9cb218860ee3a19393c342b",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 3649,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "6b7ddf48373370e61268dc7b28fd35477a04a430f9cb218860ee3a19393c342b",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 3649,
+          "exit_code": 0,
+          "max_time": null,
+          "result_sha256": "6b7ddf48373370e61268dc7b28fd35477a04a430f9cb218860ee3a19393c342b",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p32768-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14319616,
+          "exit_code": 0,
+          "max_time": 56171980,
+          "result_sha256": "2154fe2e596076f249de5a479103718fb76d75bd8280349447299cc4b8f3fc8c",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14319616,
+          "exit_code": 0,
+          "max_time": 56171980,
+          "result_sha256": "2154fe2e596076f249de5a479103718fb76d75bd8280349447299cc4b8f3fc8c",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14319616,
+          "exit_code": 0,
+          "max_time": 56171980,
+          "result_sha256": "2154fe2e596076f249de5a479103718fb76d75bd8280349447299cc4b8f3fc8c",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 14319616,
+          "exit_code": 0,
+          "max_time": 56171980,
+          "result_sha256": "2154fe2e596076f249de5a479103718fb76d75bd8280349447299cc4b8f3fc8c",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14319616,
+          "exit_code": 0,
+          "max_time": 56171980,
+          "result_sha256": "2154fe2e596076f249de5a479103718fb76d75bd8280349447299cc4b8f3fc8c",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p4096-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14630912,
+          "exit_code": 0,
+          "max_time": 459144880,
+          "result_sha256": "e1c017f1e330d86d46b7b62ba868e570b9cd8ee57980d044653c265dbecf07ce",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14630912,
+          "exit_code": 0,
+          "max_time": 459144880,
+          "result_sha256": "e1c017f1e330d86d46b7b62ba868e570b9cd8ee57980d044653c265dbecf07ce",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14630912,
+          "exit_code": 0,
+          "max_time": 459144880,
+          "result_sha256": "e1c017f1e330d86d46b7b62ba868e570b9cd8ee57980d044653c265dbecf07ce",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 14630912,
+          "exit_code": 0,
+          "max_time": 459144880,
+          "result_sha256": "e1c017f1e330d86d46b7b62ba868e570b9cd8ee57980d044653c265dbecf07ce",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14630912,
+          "exit_code": 0,
+          "max_time": 459144880,
+          "result_sha256": "e1c017f1e330d86d46b7b62ba868e570b9cd8ee57980d044653c265dbecf07ce",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p512-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14611456,
+          "exit_code": 0,
+          "max_time": 3668274520,
+          "result_sha256": "a1183684b709797f5b069c3e6a7b2f218fa58349b88a24b0e9a9a06c0b2b8af2",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14611456,
+          "exit_code": 0,
+          "max_time": 3668274520,
+          "result_sha256": "a1183684b709797f5b069c3e6a7b2f218fa58349b88a24b0e9a9a06c0b2b8af2",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14611456,
+          "exit_code": 0,
+          "max_time": 3668274520,
+          "result_sha256": "a1183684b709797f5b069c3e6a7b2f218fa58349b88a24b0e9a9a06c0b2b8af2",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 14611456,
+          "exit_code": 0,
+          "max_time": 3668274520,
+          "result_sha256": "a1183684b709797f5b069c3e6a7b2f218fa58349b88a24b0e9a9a06c0b2b8af2",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14611456,
+          "exit_code": 0,
+          "max_time": 3668274520,
+          "result_sha256": "a1183684b709797f5b069c3e6a7b2f218fa58349b88a24b0e9a9a06c0b2b8af2",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n1e4-custom": {
+      "status": "no_simulator_configs"
+    },
+    "stencil3d-p64-n1e4-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e4-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e4-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e4-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "LAZY-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "LAZY-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "NEW-orc": {
+          "decoder_actual": "orc",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 14592,
+          "exit_code": 0,
+          "max_time": 29307120,
+          "result_sha256": "ef138d8c5b1fa83c6c6ee509f99a4b24ae16285e88164b3435fbc5ce82387622",
+          "status": "pass",
+          "viz_sha256": "6a2eacf8aaa425818ae267950c3fef0af4d9145cf27766e73e057218f82c1379"
+        }
+      },
+      "records": 10000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "stencil3d-p64-n1e4-wide": {
+      "status": "no_simulator_configs"
+    },
+    "stencil3d-p64-n1e5-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e5-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e5-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e5-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "LAZY-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "LAZY-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "NEW-orc": {
+          "decoder_actual": "orc",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 145920,
+          "exit_code": 0,
+          "max_time": 293071200,
+          "result_sha256": "936d04ae4518cedf9ac0a170f6aef6ff90072c7708c6ca4bbb56f88c89473990",
+          "status": "pass",
+          "viz_sha256": "162065b60e7d68c996a7bfa997532ce3f594c53f69bf9cdadb788e40d3437d21"
+        }
+      },
+      "records": 100000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "stencil3d-p64-n1e6-custom": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-custom.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-custom.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-custom.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "stencil3d-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "LAZY-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "LAZY-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-interp-notiming": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-orc": {
+          "decoder_actual": "orc",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "PLAIN-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "stencil3d-p64-n1e6-wide": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-wide.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-wide.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-wide.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 39559932369487,
+          "result_sha256": "33a96f50b7dea70e6fe5fde5aa2cb1ab5b223a5bb7baabb50c6cf1d3d3bb2a78",
+          "status": "pass",
+          "viz_sha256": "f696a31c363751e459ced1e3ce0b3a4d7a9538b176dff465d302bb2e1846c7bb"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 39559932369487,
+          "result_sha256": "33a96f50b7dea70e6fe5fde5aa2cb1ab5b223a5bb7baabb50c6cf1d3d3bb2a78",
+          "status": "pass",
+          "viz_sha256": "f696a31c363751e459ced1e3ce0b3a4d7a9538b176dff465d302bb2e1846c7bb"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 39559932369487,
+          "result_sha256": "33a96f50b7dea70e6fe5fde5aa2cb1ab5b223a5bb7baabb50c6cf1d3d3bb2a78",
+          "status": "pass",
+          "viz_sha256": "f696a31c363751e459ced1e3ce0b3a4d7a9538b176dff465d302bb2e1846c7bb"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 39559932369487,
+          "result_sha256": "33a96f50b7dea70e6fe5fde5aa2cb1ab5b223a5bb7baabb50c6cf1d3d3bb2a78",
+          "status": "pass",
+          "viz_sha256": "f696a31c363751e459ced1e3ce0b3a4d7a9538b176dff465d302bb2e1846c7bb"
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 39559932369487,
+          "result_sha256": "33a96f50b7dea70e6fe5fde5aa2cb1ab5b223a5bb7baabb50c6cf1d3d3bb2a78",
+          "status": "pass",
+          "viz_sha256": "f696a31c363751e459ced1e3ce0b3a4d7a9538b176dff465d302bb2e1846c7bb"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "stencil3d-p64-n1e7-custom": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "BASE-savemem": {
+          "decoder_actual": null,
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp-notiming": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-orc": {
+          "decoder_actual": "orc",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-savemem-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "PLAIN-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 29353522940,
+          "result_sha256": "505ea6e48c590140be789c6df3e21aa0b2239280d8a48735d46906791b73aee0",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n1e7-wide": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 376873353865566,
+          "result_sha256": "f721e2c5b99f89f6145b7b78a4b7581f05355cc55dfc013924fdc52cd1469d4e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 376873353865566,
+          "result_sha256": "f721e2c5b99f89f6145b7b78a4b7581f05355cc55dfc013924fdc52cd1469d4e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 376873353865566,
+          "result_sha256": "f721e2c5b99f89f6145b7b78a4b7581f05355cc55dfc013924fdc52cd1469d4e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 376873353865566,
+          "result_sha256": "f721e2c5b99f89f6145b7b78a4b7581f05355cc55dfc013924fdc52cd1469d4e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE",
+          "events": 14615104,
+          "exit_code": 0,
+          "max_time": 376873353865566,
+          "result_sha256": "f721e2c5b99f89f6145b7b78a4b7581f05355cc55dfc013924fdc52cd1469d4e",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n1e8-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "BASE-savemem": {
+          "decoder_actual": null,
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-orc": {
+          "decoder_actual": "orc",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-savemem-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-tnode": {
+          "decoder_actual": "templated_node",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 100000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n2e6-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 2923264,
+          "exit_code": 0,
+          "max_time": 5871193040,
+          "result_sha256": "ad005a4d51e36d121a15c46cce01177d62102cd95fe27e36c2f9eea0e89aed2a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 2923264,
+          "exit_code": 0,
+          "max_time": 5871193040,
+          "result_sha256": "ad005a4d51e36d121a15c46cce01177d62102cd95fe27e36c2f9eea0e89aed2a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 2923264,
+          "exit_code": 0,
+          "max_time": 5871193040,
+          "result_sha256": "ad005a4d51e36d121a15c46cce01177d62102cd95fe27e36c2f9eea0e89aed2a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 2923264,
+          "exit_code": 0,
+          "max_time": 5871193040,
+          "result_sha256": "ad005a4d51e36d121a15c46cce01177d62102cd95fe27e36c2f9eea0e89aed2a",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 2000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n2e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 29230208,
+          "exit_code": 0,
+          "max_time": 58707045880,
+          "result_sha256": "db1f1c192d178d8d079b4ee9950fee9eb0606a0eef015063901cee4dd221c262",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 29230208,
+          "exit_code": 0,
+          "max_time": 58707045880,
+          "result_sha256": "db1f1c192d178d8d079b4ee9950fee9eb0606a0eef015063901cee4dd221c262",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 29230208,
+          "exit_code": 0,
+          "max_time": 58707045880,
+          "result_sha256": "db1f1c192d178d8d079b4ee9950fee9eb0606a0eef015063901cee4dd221c262",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 29230208,
+          "exit_code": 0,
+          "max_time": 58707045880,
+          "result_sha256": "db1f1c192d178d8d079b4ee9950fee9eb0606a0eef015063901cee4dd221c262",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 20000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n5e6-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 7308160,
+          "exit_code": 0,
+          "max_time": 14677982600,
+          "result_sha256": "e0f5f3509d6b5be924f2d1fcbbed785a7413e3b698c5031168570c74475b5c3a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 7308160,
+          "exit_code": 0,
+          "max_time": 14677982600,
+          "result_sha256": "e0f5f3509d6b5be924f2d1fcbbed785a7413e3b698c5031168570c74475b5c3a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 7308160,
+          "exit_code": 0,
+          "max_time": 14677982600,
+          "result_sha256": "e0f5f3509d6b5be924f2d1fcbbed785a7413e3b698c5031168570c74475b5c3a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 7308160,
+          "exit_code": 0,
+          "max_time": 14677982600,
+          "result_sha256": "e0f5f3509d6b5be924f2d1fcbbed785a7413e3b698c5031168570c74475b5c3a",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 5000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n5e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 73076736,
+          "exit_code": 0,
+          "max_time": 146770056960,
+          "result_sha256": "5d040289153749668540ad04dacd10385df80b3ba03acbfbd36256d8a6e0a593",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 73076736,
+          "exit_code": 0,
+          "max_time": 146770056960,
+          "result_sha256": "5d040289153749668540ad04dacd10385df80b3ba03acbfbd36256d8a6e0a593",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-cold": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 73076736,
+          "exit_code": 0,
+          "max_time": 146770056960,
+          "result_sha256": "5d040289153749668540ad04dacd10385df80b3ba03acbfbd36256d8a6e0a593",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 73076736,
+          "exit_code": 0,
+          "max_time": 146770056960,
+          "result_sha256": "5d040289153749668540ad04dacd10385df80b3ba03acbfbd36256d8a6e0a593",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 50000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p8-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14615408,
+          "exit_code": 0,
+          "max_time": 234833068040,
+          "result_sha256": "5727a403ddf02a2fd7bba93ad638baa8172dea6881b5b87a1dabcda8ad56c27f",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615408,
+          "exit_code": 0,
+          "max_time": 234833068040,
+          "result_sha256": "5727a403ddf02a2fd7bba93ad638baa8172dea6881b5b87a1dabcda8ad56c27f",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14615408,
+          "exit_code": 0,
+          "max_time": 234833068040,
+          "result_sha256": "5727a403ddf02a2fd7bba93ad638baa8172dea6881b5b87a1dabcda8ad56c27f",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 14615408,
+          "exit_code": 0,
+          "max_time": 234833068040,
+          "result_sha256": "5727a403ddf02a2fd7bba93ad638baa8172dea6881b5b87a1dabcda8ad56c27f",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14615408,
+          "exit_code": 0,
+          "max_time": 234833068040,
+          "result_sha256": "5727a403ddf02a2fd7bba93ad638baa8172dea6881b5b87a1dabcda8ad56c27f",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    }
+  },
+  "validation_tests": [
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/bench_decode_micro --trace /home/joshua/lgs-bench/traces/stencil3d-p64-n1e4-inferred.sd.bin --require gpu_id",
+      "exit_code": 3,
+      "expected": "failure",
+      "informational": false,
+      "name": "missing required custom field gpu_id is rejected at load time",
+      "output": "{\"tool\":\"decode_bench_micro\",\"mode\":\"require\",\"trace\":\"/home/joshua/lgs-bench/traces/stencil3d-p64-n1e4-inferred.sd.bin\",\"field\":\"gpu_id\",\"accepted\":false,\"error\":\"Trace lacks required field 'custom:gpu_id'\"}",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/bench_decode_micro --trace /home/joshua/lgs-bench/traces/stencil3d-p64-n1e4-inferred.legacy.bin --require gpu_id",
+      "exit_code": 3,
+      "expected": "failure",
+      "informational": false,
+      "name": "legacy trace has no custom fields: gpu_id rejected",
+      "output": "{\"tool\":\"decode_bench_micro\",\"mode\":\"require\",\"trace\":\"/home/joshua/lgs-bench/traces/stencil3d-p64-n1e4-inferred.legacy.bin\",\"field\":\"gpu_id\",\"accepted\":false,\"error\":\"Legacy traces have no field 'custom:gpu_id'\"}",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/bench_decode_micro --trace /home/joshua/lgs-bench/traces/stencil3d-p64-n1e4-custom.sd.bin --require gpu_id",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": false,
+      "name": "present custom field gpu_id is accepted",
+      "output": "{\"tool\":\"decode_bench_micro\",\"mode\":\"require\",\"trace\":\"/home/joshua/lgs-bench/traces/stencil3d-p64-n1e4-custom.sd.bin\",\"field\":\"gpu_id\",\"accepted\":true,\"error\":\"\"}",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid0.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid0.legacy.bin --format legacy --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format legacy rejects: cpu 256 exceeds the 8-bit cpu field",
+      "output": "txt2bin: Legacy cpu exceeds 255",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid0.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid0.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: cpu 256 exceeds the 8-bit cpu field",
+      "output": "txt2bin: Legacy cpu exceeds 255",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid0.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid0.base.bin",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": true,
+      "name": "(upstream txt2bin, informational) cpu 256 exceeds the 8-bit cpu field",
+      "output": "",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid1.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid1.legacy.bin --format legacy --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format legacy rejects: tag 2^32 exceeds the 32-bit tag field",
+      "output": "txt2bin: Legacy tag exceeds uint32_t",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid1.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid1.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: tag 2^32 exceeds the 32-bit tag field",
+      "output": "txt2bin: Legacy tag exceeds uint32_t",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid1.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid1.base.bin",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": true,
+      "name": "(upstream txt2bin, informational) tag 2^32 exceeds the 32-bit tag field",
+      "output": "",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid2.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid2.legacy.bin --format legacy --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format legacy rejects: peer outside num_ranks",
+      "output": "txt2bin: Peer is outside num_ranks",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid2.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid2.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: peer outside num_ranks",
+      "output": "txt2bin: Peer is outside num_ranks",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid2.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid2.base.bin",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": true,
+      "name": "(upstream txt2bin, informational) peer outside num_ranks",
+      "output": "",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid3.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid3.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: custom unsigned value 2^64 exceeds uint64",
+      "output": "txt2bin: Invalid unsigned value for 'gpu_id'",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid4.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid4.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: negative value for an unsigned custom field",
+      "output": "txt2bin: Invalid unsigned value for 'gpu_id'",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid5.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/invalid5.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: declared custom field missing on an operation",
+      "output": "txt2bin: Missing custom field 'gpu_id' on operation 'l1'",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/truncated.sd.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "NEW rejects a truncated self-describing trace",
+      "output": "LogGOPSim: Truncated node records",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/garbage.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "NEW rejects an unknown format",
+      "output": "LogGOPSim: Unrecognized schedule format",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/savemem-BASE.bin --save-mem",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": false,
+      "name": "BASE --save-mem run on a copy succeeds",
+      "output": "The schedule will be invalid after this simulation!\nLogGP network backend; size: 64 (1 CPUs, 1 NICs); L=2500, o=1500 g=1000, G=6, O=0, P=64, S=65535\nPERFORMANCE: Processes: 64 \t Events: 14592 \t Time: 0 s \t Speed: inf ev/s\nMaximum finishing time at host 0: 29307120 (0.0293071 s)",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/savemem-BASE.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "BASE: a trace consumed by --save-mem is rejected afterwards",
+      "output": "This is serialized goal schedule was invalidated by a prior simulation run!",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/savemem-NEW.bin --save-mem",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": false,
+      "name": "NEW --save-mem run on a copy succeeds",
+      "output": "The schedule will be invalid after this simulation!\nLogGP network backend; size: 64 (1 CPUs, 1 NICs); L=2500, o=1500 g=1000, G=6, O=0, P=64, S=65535\nPERFORMANCE: Processes: 64 \t Events: 14592 \t Time: 0 s \t Speed: inf ev/s\nMaximum finishing time at host 0: 29307120 (0.0293071 s)",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-005653-DESKTOP-FIJTQDO-full/correctness/correctness-ktd6wb8d/savemem-NEW.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "NEW: a trace consumed by --save-mem is rejected afterwards",
+      "output": "LogGOPSim: Schedule was invalidated by a prior simulation run",
+      "passed": true
+    }
+  ]
+}

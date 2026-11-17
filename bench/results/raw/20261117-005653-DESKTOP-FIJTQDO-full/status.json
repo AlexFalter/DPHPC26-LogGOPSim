@@ -1,0 +1,2462 @@
+{
+  "breakeven|e2e|BASE|stencil3d-p64-n2e6-inferred|warm": {
+    "ci": [
+      1033568935,
+      1058467375
+    ],
+    "median": 1045895103.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|BASE|stencil3d-p64-n2e7-inferred|warm": {
+    "ci": [
+      10441044711,
+      10565222042
+    ],
+    "median": 10516331566.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|BASE|stencil3d-p64-n5e6-inferred|warm": {
+    "ci": [
+      2570972800,
+      2619125570
+    ],
+    "median": 2588517276.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|BASE|stencil3d-p64-n5e7-inferred|warm": {
+    "ci": [
+      26225537572,
+      26428518911
+    ],
+    "median": 26310986686.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-interp|stencil3d-p64-n2e6-inferred|warm": {
+    "ci": [
+      1013231826,
+      1037202043
+    ],
+    "median": 1020043815.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-interp|stencil3d-p64-n2e7-inferred|warm": {
+    "ci": [
+      10126555824,
+      10378811867
+    ],
+    "median": 10237836712.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-interp|stencil3d-p64-n5e6-inferred|warm": {
+    "ci": [
+      2531561904,
+      2586870555
+    ],
+    "median": 2549073216.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-interp|stencil3d-p64-n5e7-inferred|warm": {
+    "ci": [
+      25218436806,
+      25651604486
+    ],
+    "median": 25474691202.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-cold|stencil3d-p64-n2e6-inferred|warm": {
+    "ci": [
+      1184921471,
+      1207662781
+    ],
+    "median": 1202859382.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-cold|stencil3d-p64-n2e7-inferred|warm": {
+    "ci": [
+      9734081051,
+      9881567782
+    ],
+    "median": 9785175247.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-cold|stencil3d-p64-n5e6-inferred|warm": {
+    "ci": [
+      2613731504,
+      2693343557
+    ],
+    "median": 2642722960.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-cold|stencil3d-p64-n5e7-inferred|warm": {
+    "ci": [
+      23958667054,
+      24213884286
+    ],
+    "median": 24011886625.5,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-warm|stencil3d-p64-n2e6-inferred|warm": {
+    "ci": [
+      949404383,
+      987377143
+    ],
+    "median": 952675937.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-warm|stencil3d-p64-n2e7-inferred|warm": {
+    "ci": [
+      9455678963,
+      9614669979
+    ],
+    "median": 9537895221.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-warm|stencil3d-p64-n5e6-inferred|warm": {
+    "ci": [
+      2367038490,
+      2402254406
+    ],
+    "median": 2371631919.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "breakeven|e2e|NEW-spec-warm|stencil3d-p64-n5e7-inferred|warm": {
+    "ci": [
+      23676877702,
+      23979900383
+    ],
+    "median": 23794242450.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "cold_cache|e2e|BASE|stencil3d-p64-n1e6-inferred|cold": {
+    "ci": [
+      605309636,
+      623006670
+    ],
+    "median": 607895026.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|BASE|stencil3d-p64-n1e7-inferred|cold": {
+    "ci": [
+      5386060065,
+      5511772841
+    ],
+    "median": 5425463408.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|BASE|stencil3d-p64-n1e8-inferred|cold": {
+    "ci": [
+      53780523105,
+      54607553658
+    ],
+    "median": 53961751303.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "cold_cache|e2e|LAZY-interp|stencil3d-p64-n1e6-inferred|cold": {
+    "ci": [
+      533182880,
+      545773357
+    ],
+    "median": 542369665.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|cold": {
+    "ci": [
+      5016932955,
+      5118173246
+    ],
+    "median": 5086046141.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|cold": {
+    "ci": [
+      49821713227,
+      50925763730
+    ],
+    "median": 49999943243.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-interp|stencil3d-p64-n1e6-inferred|cold": {
+    "ci": [
+      552758105,
+      566320845
+    ],
+    "median": 557333954.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|cold": {
+    "ci": [
+      5216598686,
+      5309336120
+    ],
+    "median": 5238135430.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|cold": {
+    "ci": [
+      51670032078,
+      52649991016
+    ],
+    "median": 52179395501.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-legacyfile|stencil3d-p64-n1e6-inferred|cold": {
+    "ci": [
+      520700613,
+      532267534
+    ],
+    "median": 523249074.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-legacyfile|stencil3d-p64-n1e7-inferred|cold": {
+    "ci": [
+      4530394889,
+      4638157040
+    ],
+    "median": 4548832624.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|cold": {
+    "ci": [
+      44474297831,
+      45628360709
+    ],
+    "median": 45031171473.5,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-spec-cold|stencil3d-p64-n1e6-inferred|cold": {
+    "ci": [
+      767924207,
+      793226830
+    ],
+    "median": 772769697.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-spec-cold|stencil3d-p64-n1e7-inferred|cold": {
+    "ci": [
+      5069682790,
+      5295657301
+    ],
+    "median": 5157894806.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-spec-cold|stencil3d-p64-n1e8-inferred|cold": {
+    "ci": [
+      48891789121,
+      49510713690
+    ],
+    "median": 48944493434.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-spec-warm|stencil3d-p64-n1e6-inferred|cold": {
+    "ci": [
+      514544035,
+      526838681
+    ],
+    "median": 522463260.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|cold": {
+    "ci": [
+      4869128776,
+      5040067756
+    ],
+    "median": 4926455323.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "cold_cache|e2e|NEW-spec-warm|stencil3d-p64-n1e8-inferred|cold": {
+    "ci": [
+      48832508011,
+      49806343977
+    ],
+    "median": 48896614615.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "concurrency|e2e|BASE|stencil3d-p64-n1e7-inferred|warm|k1": {
+    "ci": [
+      5304345710,
+      5383541570
+    ],
+    "median": 5340202988.0,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|BASE|stencil3d-p64-n1e7-inferred|warm|k2": {
+    "ci": [
+      5660473222,
+      5734556190
+    ],
+    "median": 5695860110.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|BASE|stencil3d-p64-n1e7-inferred|warm|k4": {
+    "ci": [
+      5977482652,
+      6180411930
+    ],
+    "median": 6115934927.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|BASE|stencil3d-p64-n1e7-inferred|warm|k8": {
+    "ci": [
+      7037864410,
+      7172202231
+    ],
+    "median": 7127768268.0,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm|k1": {
+    "ci": [
+      5032144854,
+      5080712827
+    ],
+    "median": 5047443274.0,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm|k2": {
+    "ci": [
+      5243034413,
+      5551439203
+    ],
+    "median": 5384948588.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm|k4": {
+    "ci": [
+      5643439914,
+      5801838128
+    ],
+    "median": 5734671194.0,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm|k8": {
+    "ci": [
+      6510717786,
+      6620672512
+    ],
+    "median": 6551970667.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm|k1": {
+    "ci": [
+      5161564690,
+      5269272788
+    ],
+    "median": 5225257352.0,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm|k2": {
+    "ci": [
+      5429013324,
+      5590825312
+    ],
+    "median": 5506354299.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm|k4": {
+    "ci": [
+      5901069604,
+      6052350456
+    ],
+    "median": 5991342819.0,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm|k8": {
+    "ci": [
+      6778208665,
+      7016418099
+    ],
+    "median": 6838976759.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|warm|k1": {
+    "ci": [
+      4803206607,
+      4939677678
+    ],
+    "median": 4852477238.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|warm|k2": {
+    "ci": [
+      5098211838,
+      5285375480
+    ],
+    "median": 5222678706.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|warm|k4": {
+    "ci": [
+      5516316531,
+      5684808470
+    ],
+    "median": 5591364377.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "concurrency|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|warm|k8": {
+    "ci": [
+      6297588040,
+      6478024447
+    ],
+    "median": 6366138342.5,
+    "metric": "makespan_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|base-legacy|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      12267827189,
+      12561205304
+    ],
+    "median": 12407051151.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|master-legacy|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      16381915094,
+      17090701039
+    ],
+    "median": 16653360255.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|master-sd|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      30762656633,
+      32224247729
+    ],
+    "median": 31764309829.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-legacy-t16|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      3707678113,
+      3783245964
+    ],
+    "median": 3729289593.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-legacy-t1|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      16146312891,
+      17073815501
+    ],
+    "median": 16455320095.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-legacy-t2|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      8875248940,
+      9323794302
+    ],
+    "median": 9052481791.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-legacy-t4|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      5172871759,
+      5411411280
+    ],
+    "median": 5303112356.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-legacy-t8|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      3733521824,
+      3902639097
+    ],
+    "median": 3843256417.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-sd-t16|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      18047845348,
+      19318446267
+    ],
+    "median": 18425596154.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "convert|convert|omp-sd-t1|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      29991469939,
+      30656889554
+    ],
+    "median": 30354467831.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-sd-t2|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      23266169842,
+      23718834371
+    ],
+    "median": 23531269239.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "convert|convert|omp-sd-t4|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      19407697174,
+      20479080331
+    ],
+    "median": 19686418078,
+    "metric": "wall_ns",
+    "n": 15,
+    "state": "converged"
+  },
+  "convert|convert|omp-sd-t8|stencil3d-p64-n1e7-inferred": {
+    "ci": [
+      18223550473,
+      19376225307
+    ],
+    "median": 18587870457.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "instrumentation_overhead|e2e|NEW-interp-notiming|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      515508955,
+      520995978
+    ],
+    "median": 517086082.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "instrumentation_overhead|e2e|NEW-interp-notiming|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5125238700,
+      5197814636
+    ],
+    "median": 5166985148.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "instrumentation_overhead|e2e|NEW-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      513613042,
+      527432400
+    ],
+    "median": 516299722.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "instrumentation_overhead|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5114125795,
+      5164899644
+    ],
+    "median": 5131264458.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "instrumentation_overhead|e2e|PLAIN-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      540975511,
+      554765601
+    ],
+    "median": 543426369.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "instrumentation_overhead|e2e|PLAIN-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5394235764,
+      5491699881
+    ],
+    "median": 5422156183.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "memory_budget|e2e|BASE|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      18852493,
+      20451495
+    ],
+    "median": 19163285,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|BASE|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      18551036,
+      19326320
+    ],
+    "median": 18827933,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|BASE|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      17963464,
+      20108945
+    ],
+    "median": 18200350,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      18671466,
+      19631352
+    ],
+    "median": 19173454,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      18623782,
+      19644981
+    ],
+    "median": 19120418,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      19428230,
+      19646295
+    ],
+    "median": 19431200,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-legacyfile|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      18321176,
+      18582048
+    ],
+    "median": 18486822,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-legacyfile|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      17541966,
+      22420004
+    ],
+    "median": 17883154,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-legacyfile|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      17058444,
+      19053026
+    ],
+    "median": 18158309,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      17671212,
+      20025821
+    ],
+    "median": 18084660,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      18464590,
+      20713393
+    ],
+    "median": 18621277,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      19534626,
+      21564726
+    ],
+    "median": 19709634,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      17801394,
+      19746343
+    ],
+    "median": 18534405,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      18498547,
+      20348961
+    ],
+    "median": 19967477,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      16424160,
+      19873128
+    ],
+    "median": 18657001,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "rank_sweep|e2e|BASE|stencil3d-p32768-n1e7-inferred|warm": {
+    "ci": [
+      11356341027,
+      11441603772
+    ],
+    "median": 11397523353.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|BASE|stencil3d-p4096-n1e7-inferred|warm": {
+    "ci": [
+      8488576669,
+      8823529497
+    ],
+    "median": 8675529982.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|BASE|stencil3d-p512-n1e7-inferred|warm": {
+    "ci": [
+      6445208213,
+      6597765157
+    ],
+    "median": 6505298981.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|BASE|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5238959587,
+      5335949798
+    ],
+    "median": 5272085922.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|BASE|stencil3d-p8-n1e7-inferred|warm": {
+    "ci": [
+      3584264757,
+      3624724917
+    ],
+    "median": 3599927029.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|LAZY-interp|stencil3d-p32768-n1e7-inferred|warm": {
+    "ci": [
+      10755597138,
+      10859009055
+    ],
+    "median": 10814723525.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|LAZY-interp|stencil3d-p4096-n1e7-inferred|warm": {
+    "ci": [
+      7938794844,
+      8130014760
+    ],
+    "median": 8064007186.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|LAZY-interp|stencil3d-p512-n1e7-inferred|warm": {
+    "ci": [
+      6247213599,
+      6349945795
+    ],
+    "median": 6292444418.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4924559747,
+      5041259359
+    ],
+    "median": 4969137927.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|LAZY-interp|stencil3d-p8-n1e7-inferred|warm": {
+    "ci": [
+      4153432590,
+      4200127928
+    ],
+    "median": 4184029597.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-interp|stencil3d-p32768-n1e7-inferred|warm": {
+    "ci": [
+      10136905983,
+      10310313238
+    ],
+    "median": 10240440165.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-interp|stencil3d-p4096-n1e7-inferred|warm": {
+    "ci": [
+      7628893832,
+      7842131965
+    ],
+    "median": 7712612355.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-interp|stencil3d-p512-n1e7-inferred|warm": {
+    "ci": [
+      6077552005,
+      6164863605
+    ],
+    "median": 6086722438.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5063587830,
+      5179396325
+    ],
+    "median": 5118786036.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-interp|stencil3d-p8-n1e7-inferred|warm": {
+    "ci": [
+      4005344833,
+      4091505014
+    ],
+    "median": 4034475215.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-legacyfile|stencil3d-p32768-n1e7-inferred|warm": {
+    "ci": [
+      10261329675,
+      10404434016
+    ],
+    "median": 10287730692.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-legacyfile|stencil3d-p4096-n1e7-inferred|warm": {
+    "ci": [
+      7458297731,
+      7653161193
+    ],
+    "median": 7593647602.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-legacyfile|stencil3d-p512-n1e7-inferred|warm": {
+    "ci": [
+      5355022379,
+      5418330632
+    ],
+    "median": 5395672528.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-legacyfile|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4265095334,
+      4343431787
+    ],
+    "median": 4316392933.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-legacyfile|stencil3d-p8-n1e7-inferred|warm": {
+    "ci": [
+      2896770235,
+      2963220156
+    ],
+    "median": 2928295136.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-spec-warm|stencil3d-p32768-n1e7-inferred|warm": {
+    "ci": [
+      9812542588,
+      9918182396
+    ],
+    "median": 9896377933.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-spec-warm|stencil3d-p4096-n1e7-inferred|warm": {
+    "ci": [
+      7242729251,
+      7687232196
+    ],
+    "median": 7403390003.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-spec-warm|stencil3d-p512-n1e7-inferred|warm": {
+    "ci": [
+      5736772897,
+      5792967937
+    ],
+    "median": 5772279654.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4761465024,
+      4803110915
+    ],
+    "median": 4792269945.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "rank_sweep|e2e|NEW-spec-warm|stencil3d-p8-n1e7-inferred|warm": {
+    "ci": [
+      3641273844,
+      3664563198
+    ],
+    "median": 3655561580.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "save_mem|e2e|BASE-savemem|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4906145956,
+      5125490806
+    ],
+    "median": 4991183802.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "save_mem|e2e|BASE-savemem|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      49291429265,
+      55677147675
+    ],
+    "median": 50218920310.0,
+    "metric": "wall_ns",
+    "n": 8,
+    "state": "max_reps"
+  },
+  "save_mem|e2e|BASE|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5253507868,
+      5509659709
+    ],
+    "median": 5332598460.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "save_mem|e2e|BASE|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      53107376397,
+      57160947047
+    ],
+    "median": 53408410694.0,
+    "metric": "wall_ns",
+    "n": 8,
+    "state": "max_reps"
+  },
+  "save_mem|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4981874367,
+      5258949011
+    ],
+    "median": 5060799545.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "save_mem|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      49664614117,
+      53007940060
+    ],
+    "median": 50793491920.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "save_mem|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5164440956,
+      5311329102
+    ],
+    "median": 5258453255.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "save_mem|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      51547499693,
+      53648559361
+    ],
+    "median": 52053440442.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "save_mem|e2e|NEW-savemem-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5001028692,
+      5247521345
+    ],
+    "median": 5071781408.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "save_mem|e2e|NEW-savemem-interp|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      50255092779,
+      52820054401
+    ],
+    "median": 50472130723.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|BASE|stencil3d-p64-n1e6-custom|warm": {
+    "ci": [
+      522646023,
+      534223050
+    ],
+    "median": 525707380.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|BASE|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      523665142,
+      533957240
+    ],
+    "median": 531747152.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|BASE|stencil3d-p64-n1e6-wide|warm": {
+    "ci": [
+      417082257,
+      424653245
+    ],
+    "median": 418488091.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|BASE|stencil3d-p64-n1e7-custom|warm": {
+    "ci": [
+      5215013168,
+      5316624108
+    ],
+    "median": 5251311881.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|BASE|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5195764081,
+      5302416973
+    ],
+    "median": 5232126641.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|BASE|stencil3d-p64-n1e7-wide|warm": {
+    "ci": [
+      4169770680,
+      4229779575
+    ],
+    "median": 4197940503.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|LAZY-interp|stencil3d-p64-n1e6-custom|warm": {
+    "ci": [
+      499190426,
+      508279367
+    ],
+    "median": 501899153.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|LAZY-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      496305724,
+      504624022
+    ],
+    "median": 500584114.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|LAZY-interp|stencil3d-p64-n1e6-wide|warm": {
+    "ci": [
+      395607619,
+      408491692
+    ],
+    "median": 400280853.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|LAZY-interp|stencil3d-p64-n1e7-custom|warm": {
+    "ci": [
+      4949737085,
+      5014840093
+    ],
+    "median": 4968294293.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4912140152,
+      4985102427
+    ],
+    "median": 4948392965.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|LAZY-interp|stencil3d-p64-n1e7-wide|warm": {
+    "ci": [
+      3897720603,
+      3985928942
+    ],
+    "median": 3951065594.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-interp|stencil3d-p64-n1e6-custom|warm": {
+    "ci": [
+      518512004,
+      532551503
+    ],
+    "median": 521778453.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      511709995,
+      517492733
+    ],
+    "median": 514778120.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-interp|stencil3d-p64-n1e6-wide|warm": {
+    "ci": [
+      415747224,
+      425988281
+    ],
+    "median": 419234861.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-interp|stencil3d-p64-n1e7-custom|warm": {
+    "ci": [
+      5176683576,
+      5224088628
+    ],
+    "median": 5191572648.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5085438774,
+      5161245593
+    ],
+    "median": 5139572200.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-interp|stencil3d-p64-n1e7-wide|warm": {
+    "ci": [
+      4147203528,
+      4237853965
+    ],
+    "median": 4173048275.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e6-custom|warm": {
+    "ci": [
+      485834305,
+      500982190
+    ],
+    "median": 488163792.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      478407624,
+      483605514
+    ],
+    "median": 481435097.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e6-wide|warm": {
+    "ci": [
+      383834484,
+      389155144
+    ],
+    "median": 385888850.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e7-custom|warm": {
+    "ci": [
+      4859377197,
+      4980234546
+    ],
+    "median": 4913978418.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4748904573,
+      4847401368
+    ],
+    "median": 4777595837.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e7-wide|warm": {
+    "ci": [
+      3804342905,
+      3877323929
+    ],
+    "median": 3840106330.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-tnode|stencil3d-p64-n1e6-custom|warm": {
+    "ci": [
+      505038503,
+      508603183
+    ],
+    "median": 507346133.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-tnode|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      492789200,
+      502529023
+    ],
+    "median": 496863977.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-tnode|stencil3d-p64-n1e6-wide|warm": {
+    "ci": [
+      403126262,
+      409417612
+    ],
+    "median": 405047775.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-tnode|stencil3d-p64-n1e7-custom|warm": {
+    "ci": [
+      5053521713,
+      5116885072
+    ],
+    "median": 5080207370.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-tnode|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4940784492,
+      5050677544
+    ],
+    "median": 4987234683.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "schema_sweep|e2e|NEW-tnode|stencil3d-p64-n1e7-wide|warm": {
+    "ci": [
+      4014451609,
+      4052135432
+    ],
+    "median": 4032594651.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|BASE|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      13256243,
+      14136400
+    ],
+    "median": 13774850.0,
+    "metric": "wall_ns",
+    "n": 20,
+    "state": "converged"
+  },
+  "size_sweep|e2e|BASE|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      58953413,
+      62410892
+    ],
+    "median": 60137878.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|BASE|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      526483988,
+      558040230
+    ],
+    "median": 532149247.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|BASE|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5196448630,
+      5293991761
+    ],
+    "median": 5237295593.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|BASE|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      52489756287,
+      53302741573
+    ],
+    "median": 52998036974.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-interp|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      13115703,
+      13889314
+    ],
+    "median": 13341338,
+    "metric": "wall_ns",
+    "n": 17,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-interp|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      55872761,
+      57448746
+    ],
+    "median": 56724981.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      494113738,
+      518315909
+    ],
+    "median": 498868189.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4898944585,
+      4988056947
+    ],
+    "median": 4925650660.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      49057140273,
+      49470272408
+    ],
+    "median": 49195578637.5,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-legacyfile|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      11628823,
+      12334255
+    ],
+    "median": 12219324.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-legacyfile|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      47001793,
+      48481665
+    ],
+    "median": 47949242.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-legacyfile|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      395442999,
+      407721694
+    ],
+    "median": 399497099.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-legacyfile|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      3898449297,
+      4093221325
+    ],
+    "median": 3943392629.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-legacyfile|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      38964873009,
+      39361504939
+    ],
+    "median": 39022842769.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-spec-warm|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      12519393,
+      13548010
+    ],
+    "median": 12951070.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-spec-warm|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      53154786,
+      55668040
+    ],
+    "median": 53559193.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-spec-warm|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      461358590,
+      474507456
+    ],
+    "median": 465387933.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-spec-warm|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4575813314,
+      4724062959
+    ],
+    "median": 4587323411.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|LAZY-spec-warm|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      45972963834,
+      46170115260
+    ],
+    "median": 46068106359.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-interp|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      12671375,
+      13754361
+    ],
+    "median": 13334624.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-interp|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      57230181,
+      58942708
+    ],
+    "median": 58153070.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      511466905,
+      525017407
+    ],
+    "median": 513647423.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-interp|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5080689444,
+      5380143065
+    ],
+    "median": 5124044985,
+    "metric": "wall_ns",
+    "n": 11,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      51063244268,
+      51385346804
+    ],
+    "median": 51123113284.5,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-legacyfile|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      12741048,
+      13897583
+    ],
+    "median": 13255962.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-legacyfile|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      50937243,
+      52393048
+    ],
+    "median": 51346527.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-legacyfile|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      427886749,
+      438794436
+    ],
+    "median": 436013857.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-legacyfile|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4253694116,
+      4434255385
+    ],
+    "median": 4300557513.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      43133168454,
+      44068984988
+    ],
+    "median": 43465893191.5,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-orc|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      36963910,
+      38776099
+    ],
+    "median": 38229574.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-orc|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      78849803,
+      82854430
+    ],
+    "median": 80400343.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-orc|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      507678492,
+      532957451
+    ],
+    "median": 508529491.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-orc|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4827804554,
+      4981064075
+    ],
+    "median": 4885657826.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-orc|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      47847816351,
+      48729438435
+    ],
+    "median": 48365444083.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-cold|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      241269934,
+      259148175
+    ],
+    "median": 248182645.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-cold|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      285111150,
+      301183935
+    ],
+    "median": 292985058.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-cold|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      711800131,
+      744749539
+    ],
+    "median": 718494722.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-cold|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      5011024975,
+      5205130104
+    ],
+    "median": 5037990841.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-cold|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      47770831433,
+      48302159795
+    ],
+    "median": 47888695831.5,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      13008427,
+      13966128
+    ],
+    "median": 13680167,
+    "metric": "wall_ns",
+    "n": 15,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      54343663,
+      56202643
+    ],
+    "median": 54928086,
+    "metric": "wall_ns",
+    "n": 15,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      476182566,
+      497454475
+    ],
+    "median": 480094656.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4747623458,
+      4822785209
+    ],
+    "median": 4778535927.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-spec-warm|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      47570064915,
+      48237587504
+    ],
+    "median": 48094681149.5,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-tnode|stencil3d-p64-n1e4-inferred|warm": {
+    "ci": [
+      12817496,
+      13713087
+    ],
+    "median": 13237734.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-tnode|stencil3d-p64-n1e5-inferred|warm": {
+    "ci": [
+      54883985,
+      58140587
+    ],
+    "median": 56363271.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-tnode|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      495555070,
+      511625612
+    ],
+    "median": 499839035.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-tnode|stencil3d-p64-n1e7-inferred|warm": {
+    "ci": [
+      4921914064,
+      5055257903
+    ],
+    "median": 4967757459.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "size_sweep|e2e|NEW-tnode|stencil3d-p64-n1e8-inferred|warm": {
+    "ci": [
+      49483642217,
+      50089804092
+    ],
+    "median": 49640930021.0,
+    "metric": "wall_ns",
+    "n": 6,
+    "state": "converged"
+  },
+  "workloads_large|e2e|BASE|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      3986351079,
+      4081808431
+    ],
+    "median": 4047319131.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|BASE|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      7783854447,
+      8009201006
+    ],
+    "median": 7871913348.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|BASE|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      10206032,
+      11043254
+    ],
+    "median": 10624211,
+    "metric": "wall_ns",
+    "n": 17,
+    "state": "converged"
+  },
+  "workloads_large|e2e|LAZY-interp|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      3376816015,
+      3399072674
+    ],
+    "median": 3391958366.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|LAZY-interp|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      7338132501,
+      7410879193
+    ],
+    "median": 7356842731.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|LAZY-interp|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      109129678,
+      110972336
+    ],
+    "median": 110651835.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-interp|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      3519707104,
+      3560444843
+    ],
+    "median": 3532371124.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-interp|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      7250219337,
+      7446970009
+    ],
+    "median": 7359367420.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-interp|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      93988765,
+      97766130
+    ],
+    "median": 95720917.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-spec-warm|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      3200829366,
+      3248693604
+    ],
+    "median": 3235137103.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-spec-warm|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      6904696934,
+      7107442287
+    ],
+    "median": 7026658944.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-spec-warm|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      94477814,
+      96555942
+    ],
+    "median": 95372318.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      305092878,
+      313568268
+    ],
+    "median": 309439638.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      323856990,
+      328094378
+    ],
+    "median": 325786755.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2669721332,
+      2709260053
+    ],
+    "median": 2684680551.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      607476752,
+      623534163
+    ],
+    "median": 615461895.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1443238178,
+      1477115472
+    ],
+    "median": 1471631295.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      8924043,
+      9661888
+    ],
+    "median": 9215934,
+    "metric": "wall_ns",
+    "n": 17,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      521536645,
+      530786906
+    ],
+    "median": 526125717.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      295382961,
+      303337832
+    ],
+    "median": 298979966.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      312729965,
+      318005805
+    ],
+    "median": 314492731.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2753237818,
+      2799173416
+    ],
+    "median": 2765573805.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      620656448,
+      643819273
+    ],
+    "median": 632705857.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1425799855,
+      1450443890
+    ],
+    "median": 1431037624.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      16730309,
+      18317097
+    ],
+    "median": 17469967,
+    "metric": "wall_ns",
+    "n": 11,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      493984496,
+      501518020
+    ],
+    "median": 499187389.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      287898950,
+      304002918
+    ],
+    "median": 291650985.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      311163532,
+      325084980
+    ],
+    "median": 313731731.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2768082336,
+      2813078531
+    ],
+    "median": 2788482318.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      616733967,
+      635362750
+    ],
+    "median": 623272171.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1439399847,
+      1474317675
+    ],
+    "median": 1456527719.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      16012266,
+      17531295
+    ],
+    "median": 16776726.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      509486985,
+      520573442
+    ],
+    "median": 515770308.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      226411290,
+      232416203
+    ],
+    "median": 230735926.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      251292402,
+      255164685
+    ],
+    "median": 253493057.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2682525103,
+      2801632577
+    ],
+    "median": 2723287656.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      539802524,
+      554531135
+    ],
+    "median": 548507234.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1372171185,
+      1394361476
+    ],
+    "median": 1382430474.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      9942729,
+      10861529
+    ],
+    "median": 10382704.5,
+    "metric": "wall_ns",
+    "n": 26,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      426027599,
+      434000177
+    ],
+    "median": 430503641.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      254583680,
+      256299818
+    ],
+    "median": 255481049.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      275933074,
+      283139890
+    ],
+    "median": 280459567.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2735198172,
+      2755923736
+    ],
+    "median": 2743399898.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      582685887,
+      612006178
+    ],
+    "median": 588638415.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1411464291,
+      1432114423
+    ],
+    "median": 1426759420.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      16189030,
+      16823322
+    ],
+    "median": 16499695.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      473861773,
+      485924676
+    ],
+    "median": 478896229.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  }
+}

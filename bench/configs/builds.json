@@ -1,0 +1,40 @@
+{
+  "_doc": "Builds made by bench/build.sh, each from its own git worktree under $BENCH_WORK/src/<name>. 'ref' is resolved to a commit at build time and recorded in $BENCH_WORK/build/<name>/bench-build.json. kind=upstream builds with the upstream CMake files and is never modified; kind=new gets the phase-timing hooks if instrument=true. All builds use the same compiler and the same CMAKE_<LANG>_FLAGS; build.sh asserts that the optimization flags of LogGOPSim.cpp are identical.",
+  "builds": {
+    "base": {
+      "ref": "76451de16546c7ea39651c183cbc532f4a3457c0",
+      "kind": "upstream",
+      "instrument": false,
+      "targets": ["LogGOPSim", "txt2bin", "schedgen"],
+      "description": "Unmodified upstream spcl/LogGOPSim: the last upstream commit before this project (merge of PR #18)"
+    },
+    "master": {
+      "ref": "master",
+      "kind": "new",
+      "instrument": true,
+      "targets": ["LogGOPSim", "txt2bin", "schedgen", "bench_decode_micro"],
+      "description": "Self-describing format v2, unified TraceReader, plan runners plan/jit/orc/templated_node/templated_schema"
+    },
+    "master-plain": {
+      "ref": "master",
+      "kind": "new",
+      "instrument": false,
+      "targets": ["LogGOPSim"],
+      "description": "master without phase-timing hooks: checks that the instrumentation changes nothing"
+    },
+    "omp": {
+      "ref": "origin/feature/omp-first-pass",
+      "kind": "new",
+      "instrument": true,
+      "targets": ["LogGOPSim", "txt2bin", "first_pass_bench"],
+      "description": "Parallel (OpenMP) txt2bin first pass, legacy writer with pwrite"
+    },
+    "lazy": {
+      "ref": "origin/feature/lazy-decoding",
+      "kind": "new",
+      "instrument": true,
+      "targets": ["LogGOPSim", "txt2bin", "first_pass_bench"],
+      "description": "--lazy-decoding (ready nodes as indices, dependency counters in memory, trace never written); includes omp-first-pass"
+    }
+  }
+}

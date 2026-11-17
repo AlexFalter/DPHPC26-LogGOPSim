@@ -1,0 +1,19 @@
+# Custom fields of the "custom" schema (bench/workloads/goalgen.py --schema custom): an NCCL-like
+# 64-bit communicator hash, the local GPU, the CUDA stream class and the NCCL channel. txt2bin
+# infers each field's width from the values; LogGOPSim does not bind them (they are skipped by the
+# decoder), decode_bench_micro --fields all decodes them too.
+[[fields]]
+name = "comm_id"
+type = "unsigned"
+
+[[fields]]
+name = "gpu_id"
+type = "unsigned"
+
+[[fields]]
+name = "stream_id"
+type = "unsigned"
+
+[[fields]]
+name = "channel"
+type = "unsigned"

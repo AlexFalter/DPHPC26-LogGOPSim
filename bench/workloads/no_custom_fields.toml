@@ -1,0 +1,2 @@
+# No custom fields: passed explicitly to txt2bin so that the worktree's config/custom_fields.toml
+# can never change what is benchmarked.

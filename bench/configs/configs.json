@@ -1,0 +1,43 @@
+{
+  "_doc": "Runtime configurations. file: which trace file (legacy = written by BASE's txt2bin, sd = self-describing, written by master's txt2bin). decoder: LOGGOPSIM_DECODER (null for legacy files). jit_cache: cold = a fresh empty LOGGOPSIM_JIT_CACHE per run, warm = one per campaign, filled by the warm-up run. phase_timing: GOAL_PHASE_TIMING=1 (instrumented builds only). copy_trace: the trace is copied before each run, outside the timed region (required for --save-mem, which destroys its input). Names follow TASK.md section 3.",
+  "params": {"L": 2500, "o": 1500, "g": 1000, "G": 6, "O": 0, "S": 65535},
+  "configs": {
+    "BASE":                {"build": "base",   "file": "legacy"},
+    "NEW-legacyfile":      {"build": "master", "file": "legacy", "phase_timing": true},
+    "NEW-interp":          {"build": "master", "file": "sd", "decoder": "plan", "phase_timing": true},
+    "NEW-spec-cold":       {"build": "master", "file": "sd", "decoder": "jit", "jit_cache": "cold", "phase_timing": true},
+    "NEW-spec-warm":       {"build": "master", "file": "sd", "decoder": "jit", "jit_cache": "warm", "phase_timing": true},
+    "NEW-orc":             {"build": "master", "file": "sd", "decoder": "orc", "phase_timing": true,
+                            "env": {"LOGGOPSIM_ORC_REUSE": "0"}, "optional": true},
+    "NEW-tnode":           {"build": "master", "file": "sd", "decoder": "templated_node", "phase_timing": true},
+    "NEW-tschema":         {"build": "master", "file": "sd", "decoder": "templated_schema", "phase_timing": true,
+                            "optional": true},
+    "NEW-interp-notiming": {"build": "master", "file": "sd", "decoder": "plan", "phase_timing": false},
+    "PLAIN-interp":        {"build": "master-plain", "file": "sd", "decoder": "plan"},
+    "LAZY-legacyfile":     {"build": "lazy", "file": "legacy", "args": ["--lazy-decoding"], "phase_timing": true},
+    "LAZY-interp":         {"build": "lazy", "file": "sd", "decoder": "plan", "args": ["--lazy-decoding"], "phase_timing": true},
+    "LAZY-spec-warm":      {"build": "lazy", "file": "sd", "decoder": "jit", "jit_cache": "warm",
+                            "args": ["--lazy-decoding"], "phase_timing": true},
+    "LAZY-eager-interp":   {"build": "lazy", "file": "sd", "decoder": "plan", "phase_timing": true},
+    "BASE-savemem":        {"build": "base",   "file": "legacy", "args": ["--save-mem"], "copy_trace": true},
+    "NEW-savemem-interp":  {"build": "master", "file": "sd", "decoder": "plan", "args": ["--save-mem"],
+                            "copy_trace": true, "phase_timing": true}
+  },
+  "convert_tools": {
+    "_doc": "txt2bin variants for the conversion experiment: build, output format, --threads (omp/lazy only; 0 = OMP_NUM_THREADS or all cores).",
+    "base-legacy":   {"build": "base",   "format": "legacy"},
+    "master-legacy": {"build": "master", "format": "legacy"},
+    "master-sd":     {"build": "master", "format": "self-describing"},
+    "omp-legacy-t1": {"build": "omp", "format": "legacy", "threads": 1},
+    "omp-legacy-t2": {"build": "omp", "format": "legacy", "threads": 2},
+    "omp-legacy-t4": {"build": "omp", "format": "legacy", "threads": 4},
+    "omp-legacy-t8": {"build": "omp", "format": "legacy", "threads": 8},
+    "omp-legacy-t16": {"build": "omp", "format": "legacy", "threads": 16},
+    "omp-sd-t1":     {"build": "omp", "format": "self-describing", "threads": 1},
+    "omp-sd-t2":     {"build": "omp", "format": "self-describing", "threads": 2},
+    "omp-sd-t4":     {"build": "omp", "format": "self-describing", "threads": 4},
+    "omp-sd-t8":     {"build": "omp", "format": "self-describing", "threads": 8},
+    "omp-sd-t16":    {"build": "omp", "format": "self-describing", "threads": 16},
+    "omp-sd-t20":    {"build": "omp", "format": "self-describing", "threads": 20}
+  }
+}

@@ -9,3 +9,7 @@ src/Schedgen2/schedule.goal
 .clangd
 /.vscode/
 .DS_Store
+
+# Benchmark harness: worktrees, builds, traces, scratch (BENCH_WORK) and Slurm job state
+/bench/.work/
+/bench/results/.campaign-*
