@@ -108,24 +108,6 @@ LogGOPSim predicts how long an MPI program runs. Input: per rank, a graph of sen
 \end{itemize}
 \end{frame}
 
-\begin{frame}{A schedule is a dependency graph}
-\begin{columns}[c]
-\begin{column}{0.45\textwidth}
-\centering\resizebox{\linewidth}{!}{\input{diagrams/local-dependencies.tex}}
-\end{column}
-\begin{column}{0.52\textwidth}
-\small
-\begin{itemize}
-\item Each rank is a graph of \texttt{calc}, \texttt{send} and \texttt{recv} nodes.
-\item A node's \textbf{counter} says how many nodes it still waits for. Roots start at 0.
-\item The simulator runs ready nodes with LogGOPS costs ($L$, $o$, $g$, $G$), then decrements the counters of their dependents.
-\item A dependent whose counter reaches 0 becomes ready.
-\item Output: the time at which each rank finishes.
-\end{itemize}
-\end{column}
-\end{columns}
-\end{frame}
-
 \begin{frame}{The problem: a fixed 39-byte record}
 \diagram{legacy-record}
 \vspace{4mm}
@@ -417,29 +399,6 @@ int decode(const u8* r, u8* const* t) {
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Same result as before, and what it took}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\textbf{Identical to the sequential pass}
-\small
-\begin{itemize}
-\item Same output bytes in both formats.
-\item Same errors: the lowest invalid rank is reported, with its line number in the whole file.
-\item 9 differential tests at 1, 2, 3 and 8 threads.
-\item Pipes can't be mapped: they use the sequential reader.
-\end{itemize}
-\end{column}
-\begin{column}{0.48\textwidth}
-\textbf{Two bottlenecks found on the way}
-\small
-\begin{itemize}
-\item The legacy writer remapped the whole output file for every rank. With threads, each unmap got expensive: 45\,s instead of 4\,s. Now each rank is appended with \texttt{pwrite}.
-\item Threads waiting in \texttt{omp ordered} spin and starved the writer: 15\,s instead of under 1\,s. Now they sleep on a condition variable.
-\end{itemize}
-\end{column}
-\end{columns}
-\end{frame}
-
 % ================================================================ step 4
 
 \stepframe{4}{Lazy decoding}{Decode a node only when the simulator runs it}
@@ -485,132 +444,94 @@ for (auto i : ready_)
 \end{columns}
 \end{frame}
 
-\begin{frame}{Same simulation, fewer copies}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\textbf{Correctness}
-\small
-\begin{itemize}
-\item The full \texttt{-v} event log is identical in both modes: every operation at the same simulated time.
-\item Checked on dissemination, ResNet and ring traces (14.7M--72.8M log lines), both formats.
-\item The trace file is never written, so it can be shared by concurrent runs.
-\end{itemize}
+\begin{frame}{One counter, three meanings}
+\begin{columns}[c]
+\begin{column}{0.45\textwidth}
+\centering\small
+\begin{tabular}{cl}
+\toprule
+\textbf{Stored} & \textbf{Meaning} \\
+\midrule
+0 & not read from the file yet \\
+$k+1$ & $k$ dependencies still open \\
+1 & none left: the node is ready \\
+\bottomrule
+\end{tabular}
 \end{column}
-\begin{column}{0.48\textwidth}
-\textbf{Trade-offs}
+\begin{column}{0.52\textwidth}
 \small
 \begin{itemize}
-\item The counter array is 4\,B per node, allocated at startup: 1 billion nodes need 4\,GB, still far less than the page copies it replaces.
-\item Not combinable with \texttt{-{}-save-mem}, which exists only to write counters back to the file.
+\item The array starts zero-filled, without touching the file.
+\item Each count is read once, when its node is first released.
+\item Storing the count $+1$ frees the 0, so no extra ``already read'' flag is needed.
 \end{itemize}
 \end{column}
 \end{columns}
+\vfill
+\textbf{A node with 3 dependencies}\par\vspace{2mm}
+{\centering\resizebox{\linewidth}{!}{\begin{tikzpicture}[
+  ctr/.style={draw=black!65,fill=blue!8,rounded corners=2pt,minimum width=12mm,minimum height=9mm,font=\Large\bfseries},
+  lbl/.style={font=\small,align=center},
+  state/.style={font=\small,text=black!60}]
+\node[ctr] (a) at (0,0) {0};
+\node[ctr] (b) at (4,0) {4};
+\node[ctr] (c) at (8,0) {3};
+\node[ctr] (d) at (12,0) {2};
+\node[ctr,fill=green!15,draw=green!45!black] (e) at (16,0) {1};
+\draw[arrow,dashed] (a) -- node[above=1mm,lbl] {read 3\\from the file} (b);
+\draw[arrow] (b) -- node[above=1mm,lbl] {$-1$} (c);
+\draw[arrow] (c) -- node[above=1mm,lbl] {2nd release:\\$-1$} (d);
+\draw[arrow] (d) -- node[above=1mm,lbl] {3rd release:\\$-1$} (e);
+\draw[decorate,decoration={brace,amplitude=4pt,mirror},black!50,thick]
+  ([yshift=-8mm]a.south west) -- ([yshift=-8mm]c.south east)
+  node[midway,below=4pt,font=\small,text=black!70] {1st release};
+\node[state,below=1.5mm of a] {not read yet};
+\node[state,below=1.5mm of b] {3 open};
+\node[state,below=1.5mm of c] {2 open};
+\node[state,below=1.5mm of d] {1 open};
+\node[state,below=1.5mm of e,text=green!40!black,font=\small\bfseries] {ready};
+\end{tikzpicture}}\par}
+\vfill
 \end{frame}
 
 % ================================================================ correctness
 
-\begin{frame}{Same results as the original LogGOPSim}
+\begin{frame}[fragile]{A bug in the original LogGOPSim}
 \begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\textbf{What we checked}
-\small
-\begin{itemize}
-\item 1,480 schedules $\times$ 4 network parameter sets: legacy output byte-identical to the original converter, same times in all 5,920 simulations, in both formats.
-\item Every decoder against the exact one: 300 random layouts, 2,000 records each.
-\item 2,000 corrupted files: rejected or simulated, never a crash. Clean under ASan and UBSan.
-\end{itemize}
+\begin{column}{0.36\textwidth}
+\begin{lstlisting}
+num_ranks 2
+rank 0 {
+l1: send 8b to 1 tag 5
+l2: calc 100
+l3: calc 100
+l3 requires l1
+l3 requires l2
+}
+rank 1 {
+l1: calc 100000
+l2: recv 100000b from 0 tag 5
+l2 requires l1
+}
+\end{lstlisting}
 \end{column}
-\begin{column}{0.48\textwidth}
-\textbf{Found: a bug in the original}
+\begin{column}{0.6\textwidth}
 \small
-\begin{itemize}
-\item An eager message arrives before a larger receive is posted. The receiver chose rendezvous by its own buffer size and completed the sender twice.
-\item The counter underflowed silently: 100,000 reported instead of 1,700.
-\item \textbf{Fix:} decide by the message's size, as the sender does.
-\end{itemize}
+\begin{enumerate}\setlength{\itemsep}{0pt}
+\item Rank 0 sends 8\,B. That is below the eager threshold, so the send completes at once.
+\item The message reaches rank 1 while it still computes, and waits as unexpected.
+\item Rank 1 posts a 100,000\,B receive. The original picks the protocol by the \textbf{receive's} size, ``rendezvous'', and completes rank 0's send a second time.
+\end{enumerate}
+\thento{Rank 0 is reported at \textbf{100,000} instead of 1,700. The counter underflows without an error.}
+\vspace{1mm}
+\begin{lstlisting}
+if (elem.size > S)          // original: the receive
+if (matched_elem.size > S)  // fixed: the message
+\end{lstlisting}
 \end{column}
 \end{columns}
-\end{frame}
-
-% ================================================================ benchmarks
-
-\section{Benchmarks}
-
-\begin{frame}{Files are 53--93\% smaller}
-\centering
-\small
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Trace} & \textbf{Bytes per node} & \textbf{File size} & \textbf{Smaller} \\
-\midrule
-bcast\_64k & 39 $\to$ 4 & 6.9 $\to$ 1.9 MiB & 73\% \\
-dissem\_16k & 39 $\to$ 4 & 19.2 $\to$ 2.4 MiB & 88\% \\
-alltoall\_256 & 39 $\to$ 2 & 5.4 MiB $\to$ 404 KiB & 93\% \\
-wide\_64k (random 64-bit values) & 39 $\to$ 15 & 6.9 $\to$ 3.2 MiB & 53\% \\
-ATLAHS Llama run (+8 fields) & 39 $\to$ 17 & 240.6 $\to$ 111.4 MiB & 54\% \\
-\bottomrule
-\end{tabular}
-\par\raggedright\vspace{6mm}
-\highlight{Narrow and constant fields shrink most; even random 64-bit values save half.}
-\end{frame}
-
-\begin{frame}{Simulations are faster than the original}
-\centering
-\small
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Trace} & \textbf{Original} & \textbf{Ours, legacy file} & \shortstack[r]{\textbf{Ours, new +}\\\textbf{\texttt{jit} (cached)}} & \textbf{\texttt{jit} vs.\ original} \\
-\midrule
-bcast\_64k & 48.4 & 43.9 & 43.7 & $-10\%$ \\
-dissem\_16k & 146.4 & 122.7 & 110.8 & $-24\%$ \\
-ring\_256 & 39.8 & 32.8 & 32.9 & $-17\%$ \\
-alltoall\_256 & 1950 & 2004 & 1996 & $+2\%$ \\
-wide\_64k & crashes & 78.4 & 79.5 & \\
-\bottomrule
-\end{tabular}
-\par\raggedright\vspace{5mm}
-\begin{itemize}
-\item Complete LogGOPSim runs in ms, identical results. alltoall is dominated by message matching.
-\item With legacy files our version is already 9--18\% faster on bcast, dissem and ring, so most of the gain doesn't come from the JIT. The cached \texttt{jit} is at most 5\% faster than \texttt{plan}.
-\end{itemize}
-\source{Apple M3 Pro, median of 21 interleaved runs. Original: last upstream commit (76451de).}
-\end{frame}
-
-\begin{frame}{Parallel conversion and lazy decoding}
-\begin{columns}[T]
-\begin{column}{0.47\textwidth}
-\centering\textbf{Converter pass 1, seconds}\par\vspace{2mm}
-\footnotesize
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Trace} & \textbf{Seq.} & \textbf{8 threads} & \\
-\midrule
-dissem\_65536 & 2.79 & 0.60 & \textbf{4.6$\times$} \\
-ring\_2048 & 22.1 & 8.6 & \textbf{2.6$\times$} \\
-alltoall\_4096 & 38.1 & 10.7 & \textbf{3.6$\times$} \\
-\bottomrule
-\end{tabular}
-\end{column}
-\begin{column}{0.5\textwidth}
-\centering\textbf{Peak memory of a simulation, MB}\par\vspace{2mm}
-\footnotesize
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Trace} & \textbf{Before} & \textbf{Lazy} & \\
-\midrule
-dissem\_524288 & 2220 & 1540 & \textbf{$-31\%$} \\
-ring\_2048 & 1647 & 1103 & \textbf{$-33\%$} \\
-resnet\_8192 & 216 & 153 & \textbf{$-29\%$} \\
-\bottomrule
-\end{tabular}
-\end{column}
-\end{columns}
-\vspace{6mm}
-\begin{itemize}
-\item Two threads nearly halve pass 1; beyond four it flattens. Pass 2 is still sequential.
-\item Lazy decoding is also 2--11\% faster.
-\end{itemize}
-\source{WSL2 with 8 vCPUs, median of 3 runs. Lazy: new format, \texttt{plan} decoder; peak RSS.}
+\vfill
+\highlight{Real traces can contain this: when Schedgen converts a recorded MPI run, a receive gets the size of the posted buffer, and MPI allows a buffer larger than the message.}
 \end{frame}
 
 % ================================================================ benchmarking study
@@ -862,6 +783,7 @@ Parallel branch, new format & 30.4 & 23.5 & 19.7 & 18.6 & 18.4 \\
 \item Dictionary encoding for few, far-apart values.
 \item Choose the decoder automatically from trace size and startup cost.
 \item Repeat the benchmark study on the ETH student cluster.
+\item Benchmark a trace larger than main memory, for conversion and simulation.
 \end{itemize}
 \end{column}
 \begin{column}{0.49\textwidth}
