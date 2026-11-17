@@ -1,0 +1,622 @@
+{
+  "memory_budget|e2e|BASE|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      54113171269,
+      54277199084
+    ],
+    "median": 54214870765,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|BASE|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      54256888748,
+      54811856064
+    ],
+    "median": 54788621314,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|BASE|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      54084041622,
+      54788996289
+    ],
+    "median": 54376984410,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      50447995985,
+      50650477817
+    ],
+    "median": 50585112908,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      50522450716,
+      50636319482
+    ],
+    "median": 50569042746,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-interp|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      50552538170,
+      50758605982
+    ],
+    "median": 50642381088,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-legacyfile|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      40078002933,
+      40188035199
+    ],
+    "median": 40089634772,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-legacyfile|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      39997528281,
+      40822636040
+    ],
+    "median": 40388510052,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|LAZY-legacyfile|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      40280870639,
+      40490922072
+    ],
+    "median": 40353260410,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      52530149984,
+      53096496774
+    ],
+    "median": 52693835804,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      52797554599,
+      53049093162
+    ],
+    "median": 52979038180,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-interp|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      52617978507,
+      52975057449
+    ],
+    "median": 52619604740,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|warm|2G": {
+    "ci": [
+      44342143877,
+      44902011470
+    ],
+    "median": 44394429367,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|warm|4G": {
+    "ci": [
+      44328237438,
+      45018141167
+    ],
+    "median": 45012436887,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "memory_budget|e2e|NEW-legacyfile|stencil3d-p64-n1e8-inferred|warm|8G": {
+    "ci": [
+      44206596010,
+      44488441513
+    ],
+    "median": 44468937397,
+    "metric": "wall_ns",
+    "n": 3,
+    "state": "max_reps"
+  },
+  "workloads_large|e2e|BASE|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      4218121380,
+      4322504410
+    ],
+    "median": 4276408081.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|BASE|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      8135034645,
+      8345978850
+    ],
+    "median": 8226930804.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|BASE|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      2893717311,
+      3009812576
+    ],
+    "median": 2954174790.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|LAZY-interp|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      3483181809,
+      3598362790
+    ],
+    "median": 3535524355.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|LAZY-interp|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      7588301047,
+      7751512572
+    ],
+    "median": 7650313662.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|LAZY-interp|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      3009891893,
+      3097435110
+    ],
+    "median": 3053074530.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-interp|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      3713692677,
+      3803882170
+    ],
+    "median": 3732599600.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-interp|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      7637070055,
+      7718619981
+    ],
+    "median": 7693442706.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-interp|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      2991379658,
+      3076745576
+    ],
+    "median": 3009213900.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-spec-warm|allreduce_ring-p256-n1e7-inferred|warm": {
+    "ci": [
+      3369100852,
+      3513395672
+    ],
+    "median": 3443907786.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-spec-warm|dp_nccl-p64-n1e7-inferred|warm": {
+    "ci": [
+      7198888778,
+      7333837969
+    ],
+    "median": 7260045845.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads_large|e2e|NEW-spec-warm|pipeline_1f1b-p64-n1e7-inferred|warm": {
+    "ci": [
+      2597224630,
+      2629833442
+    ],
+    "median": 2609855905.5,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      321580270,
+      328996360
+    ],
+    "median": 323987400.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      343774200,
+      348459870
+    ],
+    "median": 345747160.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2778062848,
+      2838066598
+    ],
+    "median": 2800196850.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      627519750,
+      663405710
+    ],
+    "median": 633093670.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1499297948,
+      1542105400
+    ],
+    "median": 1506918787.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      290265800,
+      302097730
+    ],
+    "median": 294171185.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|BASE|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      539603020,
+      564298350
+    ],
+    "median": 549032165.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      299813580,
+      305690440
+    ],
+    "median": 301994326.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      322859544,
+      330116710
+    ],
+    "median": 325823850.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2856260770,
+      2945139503
+    ],
+    "median": 2893532759.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      640232120,
+      651491500
+    ],
+    "median": 645161770.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1471802200,
+      1496511940
+    ],
+    "median": 1478094035.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      294056730,
+      303243270
+    ],
+    "median": 299119740.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|LAZY-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      509302420,
+      527180830
+    ],
+    "median": 516005699.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      297982080,
+      324713730
+    ],
+    "median": 309656325.0,
+    "metric": "wall_ns",
+    "n": 14,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      320811810,
+      335593830
+    ],
+    "median": 324089700,
+    "metric": "wall_ns",
+    "n": 15,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2842999536,
+      2964415190
+    ],
+    "median": 2907331501.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      634363428,
+      658546020
+    ],
+    "median": 640137190.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1494922220,
+      1543183290
+    ],
+    "median": 1520334530.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      295292470,
+      310452354
+    ],
+    "median": 301467760.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-interp|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      524848830,
+      543068020
+    ],
+    "median": 527231065.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      241783190,
+      250220410
+    ],
+    "median": 244705230,
+    "metric": "wall_ns",
+    "n": 15,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      266422090,
+      274529779
+    ],
+    "median": 268171750,
+    "metric": "wall_ns",
+    "n": 15,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2784560680,
+      2878925500
+    ],
+    "median": 2805696427.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      561911350,
+      589342820
+    ],
+    "median": 573574112.5,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1422086490,
+      1454860477
+    ],
+    "median": 1434765145.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      233176460,
+      241410180
+    ],
+    "median": 235249300.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-legacyfile|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      441002760,
+      464851530
+    ],
+    "median": 447725465.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|allreduce_rd-p64-n1e6-inferred|warm": {
+    "ci": [
+      262965780,
+      267333110
+    ],
+    "median": 265762695.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|allreduce_ring-p64-n1e6-inferred|warm": {
+    "ci": [
+      285867890,
+      299392830
+    ],
+    "median": 288408010.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|alltoall-p64-n1e6-inferred|warm": {
+    "ci": [
+      2829220460,
+      2875861010
+    ],
+    "median": 2845170460.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|dp_nccl-p16-n1e6-inferred|warm": {
+    "ci": [
+      600515300,
+      632698330
+    ],
+    "median": 605875655.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|moe_alltoall-p32-n1e6-inferred|warm": {
+    "ci": [
+      1455107060,
+      1477398670
+    ],
+    "median": 1460360880.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|pipeline_1f1b-p16-n1e6-inferred|warm": {
+    "ci": [
+      261403120,
+      277135870
+    ],
+    "median": 266784485.0,
+    "metric": "wall_ns",
+    "n": 10,
+    "state": "converged"
+  },
+  "workloads|e2e|NEW-spec-warm|stencil3d-p64-n1e6-inferred|warm": {
+    "ci": [
+      490598130,
+      514870164
+    ],
+    "median": 493762885.0,
+    "metric": "wall_ns",
+    "n": 12,
+    "state": "converged"
+  }
+}

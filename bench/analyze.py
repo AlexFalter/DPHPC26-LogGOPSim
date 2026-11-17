@@ -67,7 +67,11 @@ def style(config, catalog):
 # ------------------------------------------------------------------ loading
 
 def load(campaigns, exclude_noisy):
+    """Campaign directory names start with their date, so a re-run of an experiment (e.g.
+    --experiments workloads) replaces that experiment's data from older campaigns of the same host;
+    other experiments keep their older data."""
     runs, meta, correctness = [], {}, {}
+    campaigns = sorted(campaigns, key=lambda d: Path(d).name)
     for d in campaigns:
         d = Path(d)
         m = json.loads((d / "metadata.json").read_text()) if (d / "metadata.json").exists() else {}
@@ -83,6 +87,11 @@ def load(campaigns, exclude_noisy):
             if exclude_noisy and r.get("noisy"):
                 continue
             runs.append(r)
+    newest = {}
+    for r in runs:
+        key = (r.get("host"), r.get("experiment"))
+        newest[key] = max(newest.get(key, ""), r.get("campaign", ""))
+    runs = [r for r in runs if r.get("campaign", "") == newest[(r.get("host"), r.get("experiment"))]]
     return runs, meta, correctness
 
 

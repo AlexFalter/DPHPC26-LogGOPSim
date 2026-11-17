@@ -37,7 +37,7 @@ import sys
 from concurrent.futures import ProcessPoolExecutor
 
 # Bump when generated output changes: gen_traces.py regenerates traces from an older version.
-VERSION = 2
+VERSION = 3
 
 MASK64 = (1 << 64) - 1
 PRIME32 = 4294967291  # largest prime < 2^32; tags stay below ANY (2^32 - 1)
@@ -352,16 +352,18 @@ def pipeline_1f1b(e, P, iters, p):
         def forward(m):
             if s > 0:
                 chain(e.recv(act, s - 1, 2 * m, it, comm=COMM_PP, stream=2))
-            chain(e.calc(p["fwd"]))
-            if s < P - 1:
-                chain(e.send(act, s + 1, 2 * m, it, comm=COMM_PP, stream=2))
+            c = e.calc(p["fwd"])
+            chain(c)
+            if s < P - 1:  # asynchronous (isend): the stage goes on; a chained rendezvous send deadlocks 1F1B
+                e.requires(e.send(act, s + 1, 2 * m, it, comm=COMM_PP, stream=2), c)
 
         def backward(m):
             if s < P - 1:
                 chain(e.recv(grad, s + 1, 2 * m + 1, it, comm=COMM_PP, stream=2))
-            chain(e.calc(p["bwd"]))
+            c = e.calc(p["bwd"])
+            chain(c)
             if s > 0:
-                chain(e.send(grad, s - 1, 2 * m + 1, it, comm=COMM_PP, stream=2))
+                e.requires(e.send(grad, s - 1, 2 * m + 1, it, comm=COMM_PP, stream=2), c)
 
         warm = min(P - s - 1, M)
         f = b = 0

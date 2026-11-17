@@ -51,6 +51,7 @@ def simulate(ctx, config, tid, workdir, viz):
         res = {"exit_code": p.returncode, "result_sha256": parsed["result_sha256"], "events": parsed.get("events"),
                "max_time": parsed.get("max_time"), "decoder_actual": parsed.get("decoder_actual"),
                "fallback": parsed.get("decoder_fallback"), "has_phases": "phases" in parsed,
+               "incomplete": parsed.get("incomplete"),
                "error": parsed.get("error") or (p.stderr.strip()[-500:] if p.returncode else None),
                "viz_sha256": sha_file(workdir / f"{config}.viz") if viz else None,
                "expected_decoder": rn.expected_decoder(run), "phase_timing": run["phase_timing"],
@@ -69,6 +70,8 @@ def judge(res, ref):
         return "unavailable", f"requested {res['expected_decoder']}, ran {res['decoder_actual']}"
     if res["phase_timing"] != res["has_phases"]:
         return "fail", f"phase timing requested={res['phase_timing']} printed={res['has_phases']}"
+    if ref is not None and ref.get("incomplete"):
+        return "invalid_workload", "BASE ends with unmatched messages (deadlock): the trace is not a valid benchmark"
     if ref is None or ref["exit_code"] != 0:
         return "no_reference", "BASE did not produce a reference"
     if res["result_sha256"] != ref["result_sha256"] or res["events"] != ref["events"]:

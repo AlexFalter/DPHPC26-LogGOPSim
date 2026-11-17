@@ -1,0 +1,4 @@
+# Phase-timing instrumentation overhead (TASK.md 4)
+
+| host | trace | timing_on | compared_with | on_median_ms | on_ci | other_median_ms | other_ci | ratio_on_over_other | cis_overlap |
+|---|---|---|---|---|---|---|---|---|---|

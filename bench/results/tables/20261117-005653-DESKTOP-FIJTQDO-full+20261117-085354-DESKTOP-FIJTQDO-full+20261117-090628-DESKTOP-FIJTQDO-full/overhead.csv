@@ -1,0 +1,5 @@
+host,trace,timing_on,compared_with,on_median_ms,on_ci,other_median_ms,other_ci,ratio_on_over_other,cis_overlap
+DESKTOP-FIJTQDO,stencil3d-p64-n1e6-inferred,NEW-interp,NEW-interp-notiming,516.299722,"[514, 527]",517.086082,"[516, 521]",0.9984792474070109,True
+DESKTOP-FIJTQDO,stencil3d-p64-n1e6-inferred,NEW-interp,PLAIN-interp,516.299722,"[514, 527]",543.426369,"[541, 555]",0.9500822033168581,False
+DESKTOP-FIJTQDO,stencil3d-p64-n1e7-inferred,NEW-interp,NEW-interp-notiming,5131.264458,"[5,114, 5,165]",5166.9851485,"[5,125, 5,198]",0.9930867441122082,True
+DESKTOP-FIJTQDO,stencil3d-p64-n1e7-inferred,NEW-interp,PLAIN-interp,5131.264458,"[5,114, 5,165]",5422.1561835,"[5,394, 5,492]",0.9463512824685493,False

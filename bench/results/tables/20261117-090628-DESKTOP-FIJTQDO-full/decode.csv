@@ -1,0 +1,1 @@
+host,experiment,trace,records,variant,runner,order,fields,cache,jit_cold,core_class,n,processes,ns_per_record,ci_lo,ci_hi,mrecords_per_s,gb_per_s,record_bytes,setup_ms,resident_before,checksum

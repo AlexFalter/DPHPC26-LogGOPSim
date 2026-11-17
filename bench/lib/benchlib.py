@@ -489,6 +489,8 @@ def parse_loggopsim(stdout: str, stderr: str = "") -> dict:
         if line.startswith(("size:", "Host ", "Maximum finishing", "unexpected queue", "receive queue", " src:")):
             lines.append(line.rstrip())
     res["result_lines"] = lines
+    # Leftover queue entries: the schedule deadlocked or has unmatched messages (no finish times printed).
+    res["incomplete"] = any(l.startswith(("unexpected queue", "receive queue")) for l in lines)
     res["result_sha256"] = hashlib.sha256("\n".join(lines).encode()).hexdigest()
     for line in stderr.splitlines():
         if line.startswith("PHASES "):

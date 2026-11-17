@@ -1,0 +1,880 @@
+{
+  "byte_identity_differences": [],
+  "created": "2026-11-17T08:10:45Z",
+  "duration_s": 254.94405221939087,
+  "failed_pairs": [],
+  "machine": "DESKTOP-FIJTQDO",
+  "ok": true,
+  "traces": {
+    "allreduce_rd-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1315200,
+          "exit_code": 0,
+          "max_time": 443778072,
+          "result_sha256": "94da4b8f47db8ed83daf6edbf574589177beb5d0b8e8f326b5efc818046a4947",
+          "status": "pass",
+          "viz_sha256": "60abc39082680d5b94c5e7f99cbca624e57b048b645b29a6fa28df6116e98213"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "allreduce_ring-p256-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 14173696,
+          "exit_code": 0,
+          "max_time": 24975849980,
+          "result_sha256": "7567c2191383ea211a647ab15c28e4f529421f0e6fdcc7808ee051d225e9daf5",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "allreduce_ring-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1386112,
+          "exit_code": 0,
+          "max_time": 38893343300,
+          "result_sha256": "02fb34ef315244d600a613ae4951159f34f0e6cc326e5f50f7964cbbb835411d",
+          "status": "pass",
+          "viz_sha256": "1186e63ebbf018a585bc0ac0b589b24bc1b89f35de699add31a1489efb64fea6"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "alltoall-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1495680,
+          "exit_code": 0,
+          "max_time": 245312430,
+          "result_sha256": "d0cb83742ca80dfa5d3c4293d6c3d58bfad6485c7e537b61a767f69b885cb3b5",
+          "status": "pass",
+          "viz_sha256": "99b5a2d9117f1f2f81ac36957a0633c8f2a287d5e6875b7975d6d2e12a817bd8"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "dp_nccl-p16-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1365504,
+          "exit_code": 0,
+          "max_time": 455223173760,
+          "result_sha256": "96a1db706a3260ae4816ff48a2ef368138009419dd1037aad7eb8ea03a339a7c",
+          "status": "pass",
+          "viz_sha256": "c2a9d80fabbbd5590c90310c30081783595eb3853bb0e98cd354f43a5fcde390"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "dp_nccl-p64-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 13964608,
+          "exit_code": 0,
+          "max_time": 303964040172,
+          "result_sha256": "49d7119fbab5c433872f19107c3a87a53adc8a7e7010eda183a6a1994810a35e",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "moe_alltoall-p32-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1499904,
+          "exit_code": 0,
+          "max_time": 15057201646,
+          "result_sha256": "ee99d53e93c65296cc3001dcf7ef372cd3ca2ba03172404e9fb4e06c70f391e2",
+          "status": "pass",
+          "viz_sha256": "d3972f63d8bbfb185413a2d1ce0ba176f7c255f7f1f5a5e820e2c077c40d3eae"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "pipeline_1f1b-p16-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1270752,
+          "exit_code": 0,
+          "max_time": 2642848659360,
+          "result_sha256": "d06f217630259dc4a7104f7118aac4164652d899305958cb617e052e07bc6eb0",
+          "status": "pass",
+          "viz_sha256": "e74453675af3566a083129771b28e825793ee4085094749ea9b380e803c9dc5c"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1270752,
+          "exit_code": 0,
+          "max_time": 2642848659360,
+          "result_sha256": "d06f217630259dc4a7104f7118aac4164652d899305958cb617e052e07bc6eb0",
+          "status": "pass",
+          "viz_sha256": "e74453675af3566a083129771b28e825793ee4085094749ea9b380e803c9dc5c"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1270752,
+          "exit_code": 0,
+          "max_time": 2642848659360,
+          "result_sha256": "d06f217630259dc4a7104f7118aac4164652d899305958cb617e052e07bc6eb0",
+          "status": "pass",
+          "viz_sha256": "e74453675af3566a083129771b28e825793ee4085094749ea9b380e803c9dc5c"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1270752,
+          "exit_code": 0,
+          "max_time": 2642848659360,
+          "result_sha256": "d06f217630259dc4a7104f7118aac4164652d899305958cb617e052e07bc6eb0",
+          "status": "pass",
+          "viz_sha256": "e74453675af3566a083129771b28e825793ee4085094749ea9b380e803c9dc5c"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1270752,
+          "exit_code": 0,
+          "max_time": 2642848659360,
+          "result_sha256": "d06f217630259dc4a7104f7118aac4164652d899305958cb617e052e07bc6eb0",
+          "status": "pass",
+          "viz_sha256": "e74453675af3566a083129771b28e825793ee4085094749ea9b380e803c9dc5c"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "pipeline_1f1b-p64-n1e7-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 13180288,
+          "exit_code": 0,
+          "max_time": 15951191058968,
+          "result_sha256": "08c3647c2b712d57a89be86c12a7769e28748f9e09729b68fc4c1043cb354b8d",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 13180288,
+          "exit_code": 0,
+          "max_time": 15951191058968,
+          "result_sha256": "08c3647c2b712d57a89be86c12a7769e28748f9e09729b68fc4c1043cb354b8d",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 13180288,
+          "exit_code": 0,
+          "max_time": 15951191058968,
+          "result_sha256": "08c3647c2b712d57a89be86c12a7769e28748f9e09729b68fc4c1043cb354b8d",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE",
+          "events": 13180288,
+          "exit_code": 0,
+          "max_time": 15951191058968,
+          "result_sha256": "08c3647c2b712d57a89be86c12a7769e28748f9e09729b68fc4c1043cb354b8d",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 10000000,
+      "status": "checked",
+      "viz_compared": false
+    },
+    "stencil3d-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        },
+        "NEW-spec-warm": {
+          "decoder_actual": "jit",
+          "detail": "identical to BASE incl. -V timeline",
+          "events": 1461632,
+          "exit_code": 0,
+          "max_time": 2935596520,
+          "result_sha256": "653f38a3049c6128b14097cc04459b0f7bcc301b1dc8aa79eaf8ae1a3d868f35",
+          "status": "pass",
+          "viz_sha256": "6f8804eae413777cefdf569ae7c1d3427884dcc48ed276c5f24c753048e5a965"
+        }
+      },
+      "records": 1000000,
+      "status": "checked",
+      "viz_compared": true
+    },
+    "stencil3d-p64-n1e8-inferred": {
+      "byte_identity": null,
+      "configs": {
+        "BASE": {
+          "detail": "reference",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "LAZY-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-interp": {
+          "decoder_actual": "plan",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        },
+        "NEW-legacyfile": {
+          "decoder_actual": "legacy",
+          "detail": "identical to BASE",
+          "events": 146153472,
+          "exit_code": 0,
+          "max_time": 293540113920,
+          "result_sha256": "a8b36009697f29305ac4bcea4663003703337de5ee1619a24737ed87af85a33a",
+          "status": "pass",
+          "viz_sha256": null
+        }
+      },
+      "records": 100000000,
+      "status": "checked",
+      "viz_compared": false
+    }
+  },
+  "validation_tests": [
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/bench_decode_micro --trace /home/joshua/lgs-bench/traces/allreduce_rd-p64-n1e6-inferred.sd.bin --require gpu_id",
+      "exit_code": 3,
+      "expected": "failure",
+      "informational": false,
+      "name": "missing required custom field gpu_id is rejected at load time",
+      "output": "{\"tool\":\"decode_bench_micro\",\"mode\":\"require\",\"trace\":\"/home/joshua/lgs-bench/traces/allreduce_rd-p64-n1e6-inferred.sd.bin\",\"field\":\"gpu_id\",\"accepted\":false,\"error\":\"Trace lacks required field 'custom:gpu_id'\"}",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/bench_decode_micro --trace /home/joshua/lgs-bench/traces/pipeline_1f1b-p16-n1e6-inferred.legacy.bin --require gpu_id",
+      "exit_code": 3,
+      "expected": "failure",
+      "informational": false,
+      "name": "legacy trace has no custom fields: gpu_id rejected",
+      "output": "{\"tool\":\"decode_bench_micro\",\"mode\":\"require\",\"trace\":\"/home/joshua/lgs-bench/traces/pipeline_1f1b-p16-n1e6-inferred.legacy.bin\",\"field\":\"gpu_id\",\"accepted\":false,\"error\":\"Legacy traces have no field 'custom:gpu_id'\"}",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid0.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid0.legacy.bin --format legacy --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format legacy rejects: cpu 256 exceeds the 8-bit cpu field",
+      "output": "txt2bin: Legacy cpu exceeds 255",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid0.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid0.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: cpu 256 exceeds the 8-bit cpu field",
+      "output": "txt2bin: Legacy cpu exceeds 255",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid0.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid0.base.bin",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": true,
+      "name": "(upstream txt2bin, informational) cpu 256 exceeds the 8-bit cpu field",
+      "output": "",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid1.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid1.legacy.bin --format legacy --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format legacy rejects: tag 2^32 exceeds the 32-bit tag field",
+      "output": "txt2bin: Legacy tag exceeds uint32_t",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid1.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid1.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: tag 2^32 exceeds the 32-bit tag field",
+      "output": "txt2bin: Legacy tag exceeds uint32_t",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid1.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid1.base.bin",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": true,
+      "name": "(upstream txt2bin, informational) tag 2^32 exceeds the 32-bit tag field",
+      "output": "",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid2.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid2.legacy.bin --format legacy --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format legacy rejects: peer outside num_ranks",
+      "output": "txt2bin: Peer is outside num_ranks",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid2.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid2.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/no_custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: peer outside num_ranks",
+      "output": "txt2bin: Peer is outside num_ranks",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid2.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid2.base.bin",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": true,
+      "name": "(upstream txt2bin, informational) peer outside num_ranks",
+      "output": "",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid3.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid3.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: custom unsigned value 2^64 exceeds uint64",
+      "output": "txt2bin: Invalid unsigned value for 'gpu_id'",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid4.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid4.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: negative value for an unsigned custom field",
+      "output": "txt2bin: Invalid unsigned value for 'gpu_id'",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/txt2bin -i /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid5.goal -o /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/invalid5.self-describing.bin --format self-describing --custom-fields /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/workloads/custom_fields.toml",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "txt2bin --format self-describing rejects: declared custom field missing on an operation",
+      "output": "txt2bin: Missing custom field 'gpu_id' on operation 'l1'",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/truncated.sd.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "NEW rejects a truncated self-describing trace",
+      "output": "LogGOPSim: Truncated byte buffer",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/garbage.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "NEW rejects an unknown format",
+      "output": "LogGOPSim: Unrecognized schedule format",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/savemem-BASE.bin --save-mem",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": false,
+      "name": "BASE --save-mem run on a copy succeeds",
+      "output": "The schedule will be invalid after this simulation!\nLogGP network backend; size: 16 (1 CPUs, 1 NICs); L=2500, o=1500 g=1000, G=6, O=0, P=16, S=65535\nPERFORMANCE: Processes: 16 \t Events: 1270752 \t Time: 1 s \t Speed: 1270752.00 ev/s\nTimes: \nHost 0: 2642848659360\nHost 1: 2642797526218\nHost 2: 2642746389076\nHost 3: 2642695251934\nHost 4: 2642644114792\nHost 5: 2642592977650\nHost 6: 2642541840508\nHost 7: 2642490703366\nHost 8: 2642439566224\nHost 9: 2642388429082\nHost 10: 2642337291940\nHost 11: 2642286154798\nHost 12: 2642235017656\nHost 13: 2642183880514\nHost 14: 2642132743372\nHost 15: 2642081606230",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/base/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/savemem-BASE.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "BASE: a trace consumed by --save-mem is rejected afterwards",
+      "output": "This is serialized goal schedule was invalidated by a prior simulation run!",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/savemem-NEW.bin --save-mem",
+      "exit_code": 0,
+      "expected": "success",
+      "informational": false,
+      "name": "NEW --save-mem run on a copy succeeds",
+      "output": "The schedule will be invalid after this simulation!\nLogGP network backend; size: 16 (1 CPUs, 1 NICs); L=2500, o=1500 g=1000, G=6, O=0, P=16, S=65535\nPERFORMANCE: Processes: 16 \t Events: 1270752 \t Time: 2 s \t Speed: 635376.00 ev/s\nTimes: \nHost 0: 2642848659360\nHost 1: 2642797526218\nHost 2: 2642746389076\nHost 3: 2642695251934\nHost 4: 2642644114792\nHost 5: 2642592977650\nHost 6: 2642541840508\nHost 7: 2642490703366\nHost 8: 2642439566224\nHost 9: 2642388429082\nHost 10: 2642337291940\nHost 11: 2642286154798\nHost 12: 2642235017656\nHost 13: 2642183880514\nHost 14: 2642132743372\nHost 15: 2642081606230",
+      "passed": true
+    },
+    {
+      "cmd": "/home/joshua/lgs-bench/build/master/LogGOPSim -f /mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/results/raw/20261117-090628-DESKTOP-FIJTQDO-full/correctness/correctness-a3ie8cf2/savemem-NEW.bin",
+      "exit_code": 1,
+      "expected": "failure",
+      "informational": false,
+      "name": "NEW: a trace consumed by --save-mem is rejected afterwards",
+      "output": "LogGOPSim: Schedule was invalidated by a prior simulation run",
+      "passed": true
+    }
+  ]
+}

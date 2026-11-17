@@ -1,0 +1,16 @@
+host,trace,config,limit_gb,runs,completed,oom_killed,median_ms,majflt
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,BASE,2,3,3,0,54214.870765,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,BASE,4,3,3,0,54788.621314,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,BASE,8,3,3,0,54376.98441,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,LAZY-interp,2,3,3,0,50585.112908,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,LAZY-interp,4,3,3,0,50569.042746,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,LAZY-interp,8,3,3,0,50642.381088,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,LAZY-legacyfile,2,3,3,0,40089.634772,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,LAZY-legacyfile,4,3,3,0,40388.510052,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,LAZY-legacyfile,8,3,3,0,40353.26041,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,NEW-interp,2,3,3,0,52693.835804,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,NEW-interp,4,3,3,0,52979.03818,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,NEW-interp,8,3,3,0,52619.60474,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,NEW-legacyfile,2,3,3,0,44394.429367,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,NEW-legacyfile,4,3,3,0,45012.436887,0
+DESKTOP-FIJTQDO,stencil3d-p64-n1e8-inferred,NEW-legacyfile,8,3,3,0,44468.937397,0

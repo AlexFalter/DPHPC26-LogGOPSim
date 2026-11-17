@@ -1,0 +1,2152 @@
+{
+  "argv": [
+    "bench/run.py",
+    "--config",
+    "bench/configs/full.json",
+    "--experiments",
+    "workloads,workloads_large,memory_budget",
+    "--dry-run"
+  ],
+  "builds": {
+    "base": {
+      "binaries": {
+        "LogGOPSim": "/home/joshua/lgs-bench/build/base/LogGOPSim",
+        "bench_decode_micro": null,
+        "first_pass_bench": null,
+        "schedgen": "/home/joshua/lgs-bench/build/base/schedgen",
+        "txt2bin": "/home/joshua/lgs-bench/build/base/txt2bin"
+      },
+      "build_dir": "/home/joshua/lgs-bench/build/base",
+      "build_type": "",
+      "built_at": "2026-11-16T22:26:45Z",
+      "c_flags": "",
+      "cmake_args": "-S /home/joshua/lgs-bench/src/base/src -B /home/joshua/lgs-bench/build/base -G Ninja -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_Fortran_COMPILER=/usr/bin/gfortran -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_FLAGS= -DCMAKE_CXX_FLAGS= -DCMAKE_DISABLE_FIND_PACKAGE_Clang=ON",
+      "cmake_version": "3.28.3",
+      "commit": "76451de16546c7ea39651c183cbc532f4a3457c0",
+      "compiler": {
+        "cc": "/usr/bin/gcc",
+        "cc_version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "cxx": "/usr/bin/g++",
+        "cxx_version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "fc": "/usr/bin/gfortran",
+        "fc_version": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+      },
+      "cxx_flags": "",
+      "cxx_flags_release_with_debinfo": "-O2 -g -DNDEBUG",
+      "cxx_std": "-std=gnu++11",
+      "flags_normalized": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "generator": "-G Ninja",
+      "instrumentation": null,
+      "instrumented": false,
+      "jit_cc": "/usr/bin/gcc",
+      "kind": "upstream",
+      "llvm_dir": null,
+      "llvm_enabled": false,
+      "loggopsim_compile_command": "/usr/bin/g++ -I/usr/include/graphviz -O2 -g -DNDEBUG -std=gnu++11 -o CMakeFiles/LogGOPSim.dir/LogGOPSim/LogGOPSim.cpp.o -c /home/joshua/lgs-bench/src/base/src/LogGOPSim/LogGOPSim.cpp",
+      "name": "base",
+      "orc_plugin": null,
+      "ref": "76451de16546c7ea39651c183cbc532f4a3457c0",
+      "targets": [
+        "LogGOPSim",
+        "txt2bin",
+        "schedgen"
+      ],
+      "worktree": "/home/joshua/lgs-bench/src/base",
+      "worktree_status": []
+    },
+    "lazy": {
+      "binaries": {
+        "LogGOPSim": "/home/joshua/lgs-bench/build/lazy/LogGOPSim",
+        "bench_decode_micro": null,
+        "first_pass_bench": "/home/joshua/lgs-bench/build/lazy/first_pass_bench",
+        "schedgen": null,
+        "txt2bin": "/home/joshua/lgs-bench/build/lazy/txt2bin"
+      },
+      "build_dir": "/home/joshua/lgs-bench/build/lazy",
+      "build_type": "",
+      "built_at": "2026-11-16T22:27:58Z",
+      "c_flags": "",
+      "cmake_args": "-S /home/joshua/lgs-bench/src/lazy/src -B /home/joshua/lgs-bench/build/lazy -G Ninja -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_Fortran_COMPILER=/usr/bin/gfortran -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_FLAGS= -DCMAKE_CXX_FLAGS= -DCMAKE_DISABLE_FIND_PACKAGE_Clang=ON -DBUILD_TESTING=OFF -DLOGGOPSIM_BUILD_BENCHMARKS=OFF -DBUILD_ATLAHS=OFF -DLOGGOPSIM_WITH_LLVM=ON -DLLVM_DIR=/usr/lib/llvm-18/lib/cmake/llvm",
+      "cmake_version": "3.28.3",
+      "commit": "81436e9f1e78ca3b2b606d802159206ef20201ca",
+      "compiler": {
+        "cc": "/usr/bin/gcc",
+        "cc_version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "cxx": "/usr/bin/g++",
+        "cxx_version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "fc": "/usr/bin/gfortran",
+        "fc_version": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+      },
+      "cxx_flags": "",
+      "cxx_flags_release_with_debinfo": "-O2 -g -DNDEBUG",
+      "cxx_std": "-std=gnu++23",
+      "flags_normalized": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "generator": "-G Ninja",
+      "instrumentation": {
+        "applied": true,
+        "edits": 19,
+        "files": [
+          "src/LogGOPSim/binary_reading/LegacyTraceReader.hpp",
+          "src/LogGOPSim/binary_reading/SelfDescribingTraceReader.hpp",
+          "src/LogGOPSim/binary_reading/TraceFileView.cpp",
+          "src/LogGOPSim/binary_reading/decoding/Decoder.cpp",
+          "src/LogGOPSim/binary_reading/decoding/runners/compiled/c/CCompiler.cpp",
+          "src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/OrcLoader.cpp",
+          "src/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp",
+          "src/LogGOPSim/simulators/loggopsim/SimulationSchedule.hpp"
+        ],
+        "header_sha256": "938337e2e85bcf0af8f40d7c79f048c0c705fb3587d7c91d5e82e7094b4aca01",
+        "script_sha256": "0fce0bc7fbaadacdf370d9ec4b98bd63640a50d507f02f37413e599e761544e7"
+      },
+      "instrumented": true,
+      "jit_cc": "/usr/bin/gcc",
+      "kind": "new",
+      "llvm_dir": "/usr/lib/llvm-18/lib/cmake/llvm",
+      "llvm_enabled": true,
+      "loggopsim_compile_command": "/usr/bin/g++ -DLOGGOPSIM_HAVE_LLVM -I/usr/include/graphviz -I/home/joshua/lgs-bench/src/lazy/src/LogGOPSim -O2 -g -DNDEBUG -std=gnu++23 -o CMakeFiles/LogGOPSim.dir/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp.o -c /home/joshua/lgs-bench/src/lazy/src/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp",
+      "name": "lazy",
+      "orc_plugin": "/home/joshua/lgs-bench/build/lazy/runners/compiled/orc/libloggopsim_orc.so",
+      "ref": "origin/feature/lazy-decoding",
+      "targets": [
+        "LogGOPSim",
+        "txt2bin",
+        "first_pass_bench",
+        "loggopsim_orc"
+      ],
+      "worktree": "/home/joshua/lgs-bench/src/lazy",
+      "worktree_status": [
+        " M src/LogGOPSim/binary_reading/LegacyTraceReader.hpp",
+        " M src/LogGOPSim/binary_reading/SelfDescribingTraceReader.hpp",
+        " M src/LogGOPSim/binary_reading/TraceFileView.cpp",
+        " M src/LogGOPSim/binary_reading/decoding/Decoder.cpp",
+        " M src/LogGOPSim/binary_reading/decoding/runners/compiled/c/CCompiler.cpp",
+        " M src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/OrcLoader.cpp",
+        " M src/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp",
+        " M src/LogGOPSim/simulators/loggopsim/SimulationSchedule.hpp",
+        "?? .bench-phase-timing.json",
+        "?? src/LogGOPSim/trace_format/PhaseTiming.hpp"
+      ]
+    },
+    "master": {
+      "binaries": {
+        "LogGOPSim": "/home/joshua/lgs-bench/build/master/LogGOPSim",
+        "bench_decode_micro": "/home/joshua/lgs-bench/build/master/bench_decode_micro",
+        "first_pass_bench": null,
+        "schedgen": "/home/joshua/lgs-bench/build/master/schedgen",
+        "txt2bin": "/home/joshua/lgs-bench/build/master/txt2bin"
+      },
+      "build_dir": "/home/joshua/lgs-bench/build/master",
+      "build_type": "",
+      "built_at": "2026-11-16T22:29:10Z",
+      "c_flags": "",
+      "cmake_args": "-S /home/joshua/lgs-bench/src/master/src -B /home/joshua/lgs-bench/build/master -G Ninja -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_Fortran_COMPILER=/usr/bin/gfortran -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_FLAGS= -DCMAKE_CXX_FLAGS= -DCMAKE_DISABLE_FIND_PACKAGE_Clang=ON -DBUILD_TESTING=OFF -DLOGGOPSIM_BUILD_BENCHMARKS=OFF -DBUILD_ATLAHS=OFF -DLOGGOPSIM_WITH_LLVM=ON -DLLVM_DIR=/usr/lib/llvm-18/lib/cmake/llvm -DCMAKE_PROJECT_LogGOPSim_INCLUDE=/mnt/c/Users/Joshua/Desktop/Programing/DPHPC26-LogGOPSim/bench/micro/inject.cmake",
+      "cmake_version": "3.28.3",
+      "commit": "d7b342d7517ccadf5e2eb350faeda191d10a9927",
+      "compiler": {
+        "cc": "/usr/bin/gcc",
+        "cc_version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "cxx": "/usr/bin/g++",
+        "cxx_version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "fc": "/usr/bin/gfortran",
+        "fc_version": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+      },
+      "cxx_flags": "",
+      "cxx_flags_release_with_debinfo": "-O2 -g -DNDEBUG",
+      "cxx_std": "-std=gnu++23",
+      "flags_normalized": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "generator": "-G Ninja",
+      "instrumentation": {
+        "applied": true,
+        "edits": 19,
+        "files": [
+          "src/LogGOPSim/binary_reading/LegacyTraceReader.hpp",
+          "src/LogGOPSim/binary_reading/SelfDescribingTraceReader.hpp",
+          "src/LogGOPSim/binary_reading/TraceFileView.cpp",
+          "src/LogGOPSim/binary_reading/decoding/Decoder.cpp",
+          "src/LogGOPSim/binary_reading/decoding/runners/compiled/c/CCompiler.cpp",
+          "src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/OrcLoader.cpp",
+          "src/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp",
+          "src/LogGOPSim/simulators/loggopsim/SimulationSchedule.hpp"
+        ],
+        "header_sha256": "938337e2e85bcf0af8f40d7c79f048c0c705fb3587d7c91d5e82e7094b4aca01",
+        "script_sha256": "0fce0bc7fbaadacdf370d9ec4b98bd63640a50d507f02f37413e599e761544e7"
+      },
+      "instrumented": true,
+      "jit_cc": "/usr/bin/gcc",
+      "kind": "new",
+      "llvm_dir": "/usr/lib/llvm-18/lib/cmake/llvm",
+      "llvm_enabled": true,
+      "loggopsim_compile_command": "/usr/bin/g++ -DLOGGOPSIM_HAVE_LLVM -I/usr/include/graphviz -I/home/joshua/lgs-bench/src/master/src/LogGOPSim -O2 -g -DNDEBUG -std=gnu++23 -o CMakeFiles/LogGOPSim.dir/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp.o -c /home/joshua/lgs-bench/src/master/src/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp",
+      "name": "master",
+      "orc_plugin": "/home/joshua/lgs-bench/build/master/runners/compiled/orc/libloggopsim_orc.so",
+      "ref": "master",
+      "targets": [
+        "LogGOPSim",
+        "txt2bin",
+        "schedgen",
+        "bench_decode_micro",
+        "loggopsim_orc"
+      ],
+      "worktree": "/home/joshua/lgs-bench/src/master",
+      "worktree_status": [
+        " M src/LogGOPSim/binary_reading/LegacyTraceReader.hpp",
+        " M src/LogGOPSim/binary_reading/SelfDescribingTraceReader.hpp",
+        " M src/LogGOPSim/binary_reading/TraceFileView.cpp",
+        " M src/LogGOPSim/binary_reading/decoding/Decoder.cpp",
+        " M src/LogGOPSim/binary_reading/decoding/runners/compiled/c/CCompiler.cpp",
+        " M src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/OrcLoader.cpp",
+        " M src/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp",
+        " M src/LogGOPSim/simulators/loggopsim/SimulationSchedule.hpp",
+        "?? .bench-phase-timing.json",
+        "?? src/LogGOPSim/trace_format/PhaseTiming.hpp"
+      ]
+    }
+  },
+  "config": {
+    "_doc": "Full local campaign (TASK.md 'bench/configs/full.yaml'): standard.json plus 1e8 records (does not fit any cache, ~1/3 of a 16 GB machine's RAM in legacy form), the rank sweep at 1e7 and the memory-budget experiment. About 8-9 h on the i9-9900K (measured simulation speed ~0.35-0.5 s per 1e6 records); run.py --budget-hours stops cleanly.",
+    "builds": {
+      "base": {
+        "description": "Unmodified upstream spcl/LogGOPSim: the last upstream commit before this project (merge of PR #18)",
+        "instrument": false,
+        "kind": "upstream",
+        "ref": "76451de16546c7ea39651c183cbc532f4a3457c0",
+        "targets": [
+          "LogGOPSim",
+          "txt2bin",
+          "schedgen"
+        ]
+      },
+      "lazy": {
+        "description": "--lazy-decoding (ready nodes as indices, dependency counters in memory, trace never written); includes omp-first-pass",
+        "instrument": true,
+        "kind": "new",
+        "ref": "origin/feature/lazy-decoding",
+        "targets": [
+          "LogGOPSim",
+          "txt2bin",
+          "first_pass_bench"
+        ]
+      },
+      "master": {
+        "description": "Self-describing format v2, unified TraceReader, plan runners plan/jit/orc/templated_node/templated_schema",
+        "instrument": true,
+        "kind": "new",
+        "ref": "master",
+        "targets": [
+          "LogGOPSim",
+          "txt2bin",
+          "schedgen",
+          "bench_decode_micro"
+        ]
+      },
+      "master-plain": {
+        "description": "master without phase-timing hooks: checks that the instrumentation changes nothing",
+        "instrument": false,
+        "kind": "new",
+        "ref": "master",
+        "targets": [
+          "LogGOPSim"
+        ]
+      },
+      "omp": {
+        "description": "Parallel (OpenMP) txt2bin first pass, legacy writer with pwrite",
+        "instrument": true,
+        "kind": "new",
+        "ref": "origin/feature/omp-first-pass",
+        "targets": [
+          "LogGOPSim",
+          "txt2bin",
+          "first_pass_bench"
+        ]
+      }
+    },
+    "check": {
+      "byte_identity_max_records": 1000000,
+      "viz_max_records": 1000000
+    },
+    "configs": {
+      "BASE": {
+        "build": "base",
+        "file": "legacy"
+      },
+      "BASE-savemem": {
+        "args": [
+          "--save-mem"
+        ],
+        "build": "base",
+        "copy_trace": true,
+        "file": "legacy"
+      },
+      "LAZY-eager-interp": {
+        "build": "lazy",
+        "decoder": "plan",
+        "file": "sd",
+        "phase_timing": true
+      },
+      "LAZY-interp": {
+        "args": [
+          "--lazy-decoding"
+        ],
+        "build": "lazy",
+        "decoder": "plan",
+        "file": "sd",
+        "phase_timing": true
+      },
+      "LAZY-legacyfile": {
+        "args": [
+          "--lazy-decoding"
+        ],
+        "build": "lazy",
+        "file": "legacy",
+        "phase_timing": true
+      },
+      "LAZY-spec-warm": {
+        "args": [
+          "--lazy-decoding"
+        ],
+        "build": "lazy",
+        "decoder": "jit",
+        "file": "sd",
+        "jit_cache": "warm",
+        "phase_timing": true
+      },
+      "NEW-interp": {
+        "build": "master",
+        "decoder": "plan",
+        "file": "sd",
+        "phase_timing": true
+      },
+      "NEW-interp-notiming": {
+        "build": "master",
+        "decoder": "plan",
+        "file": "sd",
+        "phase_timing": false
+      },
+      "NEW-legacyfile": {
+        "build": "master",
+        "file": "legacy",
+        "phase_timing": true
+      },
+      "NEW-orc": {
+        "build": "master",
+        "decoder": "orc",
+        "env": {
+          "LOGGOPSIM_ORC_REUSE": "0"
+        },
+        "file": "sd",
+        "optional": true,
+        "phase_timing": true
+      },
+      "NEW-savemem-interp": {
+        "args": [
+          "--save-mem"
+        ],
+        "build": "master",
+        "copy_trace": true,
+        "decoder": "plan",
+        "file": "sd",
+        "phase_timing": true
+      },
+      "NEW-spec-cold": {
+        "build": "master",
+        "decoder": "jit",
+        "file": "sd",
+        "jit_cache": "cold",
+        "phase_timing": true
+      },
+      "NEW-spec-warm": {
+        "build": "master",
+        "decoder": "jit",
+        "file": "sd",
+        "jit_cache": "warm",
+        "phase_timing": true
+      },
+      "NEW-tnode": {
+        "build": "master",
+        "decoder": "templated_node",
+        "file": "sd",
+        "phase_timing": true
+      },
+      "NEW-tschema": {
+        "build": "master",
+        "decoder": "templated_schema",
+        "file": "sd",
+        "optional": true,
+        "phase_timing": true
+      },
+      "PLAIN-interp": {
+        "build": "master-plain",
+        "decoder": "plan",
+        "file": "sd"
+      }
+    },
+    "convert_tools": {
+      "_doc": "txt2bin variants for the conversion experiment: build, output format, --threads (omp/lazy only; 0 = OMP_NUM_THREADS or all cores).",
+      "base-legacy": {
+        "build": "base",
+        "format": "legacy"
+      },
+      "master-legacy": {
+        "build": "master",
+        "format": "legacy"
+      },
+      "master-sd": {
+        "build": "master",
+        "format": "self-describing"
+      },
+      "omp-legacy-t1": {
+        "build": "omp",
+        "format": "legacy",
+        "threads": 1
+      },
+      "omp-legacy-t16": {
+        "build": "omp",
+        "format": "legacy",
+        "threads": 16
+      },
+      "omp-legacy-t2": {
+        "build": "omp",
+        "format": "legacy",
+        "threads": 2
+      },
+      "omp-legacy-t4": {
+        "build": "omp",
+        "format": "legacy",
+        "threads": 4
+      },
+      "omp-legacy-t8": {
+        "build": "omp",
+        "format": "legacy",
+        "threads": 8
+      },
+      "omp-sd-t1": {
+        "build": "omp",
+        "format": "self-describing",
+        "threads": 1
+      },
+      "omp-sd-t16": {
+        "build": "omp",
+        "format": "self-describing",
+        "threads": 16
+      },
+      "omp-sd-t2": {
+        "build": "omp",
+        "format": "self-describing",
+        "threads": 2
+      },
+      "omp-sd-t20": {
+        "build": "omp",
+        "format": "self-describing",
+        "threads": 20
+      },
+      "omp-sd-t4": {
+        "build": "omp",
+        "format": "self-describing",
+        "threads": 4
+      },
+      "omp-sd-t8": {
+        "build": "omp",
+        "format": "self-describing",
+        "threads": 8
+      }
+    },
+    "environment": {
+      "cache_method": "auto",
+      "env_padding": true,
+      "membind": true,
+      "noisy_loadavg_per_cpu": 0.25,
+      "pin": true,
+      "timeout_s": 7200
+    },
+    "experiments": [
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "BASE",
+          "NEW-legacyfile",
+          "NEW-interp",
+          "NEW-spec-cold",
+          "NEW-spec-warm",
+          "NEW-orc",
+          "NEW-tnode",
+          "LAZY-legacyfile",
+          "LAZY-interp",
+          "LAZY-spec-warm"
+        ],
+        "kind": "e2e",
+        "name": "size_sweep",
+        "traces": {
+          "records": [
+            10000.0,
+            100000.0,
+            1000000.0,
+            10000000.0,
+            100000000.0
+          ]
+        }
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "BASE",
+          "NEW-interp",
+          "NEW-spec-cold",
+          "NEW-spec-warm"
+        ],
+        "kind": "e2e",
+        "name": "breakeven",
+        "traces": {
+          "records": [
+            2000000.0,
+            5000000.0,
+            20000000.0,
+            50000000.0
+          ]
+        }
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "BASE",
+          "NEW-legacyfile",
+          "NEW-interp",
+          "NEW-spec-warm",
+          "LAZY-interp"
+        ],
+        "kind": "e2e",
+        "name": "rank_sweep",
+        "traces": {
+          "ranks": [
+            8,
+            64,
+            512,
+            4096,
+            32768
+          ],
+          "records": [
+            10000000.0
+          ]
+        }
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "BASE",
+          "NEW-interp",
+          "NEW-spec-warm",
+          "NEW-tnode",
+          "LAZY-interp"
+        ],
+        "kind": "e2e",
+        "name": "schema_sweep",
+        "traces": {
+          "records": [
+            1000000.0,
+            10000000.0
+          ],
+          "schema": [
+            "inferred",
+            "custom",
+            "wide"
+          ]
+        }
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "BASE",
+          "NEW-legacyfile",
+          "NEW-interp",
+          "NEW-spec-warm",
+          "LAZY-interp"
+        ],
+        "kind": "e2e",
+        "name": "workloads",
+        "traces": [
+          {
+            "ranks": 64,
+            "workload": "stencil3d"
+          },
+          {
+            "ranks": 64,
+            "workload": "allreduce_ring"
+          },
+          {
+            "ranks": 64,
+            "workload": "allreduce_rd"
+          },
+          {
+            "ranks": 64,
+            "workload": "alltoall"
+          },
+          {
+            "ranks": 16,
+            "workload": "dp_nccl"
+          },
+          {
+            "ranks": 16,
+            "workload": "pipeline_1f1b"
+          },
+          {
+            "ranks": 32,
+            "workload": "moe_alltoall"
+          }
+        ]
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "BASE",
+          "NEW-interp",
+          "NEW-spec-warm",
+          "LAZY-interp"
+        ],
+        "kind": "e2e",
+        "name": "workloads_large",
+        "traces": [
+          {
+            "ranks": 64,
+            "records": 10000000.0,
+            "workload": "dp_nccl"
+          },
+          {
+            "ranks": 64,
+            "records": 10000000.0,
+            "workload": "pipeline_1f1b"
+          },
+          {
+            "ranks": 256,
+            "records": 10000000.0,
+            "workload": "allreduce_ring"
+          }
+        ]
+      },
+      {
+        "cache": [
+          "cold"
+        ],
+        "configs": [
+          "BASE",
+          "NEW-legacyfile",
+          "NEW-interp",
+          "NEW-spec-cold",
+          "NEW-spec-warm",
+          "LAZY-interp"
+        ],
+        "kind": "e2e",
+        "name": "cold_cache",
+        "traces": {
+          "records": [
+            1000000.0,
+            10000000.0,
+            100000000.0
+          ]
+        }
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "NEW-interp",
+          "NEW-interp-notiming",
+          "PLAIN-interp"
+        ],
+        "kind": "e2e",
+        "name": "instrumentation_overhead",
+        "traces": {
+          "records": [
+            1000000.0,
+            10000000.0
+          ]
+        }
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "configs": [
+          "BASE-savemem",
+          "NEW-savemem-interp",
+          "BASE",
+          "NEW-interp",
+          "LAZY-interp"
+        ],
+        "kind": "e2e",
+        "name": "save_mem",
+        "traces": {
+          "records": [
+            10000000.0,
+            100000000.0
+          ]
+        }
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "fields": [
+          "sim"
+        ],
+        "kind": "micro",
+        "name": "decode_micro",
+        "orders": [
+          "seq",
+          "topo",
+          "random"
+        ],
+        "processes": 3,
+        "reps": 10,
+        "traces": {
+          "records": [
+            100000.0,
+            1000000.0,
+            10000000.0
+          ]
+        },
+        "variants": [
+          "upstream",
+          "legacy",
+          "plan",
+          "jit",
+          "orc",
+          "templated_node"
+        ]
+      },
+      {
+        "_doc": "1e8 records (beyond every cache): two orders and two processes, since one process takes ~2 min here.",
+        "cache": [
+          "warm"
+        ],
+        "fields": [
+          "sim"
+        ],
+        "kind": "micro",
+        "name": "decode_micro_large",
+        "orders": [
+          "seq",
+          "topo"
+        ],
+        "processes": 2,
+        "reps": 5,
+        "traces": {
+          "records": [
+            100000000.0
+          ]
+        },
+        "variants": [
+          "upstream",
+          "legacy",
+          "plan",
+          "jit",
+          "orc",
+          "templated_node"
+        ]
+      },
+      {
+        "cache": [
+          "cold"
+        ],
+        "fields": [
+          "sim"
+        ],
+        "kind": "micro",
+        "name": "decode_micro_cold",
+        "orders": [
+          "seq",
+          "topo"
+        ],
+        "processes": 2,
+        "reps": 5,
+        "traces": {
+          "records": [
+            10000000.0,
+            100000000.0
+          ]
+        },
+        "variants": [
+          "upstream",
+          "legacy",
+          "plan",
+          "jit",
+          "templated_node"
+        ]
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "fields": [
+          "sim",
+          "all",
+          "scalar"
+        ],
+        "kind": "micro",
+        "name": "decode_fields",
+        "orders": [
+          "seq"
+        ],
+        "processes": 3,
+        "reps": 10,
+        "traces": {
+          "records": [
+            1000000.0
+          ],
+          "schema": [
+            "custom",
+            "wide",
+            "inferred"
+          ]
+        },
+        "variants": [
+          "plan",
+          "jit",
+          "templated_node"
+        ]
+      },
+      {
+        "cache": [
+          "warm"
+        ],
+        "fields": [
+          "sim"
+        ],
+        "jit_cold": true,
+        "kind": "micro",
+        "name": "jit_cold_micro",
+        "orders": [
+          "seq"
+        ],
+        "processes": 3,
+        "reps": 10,
+        "traces": {
+          "records": [
+            10000.0
+          ],
+          "schema": [
+            "inferred",
+            "custom",
+            "wide"
+          ]
+        },
+        "variants": [
+          "jit",
+          "orc",
+          "plan"
+        ]
+      },
+      {
+        "_doc": "1e7 only: at 1e8 one conversion takes 2-5 min, and 13 tools x repetitions would need ~5 h.",
+        "kind": "convert",
+        "name": "convert",
+        "tools": [
+          "base-legacy",
+          "master-legacy",
+          "master-sd",
+          "omp-legacy-t1",
+          "omp-legacy-t2",
+          "omp-legacy-t4",
+          "omp-legacy-t8",
+          "omp-legacy-t16",
+          "omp-sd-t1",
+          "omp-sd-t2",
+          "omp-sd-t4",
+          "omp-sd-t8",
+          "omp-sd-t16"
+        ],
+        "traces": {
+          "records": [
+            10000000.0
+          ]
+        }
+      },
+      {
+        "configs": [
+          "BASE",
+          "NEW-interp",
+          "NEW-spec-warm",
+          "LAZY-interp"
+        ],
+        "k": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "kind": "concurrent",
+        "name": "concurrency",
+        "traces": {
+          "records": [
+            10000000.0
+          ]
+        }
+      },
+      {
+        "_doc": "Runs under a cgroup memory limit (systemd-run --user --scope, swap off) smaller than the trace's dirty-page demand: which configurations still finish, and how fast. Skipped if user cgroups are unavailable.",
+        "configs": [
+          "BASE",
+          "NEW-legacyfile",
+          "NEW-interp",
+          "LAZY-interp",
+          "LAZY-legacyfile"
+        ],
+        "kind": "memcap",
+        "limits_gb": [
+          2,
+          4,
+          8
+        ],
+        "name": "memory_budget",
+        "reps": 3,
+        "traces": {
+          "records": [
+            100000000.0
+          ]
+        }
+      }
+    ],
+    "name": "full",
+    "params": {
+      "G": 6,
+      "L": 2500,
+      "O": 0,
+      "S": 65535,
+      "g": 1000,
+      "o": 1500
+    },
+    "repetitions": {
+      "caps": [
+        {
+          "max": 20,
+          "min": 10,
+          "min_records": 5000000.0
+        },
+        {
+          "max": 8,
+          "min": 5,
+          "min_records": 50000000.0
+        }
+      ],
+      "ci_rel": 0.05,
+      "confidence": 0.95,
+      "max": 50,
+      "min": 10,
+      "warmup": 1
+    },
+    "trace_defaults": {
+      "ranks": 64,
+      "records": 1000000.0,
+      "schema": "inferred",
+      "workload": "stencil3d"
+    }
+  },
+  "flags_check": {
+    "compilers": {
+      "base": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "lazy": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "master": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "master-plain": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "omp": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+    },
+    "flags": {
+      "base": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "lazy": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "master": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "master-plain": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "omp": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ]
+    },
+    "identical_compiler": true,
+    "identical_flags": true,
+    "note": "Only -std may differ: upstream's CMakeLists sets CMAKE_CXX_STANDARD 11, NEW requires 23.",
+    "std": {
+      "base": "-std=gnu++11",
+      "lazy": "-std=gnu++23",
+      "master": "-std=gnu++23",
+      "master-plain": "-std=gnu++23",
+      "omp": "-std=gnu++23"
+    }
+  },
+  "machine": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cgroup": "15:name=systemd:/init.scope\n14:misc:/\n13:rdma:/\n12:pids:/init.scope\n11:hugetlb:/\n10:net_prio:/\n9:perf_event:/\n8:net_cls:/\n7:freezer:/\n6:devices:/init.scope\n5:memory:/init.scope\n4:blkio:/\n3:cpuacct:/\n2:cpu:/\n1:cpuset:/\n0::/init.scope",
+    "cgroup_memory_max": null,
+    "cpu_capacity": {
+      "0": null,
+      "1": null,
+      "10": null,
+      "11": null,
+      "12": null,
+      "13": null,
+      "14": null,
+      "15": null,
+      "2": null,
+      "3": null,
+      "4": null,
+      "5": null,
+      "6": null,
+      "7": null,
+      "8": null,
+      "9": null
+    },
+    "cpufreq": {
+      "0": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "1": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "10": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "11": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "12": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "13": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "14": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "15": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "2": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "3": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "4": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "5": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "6": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "7": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "8": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      },
+      "9": {
+        "cpuinfo_max_freq": null,
+        "scaling_cur_freq": null,
+        "scaling_driver": null,
+        "scaling_governor": null,
+        "scaling_max_freq": null,
+        "scaling_min_freq": null
+      }
+    },
+    "cpufreq_boost": null,
+    "date_utc": "2026-11-17T07:53:54Z",
+    "hostname": "DESKTOP-FIJTQDO",
+    "intel_no_turbo": null,
+    "is_root": false,
+    "is_wsl": true,
+    "kernel": "5.15.167.4-microsoft-standard-WSL2",
+    "loadavg": [
+      0.2744140625,
+      0.08056640625,
+      0.01953125
+    ],
+    "lscpu": "Architecture:                         x86_64\nCPU op-mode(s):                       32-bit, 64-bit\nAddress sizes:                        39 bits physical, 48 bits virtual\nByte Order:                           Little Endian\nCPU(s):                               16\nOn-line CPU(s) list:                  0-15\nVendor ID:                            GenuineIntel\nModel name:                           Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz\nCPU family:                           6\nModel:                                158\nThread(s) per core:                   2\nCore(s) per socket:                   8\nSocket(s):                            1\nStepping:                             12\nBogoMIPS:                             7200.02\nFlags:                                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology cpuid pni pclmulqdq ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp fsgsbase bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap clflushopt xsaveopt xsavec xgetbv1 xsaves md_clear flush_l1d arch_capabilities\nHypervisor vendor:                    Microsoft\nVirtualization type:                  full\nL1d cache:                            256 KiB (8 instances)\nL1i cache:                            256 KiB (8 instances)\nL2 cache:                             2 MiB (8 instances)\nL3 cache:                             16 MiB (1 instance)\nVulnerability Gather data sampling:   Unknown: Dependent on hypervisor status\nVulnerability Itlb multihit:          KVM: Mitigation: VMX unsupported\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Mitigation; Clear CPU buffers; SMT Host state unknown\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Mitigation; Clear CPU buffers; SMT Host state unknown\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Mitigation; IBRS\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl and seccomp\nVulnerability Spectre v1:             Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:             Mitigation; IBRS; IBPB conditional; STIBP conditional; RSB filling; PBRSB-eIBRS Not affected; BHI SW loop, KVM SW loop\nVulnerability Srbds:                  Unknown: Dependent on hypervisor status\nVulnerability Tsx async abort:        Mitigation; Clear CPU buffers; SMT Host state unknown",
+    "mem_total_kb": 16335184,
+    "nproc_online": 16,
+    "numa_nodes": [],
+    "os_release": "PRETTY_NAME=\"Ubuntu 24.04.2 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.2 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo",
+    "perf_event_paranoid": "1",
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "slurm": {},
+    "swap_total_kb": 4194304,
+    "thp_enabled": "[always] madvise never"
+  },
+  "params": {
+    "G": 6,
+    "L": 2500,
+    "O": 0,
+    "S": 65535,
+    "g": 1000,
+    "o": 1500
+  },
+  "pinning": {
+    "enabled": true,
+    "fixed_cpus": null,
+    "membind": false
+  },
+  "repo": {
+    "head": "e819c061da36e170434a32793e0f6c0406ff2477",
+    "status": [
+      " M .clang-format",
+      " M .github/workflows/build-and-test.yml",
+      " M LICENCE",
+      " M README.md",
+      " M bench/CMakeLists.txt",
+      " M bench/analyze.py",
+      " M bench/check_correctness.py",
+      " M bench/decoding/decode_bench.cpp",
+      " M bench/decoding/summarize.py",
+      " M bench/end_to_end/decode_share.py",
+      " M bench/lib/benchlib.py",
+      " M bench/lib/runner.py",
+      " M bench/profiling/profile.py",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/breakeven.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/concurrency.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/convert.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/decode.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/environment.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/file_sizes.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/memory.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/memory_budget.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/overhead.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/phases.csv",
+      " M bench/results/tables/20261117-005653-DESKTOP-FIJTQDO-full/summary.csv",
+      " M bench/traces/vary_fields.py",
+      " M bench/workloads/goalgen.py",
+      " M bench/writing/conversion_bench.py",
+      " M build/fc_mangle.h",
+      " M build/mpi_c_wrapper.c",
+      " M build/mpi_f_wrapper.c",
+      " M build/mpi_sem.yml",
+      " M cmake/FindGraphviz.cmake",
+      " M cmake/FindUnwind.cmake",
+      " M cmake/gengetopt.cmake",
+      " M cmake/re2c.cmake",
+      " M config/custom_fields.toml",
+      " M doc/README",
+      " M doc/README-mpi-matching",
+      " M doc/binary_header.md",
+      " M report/.gitignore",
+      " M report/build.sh",
+      " M report/diagrams/backward-compat.tex",
+      " M report/diagrams/conversion-overview.tex",
+      " M report/diagrams/design-overview.tex",
+      " M report/diagrams/dictionary-encoding.tex",
+      " M report/diagrams/file-sections.tex",
+      " M report/diagrams/gpu-routing.tex",
+      " M report/diagrams/header-details.tex",
+      " M report/diagrams/legacy-file-sections.tex",
+      " M report/diagrams/legacy-gpu-record.tex",
+      " M report/diagrams/legacy-record.tex",
+      " M report/diagrams/local-dependencies.tex",
+      " M report/diagrams/node-read-call.tex",
+      " M report/diagrams/offset-encoding.tex",
+      " M report/diagrams/packed-gpu-record.tex",
+      " M report/diagrams/plan-runners.tex",
+      " M report/diagrams/schedule-pipeline.tex",
+      " M report/diagrams/schema-agreement.tex",
+      " M report/diagrams/simulation-loop.tex",
+      " M report/diagrams/tag-collision.tex",
+      " M report/plan-style.sty",
+      " M report/project_report.tex",
+      " M report/slides.tex",
+      " M src/CMakeLists.txt",
+      " M src/Drawviz/Drawviz.cpp",
+      " M src/Drawviz/Helvetica.afm",
+      " M src/Drawviz/Makefile",
+      " M src/Drawviz/TimelineDrawing.cpp",
+      " M src/Drawviz/TimelineDrawing.hpp",
+      " M src/Drawviz/cmdline.c",
+      " M src/Drawviz/cmdline.h",
+      " M src/Drawviz/drawviz.ggo",
+      " M src/LogGOPSim/Makefile",
+      " M src/LogGOPSim/binary_reading/DependencyGraph.cpp",
+      " M src/LogGOPSim/binary_reading/DependencyGraph.hpp",
+      " M src/LogGOPSim/binary_reading/DependencyListView.hpp",
+      " M src/LogGOPSim/binary_reading/FieldBindings.hpp",
+      " M src/LogGOPSim/binary_reading/LegacyTraceReader.hpp",
+      " M src/LogGOPSim/binary_reading/MappedTraceFile.cpp",
+      " M src/LogGOPSim/binary_reading/MappedTraceFile.hpp",
+      " M src/LogGOPSim/binary_reading/NodeValidator.hpp",
+      " M src/LogGOPSim/binary_reading/SelfDescribingTraceReader.cpp",
+      " M src/LogGOPSim/binary_reading/SelfDescribingTraceReader.hpp",
+      " M src/LogGOPSim/binary_reading/TraceFileView.cpp",
+      " M src/LogGOPSim/binary_reading/TraceFileView.hpp",
+      " M src/LogGOPSim/binary_reading/TraceReader.cpp",
+      " M src/LogGOPSim/binary_reading/TraceReader.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/DecodePlan.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/DecodePlan.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/Decoder.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/Decoder.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/CMakeLists.txt",
+      " M src/LogGOPSim/binary_reading/decoding/runners/PlanRunner.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/PlanRunner.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/README.md",
+      " M src/LogGOPSim/binary_reading/decoding/runners/RunnerRegistry.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/RunnerRegistry.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/CMakeLists.txt",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/CompiledRunner.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/CompiledRunner.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/c/CCompiler.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/c/CCompiler.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/c/CMakeLists.txt",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/CMakeLists.txt",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/OrcCompiler.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/OrcLoader.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/compiled/orc/OrcLoader.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/interpreted/CMakeLists.txt",
+      " M src/LogGOPSim/binary_reading/decoding/runners/interpreted/InterpretedRunner.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/interpreted/InterpretedRunner.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/templated_node/CMakeLists.txt",
+      " M src/LogGOPSim/binary_reading/decoding/runners/templated_node/TemplatedNodeRunner.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/templated_node/TemplatedNodeRunner.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/templated_schema/CMakeLists.txt",
+      " M src/LogGOPSim/binary_reading/decoding/runners/templated_schema/KnownSchemas.hpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/templated_schema/TemplatedSchemaRunner.cpp",
+      " M src/LogGOPSim/binary_reading/decoding/runners/templated_schema/TemplatedSchemaRunner.hpp",
+      " M src/LogGOPSim/binary_tree_32.goal",
+      " M src/LogGOPSim/binary_writing/LegacyTraceWriter.cpp",
+      " M src/LogGOPSim/binary_writing/LegacyTraceWriter.hpp",
+      " M src/LogGOPSim/binary_writing/RankPacking.cpp",
+      " M src/LogGOPSim/binary_writing/RankPacking.hpp",
+      " M src/LogGOPSim/binary_writing/RecordPacking.cpp",
+      " M src/LogGOPSim/binary_writing/RecordPacking.hpp",
+      " M src/LogGOPSim/binary_writing/TraceWriter.cpp",
+      " M src/LogGOPSim/binary_writing/TraceWriter.hpp",
+      " M src/LogGOPSim/goal_parsing/CustomFields.cpp",
+      " M src/LogGOPSim/goal_parsing/CustomFields.hpp",
+      " M src/LogGOPSim/goal_parsing/Goal.hpp",
+      " M src/LogGOPSim/goal_parsing/GoalReader.hpp",
+      " M src/LogGOPSim/goal_parsing/GoalReader.re",
+      " M src/LogGOPSim/goal_parsing/TraceAnalysis.cpp",
+      " M src/LogGOPSim/goal_parsing/TraceAnalysis.hpp",
+      " M src/LogGOPSim/simulators/BaseDeserializedGraphNode.hpp",
+      " M src/LogGOPSim/simulators/README.md",
+      " M src/LogGOPSim/simulators/SimulatorAdapter.hpp",
+      " M src/LogGOPSim/simulators/atlahs/AtlahsAdapter.cpp",
+      " M src/LogGOPSim/simulators/atlahs/AtlahsAdapter.hpp",
+      " M src/LogGOPSim/simulators/atlahs/README.md",
+      " M src/LogGOPSim/simulators/atlahs/UPSTREAM_REVISION",
+      " M src/LogGOPSim/simulators/atlahs/examples/two_rank_four_gpu.goal",
+      " M src/LogGOPSim/simulators/atlahs/integration/Dockerfile.nsys-export",
+      " M src/LogGOPSim/simulators/atlahs/integration/build.py",
+      " M src/LogGOPSim/simulators/atlahs/integration/prepare_reference.py",
+      " M src/LogGOPSim/simulators/loggopsim/LogGOPSim.cpp",
+      " M src/LogGOPSim/simulators/loggopsim/LogGOPSimAdapter.cpp",
+      " M src/LogGOPSim/simulators/loggopsim/LogGOPSimAdapter.hpp",
+      " M src/LogGOPSim/simulators/loggopsim/Network.hpp",
+      " M src/LogGOPSim/simulators/loggopsim/Noise.hpp",
+      " M src/LogGOPSim/simulators/loggopsim/SimulationEvents.hpp",
+      " M src/LogGOPSim/simulators/loggopsim/SimulationSchedule.hpp",
+      " M src/LogGOPSim/simulators/loggopsim/TimelineVisualization.hpp",
+      " M src/LogGOPSim/simulators/loggopsim/loggopsim_cmdline.ggo",
+      " M src/LogGOPSim/trace_format/BinaryFormat.cpp",
+      " M src/LogGOPSim/trace_format/BinaryFormat.hpp",
+      " M src/LogGOPSim/trace_format/BinaryIO.hpp",
+      " M src/LogGOPSim/trace_format/FieldIdentity.cpp",
+      " M src/LogGOPSim/trace_format/FieldIdentity.hpp",
+      " M src/LogGOPSim/trace_format/FieldTypes.cpp",
+      " M src/LogGOPSim/trace_format/FieldTypes.hpp",
+      " M src/LogGOPSim/trace_format/LegacyFormat.hpp",
+      " M src/LogGOPSim/trace_format/OffsetEncoding.cpp",
+      " M src/LogGOPSim/trace_format/OffsetEncoding.hpp",
+      " M src/LogGOPSim/trace_format/RecordLayout.cpp",
+      " M src/LogGOPSim/trace_format/RecordLayout.hpp",
+      " M src/LogGOPSim/txt2bin.cpp",
+      " M src/LogGOPSim/txt2bin_cmdline.ggo",
+      " M src/Schedgen/Makefile",
+      " M src/Schedgen/buffer_element.cpp",
+      " M src/Schedgen/buffer_element.hpp",
+      " M src/Schedgen/goal_comm.h",
+      " M src/Schedgen/process_trace.cpp",
+      " M src/Schedgen/schedgen.cpp",
+      " M src/Schedgen/schedgen.hpp",
+      " M src/Schedgen/schedgen_cmdline.ggo",
+      " M src/Schedgen/trace_reader.hpp",
+      " M src/Schedgen2/README",
+      " M src/Schedgen2/TODO",
+      " M src/Schedgen2/additional_microbenchmarks.py",
+      " M src/Schedgen2/config_example.json",
+      " M src/Schedgen2/goal.py",
+      " M src/Schedgen2/mpi_colls.py",
+      " M src/Schedgen2/patterns.py",
+      " M src/Schedgen2/process_trace.py",
+      " M src/Schedgen2/schedgen.py",
+      " M src/liballprof/allprof.h",
+      " M src/liballprof/gencode.py",
+      " M src/liballprof/mpi_header.h",
+      " M src/liballprof/mpi_helloworld.c",
+      " M src/liballprof/mpi_helloworld.f90",
+      " M src/liballprof/mpipclog.c",
+      " M src/liballprof/mpipf77log.c",
+      " M src/liballprof/numbers.h",
+      " M src/liballprof/sync.c",
+      " M src/liballprof/sync.h",
+      " M src/liballprof/template.c",
+      " M src/liballprof/wrapper.sh",
+      " M src/liballprof2/README.md",
+      " M src/liballprof2/gencode.py",
+      " M src/liballprof2/gensem.py",
+      " M src/liballprof2/mpi.h",
+      " M src/liballprof2/tracer_main.c",
+      " M tests/data/atlahs_custom_fields.toml",
+      " M tests/data/atlahs_recorded_traces.json",
+      " M tests/data/converter_custom_fields.toml",
+      " M tests/data/empty_custom_fields.toml",
+      " M tests/data/reference/README.md",
+      " M tests/data/reference/binomialtreebcast_8/expected_times.json",
+      " M tests/data/reference/binomialtreebcast_8/metadata.json",
+      " M tests/data/reference/binomialtreebcast_8/original_output.txt",
+      " M tests/data/reference/binomialtreebcast_8/schedule.goal",
+      " M tests/integration/atlahs.py",
+      " M tests/integration/atlahs_emitter.py",
+      " M tests/integration/conftest.py",
+      " M tests/integration/helpers.py",
+      " M tests/integration/pytest.ini",
+      " M tests/integration/requirements.txt",
+      " M tests/integration/test_atlahs_generator.py",
+      " M tests/integration/test_atlahs_recorded.py",
+      " M tests/integration/test_atlahs_simulation.py",
+      " M tests/integration/test_atlahs_upstream.py",
+      " M tests/integration/test_converter_schema_report.py",
+      " M tests/integration/test_converter_self_describing.py",
+      " M tests/integration/test_mpi_trace.py",
+      " M tests/integration/test_reference_times.py",
+      " M tests/integration/test_runner_simulation.py",
+      " M tests/integration/test_simulation_equivalence.py",
+      " M tests/integration/test_toolchain.py",
+      " M tests/liballprof/mpi_helloworld.c",
+      " M tests/liballprof/mpi_helloworld.f90",
+      " M tests/unit/CMakeLists.txt",
+      " M tests/unit/TestHelpers.hpp",
+      " M tests/unit/atlahs_matching.cpp",
+      " M tests/unit/atlahs_schedule.cpp",
+      " M tests/unit/binary_header.cpp",
+      " M tests/unit/binary_io.cpp",
+      " M tests/unit/custom_fields.cpp",
+      " M tests/unit/decode_plan.cpp",
+      " M tests/unit/goal_reader.cpp",
+      " M tests/unit/jit_cache.cpp",
+      " M tests/unit/legacy_reader.cpp",
+      " M tests/unit/node_field_values.cpp",
+      " M tests/unit/rank_packing.cpp",
+      " M tests/unit/rank_table.cpp",
+      " M tests/unit/record_layout.cpp",
+      " M tests/unit/record_packing.cpp",
+      " M tests/unit/trace_reader.cpp",
+      " M tests/unit/trace_writer.cpp",
+      "?? bench/results/plots/"
+    ]
+  },
+  "scratch": "/home/joshua/lgs-bench/scratch/20261117-085354-DESKTOP-FIJTQDO-full",
+  "scratch_fs": "ext2/ext3",
+  "traces": {
+    "allreduce_rd-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "allreduce_rd-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "created": "2026-11-16T23:34:10Z",
+      "experiments": [
+        "workloads"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 44244878,
+          "name": "allreduce_rd-p64-n1e6-inferred.legacy.bin",
+          "sha256": "a5b79adbc2fe690fbfb4afeba6ea35798017961c7844709faaf35effc44bcf60"
+        },
+        "sd": {
+          "bytes": 10299723,
+          "name": "allreduce_rd-p64-n1e6-inferred.sd.bin",
+          "sha256": "da7b811244b143e7149d894803995dcc3a8465ac2b6f8c96ee2f155cb48b7afd"
+        }
+      },
+      "generation": {
+        "edges": 1315136,
+        "generator": "goalgen",
+        "iterations": 822,
+        "params": {
+          "bytes": 8192,
+          "compute": 200000,
+          "reduce": 2000
+        },
+        "ranks": 64,
+        "records": 999552,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "allreduce_rd"
+      },
+      "generator_version": 2,
+      "goal_bytes": 54504628,
+      "header_bytes": 395,
+      "header_sha256": "2f1504162bf1f323ae5cf946d99bd96b80b09b420d9c337c885da6d6e078112a",
+      "record_bits": 64,
+      "spec": {
+        "ranks": 64,
+        "records": 1000000,
+        "schema": "inferred",
+        "workload": "allreduce_rd"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 0.3394276400003946,
+        "txt2bin_base_legacy_s": 0.882294151,
+        "txt2bin_master_sd_s": 2.220257796
+      }
+    },
+    "allreduce_ring-p256-n1e7-inferred": {
+      "created": "2026-11-16T23:35:48Z",
+      "experiments": [
+        "workloads_large"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 443533326,
+          "name": "allreduce_ring-p256-n1e7-inferred.legacy.bin",
+          "sha256": "06b3e1f7cc471c814becf55038f99f5bbadfeed5383ccfaffca4cc16dfdc8db3"
+        },
+        "sd": {
+          "bytes": 125568907,
+          "name": "allreduce_ring-p256-n1e7-inferred.sd.bin",
+          "sha256": "b361f3b66fbbfa44b005b454a79d06f99467c3f0a9fea82d54f3dab1d7c9fc9b"
+        }
+      },
+      "generation": {
+        "edges": 12149760,
+        "generator": "goalgen",
+        "iterations": 31,
+        "params": {
+          "bytes": 67108864,
+          "compute": 200000,
+          "reduce": 2000
+        },
+        "ranks": 256,
+        "records": 10126336,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "allreduce_ring"
+      },
+      "generator_version": 2,
+      "goal_bytes": 600592105,
+      "header_bytes": 395,
+      "header_sha256": "7c62187094079d128180775144ef93fa2c78adfd2549ef9cf6b65ce230e07ec3",
+      "record_bits": 80,
+      "spec": {
+        "ranks": 256,
+        "records": 10000000,
+        "schema": "inferred",
+        "workload": "allreduce_ring"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 2.5822662420005145,
+        "txt2bin_base_legacy_s": 9.143842719,
+        "txt2bin_master_sd_s": 22.708826657
+      }
+    },
+    "allreduce_ring-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "allreduce_ring-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "created": "2026-11-16T23:34:17Z",
+      "experiments": [
+        "workloads"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 43403790,
+          "name": "allreduce_ring-p64-n1e6-inferred.legacy.bin",
+          "sha256": "3f1f3ae9d94587d8373652cd611b79f1b4b38a2886bb15e43a0032dbce6ff772"
+        },
+        "sd": {
+          "bytes": 11000459,
+          "name": "allreduce_ring-p64-n1e6-inferred.sd.bin",
+          "sha256": "ba66d7001181b72d10ca43143f1c89fac502d8e93166874f366b834620a7bcba"
+        }
+      },
+      "generation": {
+        "edges": 1188480,
+        "generator": "goalgen",
+        "iterations": 49,
+        "params": {
+          "bytes": 67108864,
+          "compute": 200000,
+          "reduce": 2000
+        },
+        "ranks": 64,
+        "records": 990976,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "allreduce_ring"
+      },
+      "generator_version": 2,
+      "goal_bytes": 56960556,
+      "header_bytes": 395,
+      "header_sha256": "e1de87788a437e3fdc29edea0797f5589c9207f39207d39c6c8ea7f692c97f7b",
+      "record_bits": 72,
+      "spec": {
+        "ranks": 64,
+        "records": 1000000,
+        "schema": "inferred",
+        "workload": "allreduce_ring"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 0.2971192599998176,
+        "txt2bin_base_legacy_s": 0.785284307,
+        "txt2bin_master_sd_s": 2.129743627
+      }
+    },
+    "alltoall-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "alltoall-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "created": "2026-11-16T23:34:23Z",
+      "experiments": [
+        "workloads"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 46894542,
+          "name": "alltoall-p64-n1e6-inferred.legacy.bin",
+          "sha256": "fef121b541dc99c1de5bbf414113ce4f8e54b96fe84e93903db1a49df465a366"
+        },
+        "sd": {
+          "bytes": 13456715,
+          "name": "alltoall-p64-n1e6-inferred.sd.bin",
+          "sha256": "5cbc6d431f3449f4cfd9efce16ecc3ab792cb9ac8b5abf9acf9787d46f526e8d"
+        }
+      },
+      "generation": {
+        "edges": 1975680,
+        "generator": "goalgen",
+        "iterations": 123,
+        "params": {
+          "bytes": 4096,
+          "compute": 100000
+        },
+        "ranks": 64,
+        "records": 999744,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "alltoall"
+      },
+      "generator_version": 2,
+      "goal_bytes": 74155680,
+      "header_bytes": 395,
+      "header_sha256": "c787305e8e29eba4e402310164a8564f0e08ec5438e2c25eb3214125cf612095",
+      "record_bits": 80,
+      "spec": {
+        "ranks": 64,
+        "records": 1000000,
+        "schema": "inferred",
+        "workload": "alltoall"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 0.40044493000004877,
+        "txt2bin_base_legacy_s": 1.090494759,
+        "txt2bin_master_sd_s": 2.506663359
+      }
+    },
+    "dp_nccl-p16-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "dp_nccl-p16-n1e6-inferred.sd.bin"
+        }
+      },
+      "created": "2026-11-16T23:34:31Z",
+      "experiments": [
+        "workloads"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 43651982,
+          "name": "dp_nccl-p16-n1e6-inferred.legacy.bin",
+          "sha256": "5ce7a4094e99689068595cc5c8b322e52b81ea395a921bc78ff443439cd8987d"
+        },
+        "sd": {
+          "bytes": 12356299,
+          "name": "dp_nccl-p16-n1e6-inferred.sd.bin",
+          "sha256": "a2441ace62e4a92e0ef0093e8ee1280ba48649eea4fa4161c7eca3d80f8203e7"
+        }
+      },
+      "generation": {
+        "edges": 1193456,
+        "generator": "goalgen",
+        "iterations": 96,
+        "params": {
+          "bucket_bytes": 104857600,
+          "buckets": 4,
+          "bwd": 600000,
+          "channels": 2,
+          "fwd": 300000,
+          "layers": 24,
+          "optimizer": 100000,
+          "reduce": 5000
+        },
+        "ranks": 16,
+        "records": 996864,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "dp_nccl"
+      },
+      "generator_version": 2,
+      "goal_bytes": 58169044,
+      "header_bytes": 395,
+      "header_sha256": "f77596c85599d22181f294ca00dc0282c82b6f08335ba8c2b4385eb01951132c",
+      "record_bits": 80,
+      "spec": {
+        "ranks": 16,
+        "records": 1000000,
+        "schema": "inferred",
+        "workload": "dp_nccl"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 0.2709792599998764,
+        "txt2bin_base_legacy_s": 0.973718342,
+        "txt2bin_master_sd_s": 2.371486663
+      }
+    },
+    "dp_nccl-p64-n1e7-inferred": {
+      "created": "2026-11-16T23:36:21Z",
+      "experiments": [
+        "workloads_large"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 439260110,
+          "name": "dp_nccl-p64-n1e7-inferred.legacy.bin",
+          "sha256": "2a4021066db69f4922a88b059d4fd4c8485a49c228534b960b624d868e8e1ce4"
+        },
+        "sd": {
+          "bytes": 137388363,
+          "name": "dp_nccl-p64-n1e7-inferred.sd.bin",
+          "sha256": "addd3a734d345b5fb3943b8a2c36321e60f7e5508d18cfc84037519da86cf41b"
+        }
+      },
+      "generation": {
+        "edges": 12028160,
+        "generator": "goalgen",
+        "iterations": 61,
+        "params": {
+          "bucket_bytes": 104857600,
+          "buckets": 4,
+          "bwd": 600000,
+          "channels": 2,
+          "fwd": 300000,
+          "layers": 24,
+          "optimizer": 100000,
+          "reduce": 5000
+        },
+        "ranks": 64,
+        "records": 10029376,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "dp_nccl"
+      },
+      "generator_version": 2,
+      "goal_bytes": 607228804,
+      "header_bytes": 395,
+      "header_sha256": "b0127c183a3381c149f4b727d4953ef2894729193706e3d523dc6cb1c4b443fc",
+      "record_bits": 88,
+      "spec": {
+        "ranks": 64,
+        "records": 10000000,
+        "schema": "inferred",
+        "workload": "dp_nccl"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 2.5821380670004146,
+        "txt2bin_base_legacy_s": 10.605723785,
+        "txt2bin_master_sd_s": 24.161697996
+      }
+    },
+    "moe_alltoall-p32-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "moe_alltoall-p32-n1e6-inferred.sd.bin"
+        }
+      },
+      "created": "2026-11-16T23:34:36Z",
+      "experiments": [
+        "workloads"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 47212046,
+          "name": "moe_alltoall-p32-n1e6-inferred.legacy.bin",
+          "sha256": "fe9470eba9c075eee00aabebeda0e665c01eb184af6fba51ccf19f54277ff492"
+        },
+        "sd": {
+          "bytes": 13784907,
+          "name": "moe_alltoall-p32-n1e6-inferred.sd.bin",
+          "sha256": "251eed338f809d38ab86523245911a89c4d2e6cc9f99531709ef7da977bf9754"
+        }
+      },
+      "generation": {
+        "edges": 1976032,
+        "generator": "goalgen",
+        "iterations": 248,
+        "params": {
+          "attention": 300000,
+          "combine": 50000,
+          "expert": 500000,
+          "token_bytes": 4096
+        },
+        "ranks": 32,
+        "records": 1007872,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "moe_alltoall"
+      },
+      "generator_version": 2,
+      "goal_bytes": 77994928,
+      "header_bytes": 395,
+      "header_sha256": "aac70290a6552e93ee5b1e408d48b5b2f9e5d059b43856d09fa61decd78563db",
+      "record_bits": 80,
+      "spec": {
+        "ranks": 32,
+        "records": 1000000,
+        "schema": "inferred",
+        "workload": "moe_alltoall"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 0.495786317999773,
+        "txt2bin_base_legacy_s": 1.100916059,
+        "txt2bin_master_sd_s": 2.55666918
+      }
+    },
+    "pipeline_1f1b-p16-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "pipeline_1f1b-p16-n1e6-inferred.sd.bin"
+        }
+      },
+      "created": "2026-11-16T23:34:45Z",
+      "experiments": [
+        "workloads"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 41206094,
+          "name": "pipeline_1f1b-p16-n1e6-inferred.legacy.bin",
+          "sha256": "496e345b0efd263e29452d9f8faa46c6fe4767d27a9086bf7ca732019ed19414"
+        },
+        "sd": {
+          "bytes": 10541707,
+          "name": "pipeline_1f1b-p16-n1e6-inferred.sd.bin",
+          "sha256": "4c605ef50a4e3ad86ec7015831f626bcc1225f6757dc81dbca78c94db318eb51"
+        }
+      },
+      "generation": {
+        "edges": 958256,
+        "generator": "goalgen",
+        "iterations": 651,
+        "params": {
+          "activation_bytes": 8388608,
+          "bwd": 800000,
+          "fwd": 400000,
+          "microbatches": 16
+        },
+        "ranks": 16,
+        "records": 958272,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "pipeline_1f1b"
+      },
+      "generator_version": 2,
+      "goal_bytes": 50080768,
+      "header_bytes": 395,
+      "header_sha256": "c9b47ff6991449d9a8455a5a3eb602f550eae191bb6a8b2cedc3649289f51fba",
+      "record_bits": 72,
+      "spec": {
+        "ranks": 16,
+        "records": 1000000,
+        "schema": "inferred",
+        "workload": "pipeline_1f1b"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 0.2497471479991873,
+        "txt2bin_base_legacy_s": 0.807713567,
+        "txt2bin_master_sd_s": 2.071744621
+      }
+    },
+    "pipeline_1f1b-p64-n1e7-inferred": {
+      "created": "2026-11-16T23:36:58Z",
+      "experiments": [
+        "workloads_large"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 425625870,
+          "name": "pipeline_1f1b-p64-n1e7-inferred.legacy.bin",
+          "sha256": "e7c0bbbc44189e042ab4b1bc893d10ba31bde540d3b1f8a3ad6b22b45c53b2da"
+        },
+        "sd": {
+          "bytes": 121255179,
+          "name": "pipeline_1f1b-p64-n1e7-inferred.sd.bin",
+          "sha256": "21b6c6283d861fb4495f16262cd5fa19a0ed485c550d8618ad02d58f3d9e75bd"
+        }
+      },
+      "generation": {
+        "edges": 9898176,
+        "generator": "goalgen",
+        "iterations": 1628,
+        "params": {
+          "activation_bytes": 8388608,
+          "bwd": 800000,
+          "fwd": 400000,
+          "microbatches": 16
+        },
+        "ranks": 64,
+        "records": 9898240,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "pipeline_1f1b"
+      },
+      "generator_version": 2,
+      "goal_bytes": 535970868,
+      "header_bytes": 395,
+      "header_sha256": "a0d3f38d1363f08d8ad949e90a8d13d81150ec178bd7f77877bd288a293486b8",
+      "record_bits": 80,
+      "spec": {
+        "ranks": 64,
+        "records": 10000000,
+        "schema": "inferred",
+        "workload": "pipeline_1f1b"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 2.4586423300006572,
+        "txt2bin_base_legacy_s": 9.856666519,
+        "txt2bin_master_sd_s": 22.435860618
+      }
+    },
+    "stencil3d-p64-n1e6-inferred": {
+      "byte_identity": {
+        "master-legacy": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-legacy-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.legacy.bin"
+        },
+        "omp-sd-t4": {
+          "identical": true,
+          "reference": "stencil3d-p64-n1e6-inferred.sd.bin"
+        }
+      },
+      "created": "2026-11-16T23:35:01Z",
+      "experiments": [
+        "size_sweep",
+        "schema_sweep",
+        "workloads",
+        "cold_cache",
+        "instrumentation_overhead",
+        "decode_micro",
+        "decode_fields"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 46386318,
+          "name": "stencil3d-p64-n1e6-inferred.legacy.bin",
+          "sha256": "8ded600c97487600373e67470dc47805489102d2ddbc1af90185c9c6543a103b"
+        },
+        "sd": {
+          "bytes": 12232011,
+          "name": "stencil3d-p64-n1e6-inferred.sd.bin",
+          "sha256": "c426b3cf0fb045285529ff9e3f6001ace38e5eac0dc55aa47d0d879c27383724"
+        }
+      },
+      "generation": {
+        "edges": 1845504,
+        "generator": "goalgen",
+        "iterations": 1202,
+        "params": {
+          "compute": 50000,
+          "halo_x": 32768,
+          "halo_y": 32768,
+          "halo_z": 131072
+        },
+        "ranks": 64,
+        "records": 1000064,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "stencil3d"
+      },
+      "generator_version": 2,
+      "goal_bytes": 71663060,
+      "header_bytes": 395,
+      "header_sha256": "4cada367eb6fd4edbec1d9263dee42d5666c09271830410dd6d815f41e83748a",
+      "record_bits": 72,
+      "spec": {
+        "ranks": 64,
+        "records": 1000000,
+        "schema": "inferred",
+        "workload": "stencil3d"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 0.34051479500067217,
+        "txt2bin_base_legacy_s": 1.141715332,
+        "txt2bin_master_sd_s": 2.536752341
+      }
+    },
+    "stencil3d-p64-n1e8-inferred": {
+      "created": "2026-11-16T23:48:20Z",
+      "experiments": [
+        "size_sweep",
+        "cold_cache",
+        "save_mem",
+        "decode_micro_large",
+        "decode_micro_cold",
+        "memory_budget"
+      ],
+      "files": {
+        "legacy": {
+          "bytes": 4638448398,
+          "name": "stencil3d-p64-n1e8-inferred.legacy.bin",
+          "sha256": "0dcc71245485ad55e9bdafa3780723965ffdd9a250dd303c71d7977b90d93e4b"
+        },
+        "sd": {
+          "bytes": 1584611211,
+          "name": "stencil3d-p64-n1e8-inferred.sd.bin",
+          "sha256": "ba426ae413418d29ba4d735e805abb2120705351184d5b6cafa5acfe7126756a"
+        }
+      },
+      "generation": {
+        "edges": 184614144,
+        "generator": "goalgen",
+        "iterations": 120192,
+        "params": {
+          "compute": 50000,
+          "halo_x": 32768,
+          "halo_y": 32768,
+          "halo_z": 131072
+        },
+        "ranks": 64,
+        "records": 99999744,
+        "schema": "inferred",
+        "seed": 20261112,
+        "workload": "stencil3d"
+      },
+      "generator_version": 2,
+      "goal_bytes": 8105709636,
+      "header_bytes": 395,
+      "header_sha256": "5be50b829a29d3ec4d789becdcaf55d80328232b83bc16fadb3fb394e15e1267",
+      "record_bits": 88,
+      "spec": {
+        "ranks": 64,
+        "records": 100000000,
+        "schema": "inferred",
+        "workload": "stencil3d"
+      },
+      "status": "ok",
+      "times": {
+        "generate_s": 48.05321883099987,
+        "txt2bin_base_legacy_s": 136.847561216,
+        "txt2bin_master_sd_s": 343.796722543
+      }
+    }
+  },
+  "traces_dir": "/home/joshua/lgs-bench/traces",
+  "traces_fs": "ext2/ext3"
+}

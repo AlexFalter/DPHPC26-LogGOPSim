@@ -13,7 +13,9 @@ import benchlib as bl
 
 # Only these variables reach the measured process (plus what a config sets), so that runs do not
 # depend on the caller's shell environment.
-PASS_ENV = ("PATH", "HOME", "USER", "LOGNAME", "TMPDIR", "LD_LIBRARY_PATH", "SLURM_JOB_ID")
+# XDG_RUNTIME_DIR / DBUS_SESSION_BUS_ADDRESS: systemd-run --user (memory_budget) needs the session bus.
+PASS_ENV = ("PATH", "HOME", "USER", "LOGNAME", "TMPDIR", "LD_LIBRARY_PATH", "SLURM_JOB_ID", "XDG_RUNTIME_DIR",
+            "DBUS_SESSION_BUS_ADDRESS")
 
 
 class Context:
