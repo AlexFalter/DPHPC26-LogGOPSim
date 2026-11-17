@@ -136,16 +136,62 @@ The thread through the talk: **Step 1 fixes the format; steps 2–4 make sure it
 - Lazy decoding: about a third less peak memory and 2–11% faster.
 - Different machine (WSL2) from slide 26 (M3 laptop).
 
+## Benchmarking study (Joshua)
+
+Slide numbers in this section and below match the PDF (slide 34 is "Parallel conversion and lazy decoding"). About 6–7 minutes in total. If time is short, skip 40 (workloads) and 41 (conversion) and only mention the summary cards on 42.
+
+**35. Title slide.** Every branch measured on one harness, against the unmodified original.
+
+**36. How we measured.**
+- Five builds straight from their branches: the original (last upstream commit), master with the new format and all decoders, the lazy-decoding branch and the parallel-conversion branch. Same compiler and flags; the harness checks that the flags are identical.
+- Seven generated workloads that look like real HPC and ML traffic. Sizes go up to 10^8 nodes (a 4.6 GB legacy file).
+- Method follows Hoefler & Belli (SC'15): report medians with confidence intervals, repeat until the 95% CI is within ±5%, interleave configurations randomly so drift hits all of them equally.
+- Every configuration is first checked against the original: same simulated times and the same per-operation timeline (`-V`). No speedup is counted for a wrong result.
+
+**37. 10^8 nodes: up to 1.36× faster.**
+- Read the table top to bottom: new format with the interpreter barely differs from the original; the compiled decoders give about 10%.
+- The big jumps come from the restructured reader on the legacy file (1.22×) and lazy decoding (1.36×), not from the format.
+- Grey numbers are within 5%. Why 5%: the same source built with and without our timing hooks differs by 5% with non-overlapping CIs. That is code layout (Mytkowicz et al., ASPLOS'09), so we don't claim gaps that small. Switching the timing on and off in the same binary changes only 0.2–0.7%.
+- The jit with an empty cache is as fast as the cached one here: the 241 ms compile is 0.5% of a 48 s run.
+
+**38. Lazy decoding: memory.**
+- "Non-reclaimable" means anonymous memory: the kernel can't drop it, only swap it. Clean file pages can simply be dropped and re-read.
+- The original decrements counters inside the private mapping, so every touched page of the 4.6 GB file becomes a private copy: 3.7 GB. The new format copies less because the file is 3× smaller. Lazy never writes the file; what remains is the counter array (4 B per node = 0.4 GB).
+- Right table: 8 simulations of the same trace at once. The file pages are shared, so lazy needs 0.31 GB in total against 3 GB for the original, and it has the highest throughput.
+- If asked why lazy's total RSS (1.9 GB) is higher than the new format's (1.5 GB): RSS also counts the clean, shared file pages, and lazy keeps the counters separately instead of inside the file pages.
+- `--save-mem` gets the original to zero anonymous memory, but it writes into the trace (the file can't be reused) and takes 950k major page faults.
+
+**39. When does compiling the decoder pay off?**
+- Right table: decoding alone. The jit is 1.7× faster than the interpreter, but still slower than reading legacy records (57 vs 41 ns). These numbers include both dependency lists and a trace far larger than the cache, so they are higher than the 12–18 ns on the JIT slide (22).
+- The compile with an empty cache costs 241 ms. Divide by the per-node saving over the interpreter: the jit pays off after 6.4M nodes (7.8M in dependency order).
+- The left plot measures it end to end: the jit with an empty cache overtakes the interpreter at 8.0M nodes. Model and measurement agree.
+- Practical rule: small traces use `plan` (or a cached jit); large ones the jit.
+
+**40. Workloads and scale.**
+- Left: the gains depend on how much time goes into decoding. Allreduce and pipeline gain 10–22% with the jit; where message matching dominates (alltoall, MoE, data-parallel), everything is within noise.
+- Right: with 8 ranks the new format is 11% slower with the interpreter; from 512 ranks on it is 7–17% faster. We haven't profiled the cause of the 8-rank case yet.
+
+**41. Conversion is now the slowest step.**
+- Complete `txt2bin` runs on a 1.35 GB GOAL file, so these are larger than the pass-1 numbers on slide 34.
+- One thread: the new format takes 2.5× as long as the original (two passes plus packing).
+- 16 threads: legacy output is 3.3× faster than the original, but the new format only gains 1.65× because pass 2 is still sequential (Amdahl). Hence the outlook item: parallelise pass 2.
+- The parallel branch maps the whole input: 0.8–1.3 GB peak memory instead of 45 MB.
+
+**42. What the study shows.** Read the four cards. Next: the same harness on the ETH student cluster (bare Linux, aarch64 GB10 and x86), where we can evict the page cache and enforce memory limits. Under WSL the memory-limit runs completed even with a limit below the original's footprint, so the limit evidently wasn't enforced; we don't report them.
+
 ## Outlook
 
-**28. Outlook.**
-- Next: parallelise pass 2, dictionary encoding, automatic decoder choice, Joshua's full study on Euler.
+**43. Outlook.**
+- Next: parallelise pass 2, dictionary encoding, automatic decoder choice, the benchmark study on the ETH student cluster.
 - GPU: conversion is embarrassingly parallel (independent ranks and nodes, min/max reductions, per-node packing). A CUDA kernel could use thousands of threads and the GPU's memory bandwidth. Exploratory, no numbers yet.
 
-**29. Who did what.** Read it briefly.
+**44. Who did what.** Read it briefly.
 
-**30. Questions.** Prepare for:
+**45. Questions.** Prepare for:
 - Why isn't lazy decoding the default? (It could be. It's opt-in so that default behaviour doesn't change.)
 - Which decoder should be the default? (Short runs: interpreter or templated; long runs: `jit` or `orc`.)
 - What if the counter array doesn't fit? (4 B/node. A trace that large is already tens of GB on disk. It fails at startup, not mid-run: `bad_alloc`, or the OOM killer on Linux.)
 - Why not keep all ranks in memory instead of parsing twice? (Large schedules don't fit. A temporary binary file is a prototyped alternative.)
+- Why WSL and not bare metal for the study? (It was the machine available before today. The harness records the environment and flags runs with background load; the cluster runs repeat everything on bare Linux.)
+- Are the synthetic workloads representative? (They follow the communication patterns of real HPC and ML jobs, but they are generated. Recorded traces, such as the ATLAHS Llama run, are next.)
+- Why does the new format lose at 8 ranks? (Not profiled yet. The legacy file through our reader is faster at every rank count, so the cost is in decoding the packed records, not in the restructured simulator.)
