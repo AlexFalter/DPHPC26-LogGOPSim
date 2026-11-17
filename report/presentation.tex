@@ -6,6 +6,8 @@
 \usepackage{listings}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
 
 % Same TikZ styles as slides.tex, so the report's diagrams render unchanged.
 \tikzset{box/.style={draw=black!65,rounded corners=3pt,minimum height=9mm,
@@ -611,6 +613,242 @@ resnet\_8192 & 216 & 153 & \textbf{$-29\%$} \\
 \source{WSL2 with 8 vCPUs, median of 3 runs. Lazy: new format, \texttt{plan} decoder; peak RSS.}
 \end{frame}
 
+% ================================================================ benchmarking study
+
+% A speedup inside the +-5% band that code layout alone can cause: shown in grey.
+\newcommand{\nz}[1]{\textcolor{black!40}{#1}}
+\newcommand{\studysource}{Intel i9-9900K, WSL2; builds and method: \emph{How we measured}.}
+
+\begin{frame}
+\centering\vfill
+{\usebeamercolor[fg]{title}\huge\bfseries Benchmarking study\par}
+\vspace{3mm}
+{\color{black!60}Every branch on one harness: original, new format, lazy decoding, parallel conversion\par}
+\vfill
+\end{frame}
+
+\begin{frame}{How we measured}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\textbf{What}
+\small
+\begin{itemize}
+\item 5 builds from their branches, with the same compiler and flags. The original is never modified.
+\item 7 generated workloads: 3D stencil, ring and recursive-doubling allreduce, alltoall, data-parallel (NCCL-style), 1F1B pipeline, MoE all-to-all.
+\item $10^4$--$10^8$ nodes, 8--32,768 ranks.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\textbf{How} {\small (Hoefler \& Belli, SC'15)}
+\small
+\begin{itemize}
+\item Repeat until the 95\% CI of the median is within $\pm$5\% (10--50 runs).
+\item Configurations interleaved in random order, pinned to one core.
+\item Bootstrap CIs for speedups; memory sampled from \texttt{/proc}.
+\item Every result checked against the original: identical, including the per-operation timeline.
+\end{itemize}
+\end{column}
+\end{columns}
+\vspace{4mm}
+\highlight{\raggedright One command, \texttt{bench/run\_all.sh}, builds all branches, generates the traces, runs, checks and plots.}
+\source{Intel i9-9900K, 16\,GB, WSL2, g++ 13.3. Commits: original 76451de, master d7b342d, lazy 81436e9, parallel 34cd5fc.}
+\end{frame}
+
+\begin{frame}[t]{$10^8$ nodes: up to 1.36$\times$ faster than the original}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Simulator} & \textbf{Reads} & \textbf{Time} & \textbf{vs.\ original} & \textbf{95\% CI} \\
+\midrule
+Original & legacy file & 53.0\,s & & \\
+\midrule
+Ours, \texttt{plan} & new format & 51.1\,s & \nz{1.04$\times$} & \nz{1.03--1.04} \\
+Ours, \texttt{templated\_node} & new format & 49.6\,s & 1.07$\times$ & 1.06--1.07 \\
+Ours, \texttt{jit} (cached) & new format & 48.1\,s & 1.10$\times$ & 1.09--1.11 \\
+Ours, \texttt{jit} (empty cache) & new format & 47.9\,s & 1.11$\times$ & 1.09--1.11 \\
+Ours & legacy file & 43.5\,s & 1.22$\times$ & 1.20--1.23 \\
+\midrule
+Lazy, \texttt{plan} & new format & 49.2\,s & 1.08$\times$ & 1.07--1.08 \\
+Lazy, \texttt{jit} (cached) & new format & 46.1\,s & 1.15$\times$ & 1.14--1.16 \\
+Lazy & legacy file & \textbf{39.0\,s} & \textbf{1.36$\times$} & 1.35--1.37 \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{2mm}
+\small
+\begin{itemize}\setlength{\itemsep}{0pt}
+\item Most of the gain comes from the restructured reader and lazy decoding; reading the legacy file is still fastest.
+\item Grey: within 5\%. The same code with and without our timing hooks differs by 5\% (code layout), so smaller gaps are not ours.
+\end{itemize}
+\source{3D stencil, 64 ranks, warm page cache. \studysource}
+\end{frame}
+
+\begin{frame}{Lazy decoding: 10$\times$ less memory the kernel can't reclaim}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\centering\textbf{One run, $10^8$ nodes}\par\vspace{1mm}
+\begin{tikzpicture}
+\begin{axis}[xbar,width=\linewidth,height=34mm,bar width=4.5mm,xmin=0,xmax=4.6,
+  symbolic y coords={Lazy,New format,Original},ytick=data,enlarge y limits=0.3,
+  xlabel={non-reclaimable memory (GB)},axis lines*=left,xmajorgrids,grid style={black!10},
+  tick label style={font=\scriptsize},label style={font=\scriptsize},
+  nodes near coords,nodes near coords style={font=\scriptsize,anchor=west,xshift=1pt},
+  point meta=explicit symbolic]
+\addplot[fill=navy!75,draw=none] coordinates {(3.72,Original)[3.72] (1.05,New format)[1.05] (0.38,Lazy)[0.38]};
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\centering\textbf{8 runs of one trace at once, $10^7$ nodes}\par\vspace{2mm}
+\footnotesize
+\begin{tabular}{lrr}
+\toprule
+& \shortstack[r]{\textbf{Non-reclaimable}\\\textbf{memory, all 8}} & \shortstack[r]{\textbf{Simulations}\\\textbf{per second}} \\
+\midrule
+Original & 2.98\,GB & 1.12 \\
+New format & 0.77\,GB & 1.17 \\
+Lazy & \textbf{0.31\,GB} & \textbf{1.22} \\
+\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+\vspace{4mm}
+\small
+\begin{itemize}\setlength{\itemsep}{1pt}
+\item Original: decrementing counters in the private mapping copies almost every page of the 4.6\,GB file.
+\item Lazy: the file is never written, so its pages are shared between runs and can be dropped. Only the 4\,B-per-node counters remain.
+\item \texttt{-{}-save-mem} avoids the copies by overwriting the file (950,000 major page faults).
+\end{itemize}
+\source{Peak anonymous RSS. Total peak RSS, which also counts clean file pages: 4.4 / 1.5 / 1.9\,GB. \studysource}
+\end{frame}
+
+\begin{frame}[t]{When does compiling the decoder pay off?}
+\begin{columns}[T]
+\begin{column}{0.53\textwidth}
+\centering\textbf{Complete runs, \texttt{jit} vs.\ \texttt{plan}}\par\vspace{1mm}
+\begin{tikzpicture}
+\begin{semilogxaxis}[width=\linewidth,height=44mm,xmin=5e3,xmax=2e8,ymin=0,ymax=1.25,
+  xlabel={trace size (nodes)},ylabel={\texttt{jit} (empty cache) speedup},axis lines=left,
+  grid=major,grid style={black!10},tick label style={font=\scriptsize},label style={font=\scriptsize}]
+\fill[gold!30] (axis cs:6.36e6,0) rectangle (axis cs:7.85e6,1.25);
+\draw[black!50,dashed] (axis cs:5e3,1) -- (axis cs:2e8,1);
+\addplot[navy,thick,mark=*,mark size=1.4pt] coordinates
+  {(1e4,0.054) (1e5,0.198) (1e6,0.715) (2e6,0.848) (5e6,0.965) (1e7,1.017) (2e7,1.046) (5e7,1.061) (1e8,1.068)};
+\draw[gold!80!black,thick] (axis cs:7.98e6,0) -- (axis cs:7.98e6,1.25);
+\node[anchor=west,font=\scriptsize,align=left,text=gold!70!black] at (axis cs:1.2e7,0.45) {break-even\\8.0M nodes};
+\end{semilogxaxis}
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.44\textwidth}
+\centering\textbf{Decoding alone, ns per node}\par\vspace{2mm}
+\footnotesize
+\begin{tabular}{lr}
+\toprule
+\textbf{Reader} & \textbf{ns/node} \\
+\midrule
+Original, legacy file & 41.6 \\
+Ours, legacy file & 41.5 \\
+\texttt{jit} & 56.5 \\
+\texttt{templated\_node} & 78.8 \\
+\texttt{plan} & 94.4 \\
+\midrule
+\texttt{jit} compile (empty cache) & 241\,ms \\
+\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+\vspace{2mm}
+\small
+\begin{itemize}\setlength{\itemsep}{0pt}
+\item Model: 241\,ms / (94.4 $-$ 56.5)\,ns = 6.4--7.8M nodes (gold band). Measured: 8.0M.
+\item Against legacy files, \texttt{jit} never breaks even: 57 vs.\ 41\,ns per node.
+\end{itemize}
+\source{Decoding alone: a 1.6\,GB trace, with dependency lists. \studysource}
+\end{frame}
+
+\begin{frame}[t]{Workloads and scale}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\centering\textbf{Speedup vs.\ original, $10^6$ nodes}\par\vspace{1mm}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Workload} & \texttt{plan} & \shortstack[r]{\texttt{jit}\\(cached)} & \shortstack[r]{legacy\\file} & \shortstack[r]{lazy,\\\texttt{plan}} \\
+\midrule
+allreduce, rec.\ doubling & \nz{1.05} & 1.22 & 1.32 & 1.07 \\
+allreduce, ring & 1.07 & 1.20 & 1.29 & 1.06 \\
+1F1B pipeline & \nz{0.98} & 1.10 & 1.25 & \nz{0.98} \\
+3D stencil & \nz{1.04} & 1.11 & 1.23 & 1.06 \\
+data-parallel (NCCL) & \nz{0.99} & \nz{1.04} & 1.10 & \nz{0.98} \\
+MoE all-to-all & \nz{0.99} & \nz{1.03} & \nz{1.05} & \nz{1.02} \\
+alltoall & \nz{0.96} & \nz{0.98} & \nz{1.00} & \nz{0.97} \\
+\bottomrule
+\end{tabular}
+\end{column}
+\begin{column}{0.41\textwidth}
+\centering\textbf{3D stencil, $10^7$ nodes}\par\vspace{1mm}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{rrr}
+\toprule
+\textbf{Ranks} & \texttt{plan} & \shortstack[r]{\texttt{jit}\\(cached)} \\
+\midrule
+8 & 0.89 & \nz{0.98} \\
+64 & \nz{1.03} & 1.10 \\
+512 & 1.07 & 1.13 \\
+4,096 & 1.12 & 1.17 \\
+32,768 & 1.11 & 1.15 \\
+\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+\vspace{1mm}
+\small
+\begin{itemize}\setlength{\itemsep}{0pt}
+\item Where message matching dominates (alltoall, MoE, data-parallel), the new format is within 5\% of the original.
+\item With few ranks the new format is slower (0.89$\times$ at 8 ranks); from 512 ranks on it is 7--17\% faster.
+\end{itemize}
+\source{Grey: within 5\%. \studysource}
+\end{frame}
+
+\begin{frame}[t]{Conversion is now the slowest step}
+\centering\textbf{\texttt{txt2bin}, $10^7$ nodes (1.35\,GB of GOAL text), seconds}\par\vspace{2mm}
+\footnotesize
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Threads} & \textbf{1} & \textbf{2} & \textbf{4} & \textbf{8} & \textbf{16} \\
+\midrule
+Original, legacy & 12.4 & & & & \\
+Parallel branch, legacy & 16.5 & 9.1 & 5.3 & 3.8 & \textbf{3.7} \\
+Parallel branch, new format & 30.4 & 23.5 & 19.7 & 18.6 & 18.4 \\
+\bottomrule
+\end{tabular}
+\par\raggedright\vspace{5mm}
+\small
+\begin{itemize}
+\item Writing the new format is 2.5$\times$ slower than the original on one thread: two passes plus bit packing.
+\item With 16 threads the legacy file is written 3.3$\times$ faster than by the original, but the new format only gains 1.65$\times$: pass 2 is still sequential.
+\item The parallel branch maps the whole text: 0.8--1.3\,GB peak memory instead of 45\,MB.
+\end{itemize}
+\highlight{Parallelising pass 2 is the next target: it now bounds the new format's conversion time.}
+\source{Median of 10--15 runs. \studysource}
+\end{frame}
+
+\begin{frame}{What the study shows}
+\centering\vfill
+\begin{tikzpicture}[choice/.style={text width=29mm,minimum width=0pt,minimum height=36mm}]
+\node[card=green!12,choice] at (0,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries Identical}\\[2mm]\small results to the original on every trace and configuration};
+\node[card=blue!8,choice] at (36mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 10$\times$}\\[2mm]\small less non-reclaimable memory with lazy decoding};
+\node[card=orange!15,choice] at (72mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 1.36$\times$}\\[2mm]\small faster complete runs at best ($10^8$ nodes)};
+\node[card=red!10,choice] at (108mm,0) {{\usebeamercolor[fg]{title}\LARGE\bfseries 2.5$\times$}\\[2mm]\small slower conversion to the new format};
+\end{tikzpicture}
+\vfill
+\par\raggedright
+\highlight{Next: the same harness on the ETH student cluster (bare Linux, aarch64 and x86), with cold page caches and enforced memory limits, which WSL can't provide.}
+\end{frame}
+
 % ================================================================ outlook
 
 \section{Outlook}
@@ -623,7 +861,7 @@ resnet\_8192 & 216 & 153 & \textbf{$-29\%$} \\
 \item Parallelise pass 2 and the legacy writer.
 \item Dictionary encoding for few, far-apart values.
 \item Choose the decoder automatically from trace size and startup cost.
-\item Full benchmark study on Euler.
+\item Repeat the benchmark study on the ETH student cluster.
 \end{itemize}
 \end{column}
 \begin{column}{0.49\textwidth}
@@ -645,7 +883,7 @@ resnet\_8192 & 216 & 153 & \textbf{$-29\%$} \\
 \toprule
 \textbf{Name} & \textbf{Work} \\
 \midrule
-Joshua Durrant & Full benchmarking study (upcoming) \\
+Joshua Durrant & Benchmark harness for all branches (builds, workload generator, adaptive repetitions, correctness gate, phase timing, decode benchmark, analysis); benchmarking study \\
 Alexander Falter & Parallel conversion (OpenMP first pass, \texttt{-{}-threads}, tests, benchmark); faster legacy writer; lazy decoding \\
 Samuel Garcin & Decode plan, C JIT with cache, LLVM ORC JIT, decode benchmark, differential tests \\
 Mykhaylo Gershman & Self-describing format and converter, custom fields, validating reader and adapters, ATLAHS integration, runner architecture, test and benchmark suites, report \\
