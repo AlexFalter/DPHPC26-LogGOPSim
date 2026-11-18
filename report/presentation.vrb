@@ -1,0 +1,29 @@
+\frametitle{Implementation}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{lstlisting}[language=C++]
+// A node finished: release its dependents.
+for (auto i : dependents) {
+  auto& c = counters_[i];  // remaining + 1
+  if (c == 0)              // first use
+    c = reader.read_dependency_count(rank, i) + 1;
+  if (--c == 1)            // none left
+    ready_.push_back(i);   // 4-byte index
+}
+
+// The simulator takes the ready nodes: decode now.
+for (auto i : ready_)
+  out.push_back(reader.read_node(rank, i));
+\end{lstlisting}
+{\scriptsize\color{black!55}From \texttt{SimulationSchedule.hpp}, simplified.\par}
+\end{column}
+\begin{column}{0.37\textwidth}
+\small
+\begin{itemize}
+\item Counters are read from the file only on their first decrement: no extra pass over the file at startup.
+\item 0 means ``not read yet'', so the stored value is the remaining count plus one.
+\item Works for both formats and every decoder, through the same reader.
+\item Opt-in flag \texttt{-{}-lazy-decoding}; the default is unchanged.
+\end{itemize}
+\end{column}
+\end{columns}

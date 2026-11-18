@@ -48,6 +48,12 @@ target_link_libraries(trace_schema PRIVATE tomlplusplus::tomlplusplus ${CMAKE_DL
 # The plan runners add their own sources to trace_schema.
 add_subdirectory(LogGOPSim/binary_reading/decoding/runners ${CMAKE_CURRENT_BINARY_DIR}/runners)
 
+# Optional, experimental: bulk decoding on an NVIDIA GPU (CUDA driver API + NVRTC) and its benchmark.
+option(LOGGOPSIM_BUILD_CUDA "Build the GPU bulk decoder (needs the CUDA toolkit)" OFF)
+if(LOGGOPSIM_BUILD_CUDA)
+  add_subdirectory(LogGOPSim/binary_reading/decoding/gpu ${CMAKE_CURRENT_BINARY_DIR}/gpu)
+endif()
+
 # Optional integration with ATLAHS's existing packet simulator and GOAL scheduler.
 option(BUILD_ATLAHS "Build and test the optional ATLAHS integration" OFF)
 # The ATLAHS fork is a separate checkout, by default next to this repository.

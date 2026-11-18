@@ -397,6 +397,16 @@ accepts several campaigns at once (local + cluster) and keeps hosts apart.
 
 ---
 
+## GPU bulk decoding (experimental)
+
+`bench/gpu/` holds a GPU decoder for whole-trace passes, not for the simulator's event loop. The
+GPU reads the self-describing header and compiles its own specialised kernel with NVRTC; a
+generic kernel and the legacy format are supported too. Its checksum is `decode_bench_micro`'s.
+It is built only with `-DLOGGOPSIM_BUILD_CUDA=ON` and is not yet part of `run.py`. Design,
+usage and first results are in [`gpu/README.md`](gpu/README.md).
+
+---
+
 ## Component benchmarks (pre-existing)
 
 The Google-Benchmark suite below predates the harness above and remains useful for quick,
